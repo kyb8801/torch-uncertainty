@@ -268,7 +268,7 @@ for i in range(8):
     model.load_state_dict(state_dict)
     all_models.append(model)
 
-from torch_uncertainty.models import deep_ensembles
+from torch_uncertainty.methods import deep_ensembles
 from torch_uncertainty.transforms import RepeatTarget
 
 ensemble = deep_ensembles(
