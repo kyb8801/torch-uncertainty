@@ -1,5 +1,5 @@
 [build-system]
-requires = ["uv_build>=0.8.22,<0.9.0"]
+requires = ["uv_build>=0.11.8,<0.12"]
 build-backend = "uv_build"
 
 [project]
@@ -12,6 +12,7 @@ authors = [
 description = "Uncertainty quantification in PyTorch"
 readme = "README.md"
 requires-python = ">=3.10,<3.14"
+
 keywords = [
   "bayesian-network",
   "ensembles",
@@ -22,6 +23,7 @@ keywords = [
   "uncertainty",
   "uncertainty-quantification",
 ]
+
 classifiers = [
   "License :: OSI Approved :: Apache Software License",
   "Programming Language :: Python :: 3 :: Only",
@@ -30,7 +32,11 @@ classifiers = [
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
 ]
-dependencies = ["einops", "seaborn"]
+
+dependencies = [
+    "einops",
+    "seaborn",
+]
 
 [dependency-groups]
 dev = [
@@ -82,6 +88,8 @@ gpu = [
 
 [tool.uv]
 conflicts = [[{ extra = "cpu" }, { extra = "gpu" }]]
+exclude-newer = "7 days"
+exclude-newer-package = {torch = false}
 
 [tool.uv.sources]
 torch = [
@@ -102,6 +110,7 @@ explicit = true
 name = "pytorch-cu128"
 url = "https://download.pytorch.org/whl/cu128"
 explicit = true
+
 
 [project.urls]
 homepage = "https://torch-uncertainty.github.io/"

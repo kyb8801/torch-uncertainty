@@ -5,7 +5,7 @@ from torch import Tensor, nn
 from torch.utils.data import DataLoader
 
 from torch_uncertainty.layers.bayesian.abnn import BatchNormAdapter2d
-from torch_uncertainty.models import deep_ensembles
+from torch_uncertainty.methods import deep_ensembles
 from torch_uncertainty.optim_recipes import optim_abnn
 from torch_uncertainty.routines import ClassificationRoutine
 from torch_uncertainty.utils import TUTrainer
