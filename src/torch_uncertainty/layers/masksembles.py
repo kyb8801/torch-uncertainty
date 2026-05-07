@@ -288,8 +288,8 @@ class MaskedConvTranspose2d(nn.Module):
         num_estimators: int,
         scale: float,
         stride: _size_2_t = 1,
-        padding: str | _size_2_t = 0,
-        output_padding: str | _size_2_t = 0,
+        padding: _size_2_t = 0,
+        output_padding: _size_2_t = 0,
         groups: int = 1,
         bias: bool = True,
         dilation: _size_2_t = 1,
@@ -306,7 +306,7 @@ class MaskedConvTranspose2d(nn.Module):
             num_estimators (int): Number of estimators in the ensemble.
             scale (float): The scale parameter for the masks.
             stride (int or tuple, optional): Stride of the convolution. Defaults to ``1``.
-            padding (int, tuple or str, optional): Padding added to all four sides of the input. Defaults to ``0``.
+            padding (int or tuple, optional): Padding added to all four sides of the input. Defaults to ``0``.
             output_padding (int, tuple or str, optional): Additional size added to one side of each dimension in the output shape. Defaults to ``0``.
             groups (int, optional): Number of blocked connexions from input channels to output channels for each estimator. Defaults to ``1``.
             bias (bool, optional): If ``True``, adds a learnable bias to the output. Defaults to ``True``.
