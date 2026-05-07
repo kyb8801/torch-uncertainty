@@ -123,7 +123,7 @@ class AURC(Metric):
             tuple[[Figure | None], Axes]: Figure object and Axes object
         """
         fig, ax = plt.subplots(figsize=(6, 6)) if ax is None else (None, ax)
-        ax = cast(plt.Axes, ax)
+        ax = cast("plt.Axes", ax)
 
         # Computation of AURC
         error_rates = self.partial_compute().cpu().flip(0)
@@ -247,7 +247,7 @@ class AUGRC(AURC):
             tuple[[Figure | None], Axes]: Figure object and Axes object
         """
         fig, ax = plt.subplots(figsize=(6, 6)) if ax is None else (None, ax)
-        ax = cast(plt.Axes, ax)
+        ax = cast("plt.Axes", ax)
 
         # Computation of AUGRC
         error_rates = self.partial_compute().cpu().flip(0)

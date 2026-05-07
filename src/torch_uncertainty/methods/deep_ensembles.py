@@ -32,7 +32,7 @@ class _DeepEnsembles(nn.Module):
                 where :math:`B` is the batch size, :math:`N` is the number of
                 estimators, and :math:`C` is the number of classes.
         """
-        #TODO: This probably doesn't work for regression
+        # TODO: This probably doesn't work for regression
         preds: list[Tensor] = []
         if self.store_on_cpu:
             for model in self.core_models:

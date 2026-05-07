@@ -245,7 +245,7 @@ def masked_wideresnet28x10(
     conv_bias: bool = True,
     dropout_rate: float = 0.3,
     groups: int = 1,
-    style: ResNetStyle= ResNetStyle.IMAGENET,
+    style: ResNetStyle = ResNetStyle.IMAGENET,
     activation_fn: Callable = relu,
     normalization_layer: type[nn.Module] = nn.BatchNorm2d,
     repeat_strategy: Literal["legacy", "paper"] = "paper",

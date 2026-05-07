@@ -1,7 +1,6 @@
+
 import torch
 from einops import repeat
-from typing import cast
-
 from torch import nn
 
 from torch_uncertainty.layers import BatchConv2d, BatchLinear
@@ -110,7 +109,9 @@ class BatchEnsemble(nn.Module):
             )
 
 
-def _batch_ensemble_checks(filtered_modules: list[BatchConv2d | BatchLinear], num_estimators: int) -> None:
+def _batch_ensemble_checks(
+    filtered_modules: list[BatchConv2d | BatchLinear], num_estimators: int
+) -> None:
     """Check if the model contains the required number of dropout modules."""
     if len(filtered_modules) == 0:
         raise ValueError(

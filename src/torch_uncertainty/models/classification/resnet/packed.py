@@ -1,4 +1,4 @@
-from typing import Any, Literal
+from typing import Any
 
 import torch.nn.functional as F
 from torch import Tensor, nn

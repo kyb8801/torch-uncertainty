@@ -279,10 +279,8 @@ def packed_multi_head_attention_forward(  # noqa: D417
         `torch.nn.MultiheadAttention` module. The implementation is adapted to support packed inputs.
     """
     if hasattr(F, "_mha_shape_check"):
-        is_batched = F._mha_shape_check(
-            query, key, value, key_padding_mask, attn_mask, num_heads
-        )
-    else: # coverage: ignore
+        is_batched = F._mha_shape_check(query, key, value, key_padding_mask, attn_mask, num_heads)
+    else:  # coverage: ignore
         is_batched = query.dim() == 3
 
     # For unbatched input, we unsqueeze at the expected batch-dim to pretend that the input

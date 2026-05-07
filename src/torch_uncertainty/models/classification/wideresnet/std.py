@@ -1,5 +1,4 @@
 from collections.abc import Callable
-from typing import Literal
 
 from torch import Tensor, nn
 from torch.nn.functional import relu
@@ -76,7 +75,7 @@ class _WideResNet(nn.Module):
         conv_bias: bool,
         dropout_rate: float,
         groups: int = 1,
-        style: ResNetStyle= ResNetStyle.IMAGENET,
+        style: ResNetStyle = ResNetStyle.IMAGENET,
         activation_fn: Callable = relu,
         normalization_layer: type[nn.Module] = nn.BatchNorm2d,
     ) -> None:

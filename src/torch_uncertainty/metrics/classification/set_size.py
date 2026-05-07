@@ -1,4 +1,4 @@
-from typing import Any, Literal, cast
+from typing import Literal, cast
 
 import torch
 from torch import Tensor
@@ -49,10 +49,8 @@ class SetSize(Metric):
             self.add_state("sizes", default=[], dist_reduce_fx="cat")
         self.add_state("total", default=torch.tensor(0, dtype=torch.long), dist_reduce_fx="sum")
 
-     # pyrefly: ignore[bad-override]
-    def update(
-        self, preds: torch.Tensor, targets: torch.Tensor | None = None  
-    ) -> None:
+    # pyrefly: ignore[bad-override]
+    def update(self, preds: torch.Tensor, targets: torch.Tensor | None = None) -> None:
         """Update the metric state with predictions and targets.
 
         Args:
@@ -64,7 +62,7 @@ class SetSize(Metric):
         pred_sizes = preds.bool().sum(-1)
 
         if self.reduction is None or self.reduction == "none":
-            sizes = cast(list[Tensor], self.sizes)
+            sizes = cast("list[Tensor]", self.sizes)
             sizes.append(pred_sizes)
         else:
             self.sizes += pred_sizes.sum()

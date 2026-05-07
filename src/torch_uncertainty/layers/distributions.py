@@ -1,10 +1,10 @@
 import inspect
-from typing import cast
+from abc import ABC, abstractmethod
 
 import torch
 import torch.nn.functional as F
 from torch import Tensor, nn
-from abc import abstractmethod, ABC
+
 
 def get_dist_linear_layer(dist_family: str) -> type[nn.Module]:
     if dist_family == "normal":
@@ -94,7 +94,7 @@ class _ExpandOutputConvNd(nn.Module, ABC):
 
     def base_forward(self, x: Tensor) -> Tensor:
         return self.base_layer(x)
-    
+
     @abstractmethod
     def forward(self, x: Tensor) -> dict[str, Tensor]:
         pass

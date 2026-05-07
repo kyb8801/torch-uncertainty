@@ -1,5 +1,4 @@
 from collections.abc import Callable
-from typing import Literal
 
 from torch import Tensor, nn
 from torch.nn.functional import relu

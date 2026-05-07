@@ -210,17 +210,17 @@ def mlp(
         _MLP: A Multi-Layer-Perceptron model.
     """
     return cast(
-        _MLP,
+        "_MLP",
         _mlp(
-        stochastic=False,
-        in_features=in_features,
-        num_outputs=num_outputs,
-        hidden_dims=hidden_dims,
-        activation=activation,
-        dropout_rate=dropout_rate,
-        dist_family=dist_family,
-        dist_args=dist_args,
-        flatten_start_dim=flatten_start_dim,
+            stochastic=False,
+            in_features=in_features,
+            num_outputs=num_outputs,
+            hidden_dims=hidden_dims,
+            activation=activation,
+            dropout_rate=dropout_rate,
+            dist_family=dist_family,
+            dist_args=dist_args,
+            flatten_start_dim=flatten_start_dim,
         ),
     )
 
@@ -244,19 +244,19 @@ def packed_mlp(
         "gamma": gamma,
     }
     return cast(
-        _MLP,
+        "_MLP",
         _mlp(
-        stochastic=False,
-        in_features=in_features,
-        num_outputs=num_outputs,
-        hidden_dims=hidden_dims,
-        layer=PackedLinear,
-        activation=activation,
-        layer_args=layer_args,
-        dropout_rate=dropout_rate,
-        dist_family=dist_family,
-        dist_args=dist_args,
-        flatten_start_dim=flatten_start_dim,
+            stochastic=False,
+            in_features=in_features,
+            num_outputs=num_outputs,
+            hidden_dims=hidden_dims,
+            layer=PackedLinear,
+            activation=activation,
+            layer_args=layer_args,
+            dropout_rate=dropout_rate,
+            dist_family=dist_family,
+            dist_args=dist_args,
+            flatten_start_dim=flatten_start_dim,
         ),
     )
 
@@ -276,19 +276,19 @@ def batched_mlp(
         "num_estimators": num_estimators,
     }
     return cast(
-        _MLP,
+        "_MLP",
         _mlp(
-        stochastic=False,
-        in_features=in_features,
-        num_outputs=num_outputs,
-        hidden_dims=hidden_dims,
-        layer=BatchLinear,
-        activation=activation,
-        layer_args=layer_args,
-        dropout_rate=dropout_rate,
-        dist_family=dist_family,
-        dist_args=dist_args,
-        flatten_start_dim=flatten_start_dim,
+            stochastic=False,
+            in_features=in_features,
+            num_outputs=num_outputs,
+            hidden_dims=hidden_dims,
+            layer=BatchLinear,
+            activation=activation,
+            layer_args=layer_args,
+            dropout_rate=dropout_rate,
+            dist_family=dist_family,
+            dist_args=dist_args,
+            flatten_start_dim=flatten_start_dim,
         ),
     )
 
@@ -305,19 +305,19 @@ def bayesian_mlp(
     flatten_start_dim: int = -1,
 ) -> StochasticModel:
     return cast(
-        StochasticModel,
+        "StochasticModel",
         _mlp(
-        stochastic=True,
-        num_samples=num_samples,
-        in_features=in_features,
-        num_outputs=num_outputs,
-        hidden_dims=hidden_dims,
-        layer=BayesLinear,
-        activation=activation,
-        dropout_rate=dropout_rate,
-        dist_family=dist_family,
-        dist_args=dist_args,
-        flatten_start_dim=flatten_start_dim,
+            stochastic=True,
+            num_samples=num_samples,
+            in_features=in_features,
+            num_outputs=num_outputs,
+            hidden_dims=hidden_dims,
+            layer=BayesLinear,
+            activation=activation,
+            dropout_rate=dropout_rate,
+            dist_family=dist_family,
+            dist_args=dist_args,
+            flatten_start_dim=flatten_start_dim,
         ),
     )
 

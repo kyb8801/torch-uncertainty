@@ -1,5 +1,6 @@
-import matplotlib.pyplot as plt
 from typing import cast
+
+import matplotlib.pyplot as plt
 import torch
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
@@ -103,7 +104,7 @@ class AUSE(Metric):
             tuple[[Figure | None], Axes]: Figure object and Axes object
         """
         fig, ax = plt.subplots() if ax is None else (None, ax)
-        ax = cast(Axes, ax)
+        ax = cast("Axes", ax)
 
         # Computation of AUSEC
         error_rates, optimal_error_rates = self.partial_compute()

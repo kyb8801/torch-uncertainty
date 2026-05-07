@@ -86,7 +86,7 @@ class QuantileCalibrationError(BinaryCalibrationError):
             bound_log_prob = iid_dist.log_prob(b_min)
             target_log_prob = dist.log_prob(target)
             if reduce_event_dims:
-                indep_dist = cast(Independent, dist)
+                indep_dist = cast("Independent", dist)
                 bound_log_prob = bound_log_prob.sum(
                     dim=list(range(-indep_dist.reinterpreted_batch_ndims, 0))
                 )
