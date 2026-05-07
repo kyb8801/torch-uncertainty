@@ -347,7 +347,7 @@ class BCEWithLogitsLSLoss(nn.BCEWithLogitsLoss):
             )
         self.label_smoothing = label_smoothing
 
-    def forward(self, input: Tensor, target: Tensor) -> Tensor:
+    def forward(self, input: Tensor, target: Tensor) -> Tensor:  # noqa: A002
         if self.label_smoothing == 0.0:
             return super().forward(input, target.type_as(input))
         target = target.float()
@@ -389,7 +389,7 @@ class CrossEntropyMaxSupLoss(nn.CrossEntropyLoss):
         )
         self.max_sup = max_sup
 
-    def forward(self, input: Tensor, target: Tensor) -> Tensor:
+    def forward(self, input: Tensor, target: Tensor) -> Tensor:  # noqa: A002
         if self.max_sup == 0.0:
             return super().forward(input, target)
         z_top1 = input.topk(1, -1)[0]
@@ -453,7 +453,7 @@ class MixupMPLoss(nn.CrossEntropyLoss):
             raise ValueError(f"mixup_ratio must be > 0. Got {mixup_ratio} < 0.")
         self.mixup_ratio = mixup_ratio
 
-    def forward(self, input: Tensor, target: Tensor) -> Tensor:
+    def forward(self, input: Tensor, target: Tensor) -> Tensor: # noqa: A002
         """The mixup transform should arrange outputs as `[mixup, normal]` or
         `[normal, mixup]` depending on r; this splits them accordingly.
 
@@ -461,8 +461,8 @@ class MixupMPLoss(nn.CrossEntropyLoss):
         that case by manually using F.kl_div if needed.
 
         Args:
-            inputs (Tensor): model logits shape (N_total, num_classes)
-            targets (Tensor): target labels (one-hot or class indices) shape (N_total, ...)
+            input (Tensor): model logits shape (N_total, num_classes)
+            target (Tensor): target labels (one-hot or class indices) shape (N_total, ...)
         """
         # determine how many samples correspond to mixup vs normal
         mixup_count = round((self.mixup_ratio / (self.mixup_ratio + 1)) * input.size(0))
