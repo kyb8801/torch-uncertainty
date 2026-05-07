@@ -52,6 +52,6 @@ class Log10(MeanAbsoluteError):
         self.add_state("values", default=torch.tensor(0.0), dist_reduce_fx="sum")
         self.add_state("total", default=torch.tensor(0), dist_reduce_fx="sum")
 
-    def update(self, pred: Tensor, target: Tensor) -> None:
+    def update(self, preds: Tensor, target: Tensor) -> None:
         """Update state with predictions and targets."""
-        return super().update(pred.log10(), target.log10())
+        return super().update(preds.log10(), target.log10())

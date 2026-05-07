@@ -1,5 +1,5 @@
 import warnings
-from typing import Literal
+from typing import Literal, cast
 
 import torch
 from torch import Tensor
@@ -44,7 +44,7 @@ class QuantileCalibrationError(BinaryCalibrationError):
         super().__init__(num_bins, norm, ignore_index, validate_args, **kwargs)
         self.conf_intervals = torch.linspace(0.05, 0.95, self.n_bins + 1)
 
-    def update(
+    def update(  # pyrefly: ignore[bad-override]
         self,
         dist: Distribution,
         target: Tensor,
@@ -86,8 +86,9 @@ class QuantileCalibrationError(BinaryCalibrationError):
             bound_log_prob = iid_dist.log_prob(b_min)
             target_log_prob = dist.log_prob(target)
             if reduce_event_dims:
+                indep_dist = cast(Independent, dist)
                 bound_log_prob = bound_log_prob.sum(
-                    dim=list(range(-dist.reinterpreted_batch_ndims, 0))
+                    dim=list(range(-indep_dist.reinterpreted_batch_ndims, 0))
                 )
 
             correct_mask[..., i] = (bound_log_prob <= target_log_prob).float()
@@ -111,7 +112,7 @@ class QuantileCalibrationError(BinaryCalibrationError):
             return torch.tensor(float("nan"))
         return super().compute()
 
-    def plot(self) -> _PLOT_OUT_TYPE:
+    def plot(self) -> _PLOT_OUT_TYPE:  # pyrefly: ignore[bad-override]
         """Plot the quantile calibration reliability diagram.
 
         Raises:
