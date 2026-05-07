@@ -1,4 +1,5 @@
 import math
+from typing import cast
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -61,7 +62,7 @@ class AURC(Metric):
         self.add_state("scores", default=[], dist_reduce_fx="cat")
         self.add_state("errors", default=[], dist_reduce_fx="cat")
 
-    def update(self, probs: Tensor, targets: Tensor) -> None:
+    def update(self, probs: Tensor, targets: Tensor) -> None:  # pyrefly: ignore[bad-override]
         """Store the scores and their associated errors for later computation.
 
         Args:
@@ -102,7 +103,7 @@ class AURC(Metric):
         cov = torch.arange(1, num_samples + 1, device=self.device) / num_samples
         return _auc_compute(cov, error_rates) / (1 - 1 / num_samples)
 
-    def plot(
+    def plot(  # pyrefly: ignore[bad-override]
         self,
         ax: _AX_TYPE | None = None,
         plot_value: bool = True,
@@ -122,6 +123,7 @@ class AURC(Metric):
             tuple[[Figure | None], Axes]: Figure object and Axes object
         """
         fig, ax = plt.subplots(figsize=(6, 6)) if ax is None else (None, ax)
+        ax = cast(plt.Axes, ax)
 
         # Computation of AURC
         error_rates = self.partial_compute().cpu().flip(0)
@@ -245,6 +247,7 @@ class AUGRC(AURC):
             tuple[[Figure | None], Axes]: Figure object and Axes object
         """
         fig, ax = plt.subplots(figsize=(6, 6)) if ax is None else (None, ax)
+        ax = cast(plt.Axes, ax)
 
         # Computation of AUGRC
         error_rates = self.partial_compute().cpu().flip(0)
@@ -340,7 +343,7 @@ class CovAtxRisk(Metric):
         _risk_coverage_checks(risk_threshold)
         self.risk_threshold = risk_threshold
 
-    def update(self, probs: Tensor, targets: Tensor) -> None:
+    def update(self, probs: Tensor, targets: Tensor) -> None:  # pyrefly: ignore[bad-override]
         """Store the scores and their associated errors for later computation.
 
         Args:
@@ -454,7 +457,7 @@ class RiskAtxCov(Metric):
         _risk_coverage_checks(cov_threshold)
         self.cov_threshold = cov_threshold
 
-    def update(self, probs: Tensor, targets: Tensor) -> None:
+    def update(self, probs: Tensor, targets: Tensor) -> None:  # pyrefly: ignore[bad-override]
         """Store the scores and their associated errors for later computation.
 
         Args:

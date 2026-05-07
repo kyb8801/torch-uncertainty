@@ -61,7 +61,7 @@ class FPRx(Metric):
             " footprint."
         )
 
-    def update(self, confidences: Tensor, target: Tensor) -> None:
+    def update(self, confidences: Tensor, target: Tensor) -> None:  # pyrefly: ignore[bad-override]
         """Update the metric state.
 
         Args:

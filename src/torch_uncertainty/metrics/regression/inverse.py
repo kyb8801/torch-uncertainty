@@ -25,7 +25,7 @@ class MeanSquaredErrorInverse(MeanSquaredError):
         self,
         squared: bool = True,
         num_outputs: int = 1,
-        unit: str = "km",
+        unit: Literal["mm", "m", "km"] = "km",
         **kwargs,
     ) -> None:
         r"""Mean Squared Error of the inverse predictions (iMSE).
@@ -64,7 +64,7 @@ class MeanSquaredErrorInverse(MeanSquaredError):
 
 
 class MeanAbsoluteErrorInverse(MeanAbsoluteError):
-    def __init__(self, unit: str = "km", **kwargs) -> None:
+    def __init__(self, unit: Literal["mm", "m", "km"] = "km", **kwargs) -> None:
         r"""Mean Absolute Error of the inverse predictions (iMAE).
 
         .. math:: \text{iMAE} = \frac{1}{N}\sum_i^N \left| \frac{1}{y_i} - \frac{1}{\hat{y_i}} \right|
