@@ -7,7 +7,7 @@ import yaml
 from timm.data.auto_augment import rand_augment_transform
 from timm.data.mixup import Mixup
 from torch import nn
-from torch.utils.data import DataLoader, Subset
+from torch.utils.data import DataLoader, Dataset, Subset
 from torchvision.datasets import DTD, SVHN, ImageNet, INaturalist
 from torchvision.transforms import v2
 
@@ -41,6 +41,8 @@ class ImageNetDataModule(TUDataModule):
     std = (0.229, 0.224, 0.225)
     train_indices = None
     val_indices = None
+    dataset: type[ImageNet] | type[ImageNetR] | type[ImageNetO] | type[ImageNetA] | type[ImageNetC]
+    ood_dataset: type[Dataset]
 
     def __init__(
         self,
@@ -237,7 +239,7 @@ class ImageNetDataModule(TUDataModule):
 
     def prepare_data(self) -> None:  # coverage: ignore
         if self.test_alt is not None:
-            self.data = self.dataset(
+            self.data = self.dataset(  # type: ignore
                 self.root,
                 split="val",
                 download=True,
@@ -251,7 +253,7 @@ class ImageNetDataModule(TUDataModule):
                     transform=self.test_transform,
                 )
             elif self.ood_ds != "textures":
-                self.ood = self.ood_dataset(
+                self.ood = self.ood_dataset(  # type: ignore
                     self.root,
                     split="test",
                     download=True,
@@ -272,7 +274,7 @@ class ImageNetDataModule(TUDataModule):
                 shift_severity=self.shift_severity,
             )
 
-    def setup(self, stage: Literal["fit", "test"] | None = None) -> None:
+    def setup(self, stage: str | None = None) -> None:
         if stage == "fit" or stage is None:
             if self.test_alt is not None:
                 raise ValueError("The test_alt argument is not supported for training.")

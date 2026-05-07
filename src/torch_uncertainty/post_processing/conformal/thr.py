@@ -51,6 +51,7 @@ class ConformalClsTHR(Conformal):
         )
 
     def fit(self, dataloader: DataLoader) -> None:
+        assert self.model is not None
         if self.enable_ts:
             self.model.fit(dataloader=dataloader)
 
@@ -66,7 +67,7 @@ class ConformalClsTHR(Conformal):
         labels = torch.cat(label_list).long()
         true_class_probs = probs.gather(1, labels.unsqueeze(1)).squeeze(1)
         scores = 1.0 - true_class_probs
-        self.q_hat = torch.quantile(scores, 1.0 - self.alpha).item()
+        self.q_hat = torch.quantile(scores, 1.0 - self.alpha)
 
     @torch.no_grad()
     def conformal(self, inputs: Tensor) -> Tensor:

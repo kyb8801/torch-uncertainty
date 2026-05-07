@@ -36,7 +36,7 @@ class TUDataModule(LightningDataModule, ABC):
         root: str | Path,
         batch_size: int,
         eval_batch_size: int | None,
-        val_split: float | None,
+        val_split: float | str | Path | None,
         num_workers: int,
         pin_memory: bool,
         persistent_workers: bool,
@@ -89,7 +89,7 @@ class TUDataModule(LightningDataModule, ABC):
         self.postprocess_set = postprocess_set
 
     @abstractmethod
-    def setup(self, stage: Literal["fit", "test"] | None = None) -> None:
+    def setup(self, stage: str | None = None) -> None:
         pass
 
     def get_train_set(self) -> Dataset:
@@ -198,7 +198,7 @@ class TUDataModule(LightningDataModule, ABC):
         cv_dm = []
 
         for fold, (train_idx, val_idx) in enumerate(
-            skf.split(self._get_train_data(), self._get_train_targets())
+            skf.split(self._get_train_data(), self._get_train_targets())  # type: ignore
         ):
             if fold >= train_over:
                 break
@@ -230,7 +230,7 @@ class CrossValDataModule(TUDataModule):
         datamodule: TUDataModule,
         batch_size: int,
         eval_batch_size: int | None,
-        val_split: float,
+        val_split: float | Path | str | None,
         num_workers: int,
         pin_memory: bool,
         persistent_workers: bool,
@@ -260,10 +260,10 @@ class CrossValDataModule(TUDataModule):
         else:
             raise ValueError(f"Stage {stage} not supported.")
 
-    def _data_loader(self, dataset: Dataset, idx: ArrayLike, training: bool) -> DataLoader:
+    def _cv_data_loader(self, dataset: Dataset, idx: ArrayLike, training: bool) -> DataLoader:
         return DataLoader(
             dataset=dataset,
-            sampler=SubsetRandomSampler(idx),
+            sampler=SubsetRandomSampler(idx),  # type: ignore
             shuffle=False,
             batch_size=self.batch_size if training else self.eval_batch_size,
             num_workers=self.num_workers,
@@ -285,12 +285,12 @@ class CrossValDataModule(TUDataModule):
 
     def train_dataloader(self) -> DataLoader:
         """Get the training dataloader for the current fold."""
-        return self._data_loader(self.dm.get_train_set(), training=True, idx=self.train_idx)
+        return self._cv_data_loader(self.dm.get_train_set(), training=True, idx=self.train_idx)
 
     def val_dataloader(self) -> DataLoader:
         """Get the validation dataloader for the current fold."""
-        return self._data_loader(self.dm.get_train_set(), training=False, idx=self.val_idx)
+        return self._cv_data_loader(self.dm.get_train_set(), training=False, idx=self.val_idx)
 
     def test_dataloader(self) -> list[DataLoader]:
         """Get the test dataloader for the current fold."""
-        return [self._data_loader(self.dm.get_train_set(), training=False, idx=self.val_idx)]
+        return [self._cv_data_loader(self.dm.get_train_set(), training=False, idx=self.val_idx)]

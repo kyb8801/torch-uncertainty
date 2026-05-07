@@ -20,5 +20,5 @@ class ChannelLayerNorm(LayerNorm):
         self.cback = ChannelBack()
         self.cfront = ChannelFront()
 
-    def forward(self, inputs: Tensor) -> Tensor:
-        return self.cfront(super().forward(self.cback(inputs)))
+    def forward(self, input: Tensor) -> Tensor:  # noqa: A002
+        return self.cfront(super().forward(self.cback(input)))

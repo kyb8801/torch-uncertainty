@@ -6,7 +6,7 @@ import torch
 from numpy.typing import ArrayLike
 from timm.data.auto_augment import rand_augment_transform
 from torch import nn
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, Dataset
 from torchvision.datasets import CIFAR100, SVHN
 from torchvision.transforms import v2
 
@@ -24,6 +24,9 @@ class CIFAR100DataModule(TUDataModule):
     training_task = "classification"
     mean = (0.5071, 0.4867, 0.4408)
     std = (0.2675, 0.2565, 0.2761)
+    dataset: type[CIFAR100]
+    ood_dataset: type[Dataset]
+    shift_dataset: type[Dataset]
 
     def __init__(
         self,
@@ -162,21 +165,21 @@ class CIFAR100DataModule(TUDataModule):
         self.dataset(self.root, train=False, download=True)
 
         if self.eval_ood:
-            self.ood_dataset(
+            self.ood_dataset(  # type: ignore
                 self.root,
                 split="test",
                 download=True,
                 transform=self.test_transform,
             )
         if self.eval_shift:
-            self.shift_dataset(
+            self.shift_dataset(  # type: ignore
                 self.root,
                 download=True,
                 transform=self.test_transform,
                 shift_severity=self.shift_severity,
             )
 
-    def setup(self, stage: Literal["fit", "test"] | None = None) -> None:
+    def setup(self, stage: str | None = None) -> None:
         if stage == "fit" or stage is None:
             full = self.dataset(
                 self.root,
@@ -187,7 +190,7 @@ class CIFAR100DataModule(TUDataModule):
             if self.val_split:
                 self.train, self.val = create_train_val_split(
                     full,
-                    self.val_split,
+                    self.val_split,  # type: ignore
                     self.test_transform,
                 )
             else:
@@ -252,10 +255,10 @@ class CIFAR100DataModule(TUDataModule):
 
     def _get_train_data(self) -> ArrayLike:
         if self.val_split:
-            return self.train.dataset.data[self.train.indices]
-        return self.train.data
+            return self.train.dataset.data[self.train.indices]  # type: ignore
+        return self.train.data  # type: ignore
 
     def _get_train_targets(self) -> ArrayLike:
         if self.val_split:
-            return np.array(self.train.dataset.targets)[self.train.indices]
-        return np.array(self.train.targets)
+            return np.array(self.train.dataset.targets)[self.train.indices]  # type: ignore
+        return np.array(self.train.targets)  # type: ignore

@@ -55,6 +55,7 @@ class ConformalClsAPS(Conformal):
 
     def model_forward(self, inputs: Tensor) -> Tensor:
         """Apply the model and return the scores."""
+        assert self.model is not None
         self.model.eval()
         return self.model(inputs.to(self.device)).softmax(-1)
 
@@ -90,6 +91,7 @@ class ConformalClsAPS(Conformal):
     @torch.no_grad()
     def fit(self, dataloader: DataLoader) -> None:
         """Calibrate the APS threshold q_hat on a calibration set."""
+        assert self.model is not None
         if self.enable_ts:
             self.model.fit(dataloader=dataloader)
 
@@ -100,7 +102,7 @@ class ConformalClsAPS(Conformal):
             scores = self._calculate_single_label(probs, labels)
             aps_scores.append(scores)
 
-        self.q_hat = torch.quantile(torch.cat(aps_scores), 1 - self.alpha).item()
+        self.q_hat = torch.quantile(torch.cat(aps_scores), 1 - self.alpha)
 
     @torch.no_grad()
     def conformal(self, inputs: Tensor) -> Tensor:

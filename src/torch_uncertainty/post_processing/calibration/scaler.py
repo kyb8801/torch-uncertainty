@@ -100,7 +100,9 @@ class Scaler(PostProcessing):
 
     @torch.no_grad()
     def forward(self, inputs: Tensor) -> Tensor:
-        if self.model is None or not self.trained:
+        if self.model is None:
+            raise RuntimeError("The model has not been set.")
+        if not self.trained:
             logging.warning(
                 "TemperatureScaler has not been trained yet. Returning manually tempered inputs."
             )
@@ -109,6 +111,7 @@ class Scaler(PostProcessing):
     def _extract_data(self, dataloader: DataLoader, progress: bool) -> tuple[Tensor, Tensor]:
         all_logits = []
         all_labels = []
+        assert self.model is not None
         with torch.no_grad():
             for inputs, labels in tqdm(dataloader, disable=not progress):
                 logits = self.model(inputs.to(self.device))

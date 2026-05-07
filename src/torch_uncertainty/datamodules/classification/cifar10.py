@@ -6,7 +6,7 @@ import torch
 from numpy.typing import ArrayLike
 from timm.data.auto_augment import rand_augment_transform
 from torch import nn
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, Dataset
 from torchvision.datasets import CIFAR10, SVHN
 from torchvision.transforms import v2
 
@@ -24,6 +24,9 @@ class CIFAR10DataModule(TUDataModule):
     training_task = "classification"
     mean = (0.4914, 0.4822, 0.4465)
     std = (0.2023, 0.1994, 0.2010)
+    dataset: type[CIFAR10] | type[CIFAR10H]
+    ood_dataset: type[Dataset]
+    shift_dataset: type[Dataset]
 
     def __init__(
         self,
@@ -179,15 +182,15 @@ class CIFAR10DataModule(TUDataModule):
             )
 
         if self.eval_ood:
-            self.ood_dataset(self.root, split="test", download=True)
+            self.ood_dataset(self.root, split="test", download=True)  # type: ignore
         if self.eval_shift:
-            self.shift_dataset(
+            self.shift_dataset(  # type: ignore
                 self.root,
                 shift_severity=self.shift_severity,
                 download=True,
             )
 
-    def setup(self, stage: Literal["fit", "test"] | None = None) -> None:
+    def setup(self, stage: str | None = None) -> None:
         if stage == "fit" or stage is None:
             if self.test_alt == "h":
                 raise ValueError("CIFAR-H can only be used at test time.")
@@ -200,7 +203,7 @@ class CIFAR10DataModule(TUDataModule):
             if self.val_split:
                 self.train, self.val = create_train_val_split(
                     full,
-                    self.val_split,
+                    self.val_split,  # type: ignore
                     self.test_transform,
                 )
             else:
@@ -223,7 +226,7 @@ class CIFAR10DataModule(TUDataModule):
                 self.test = self.dataset(
                     self.root,
                     transform=self.test_transform,
-                    shift_severity=self.shift_severity,
+                    shift_severity=self.shift_severity,  # type: ignore
                 )
             if self.eval_ood:
                 self.ood = self.ood_dataset(
@@ -272,10 +275,10 @@ class CIFAR10DataModule(TUDataModule):
 
     def _get_train_data(self) -> ArrayLike:
         if self.val_split:
-            return self.train.dataset.data[self.train.indices]
-        return self.train.data
+            return self.train.dataset.data[self.train.indices]  # type: ignore
+        return self.train.data  # type: ignore
 
     def _get_train_targets(self) -> ArrayLike:
         if self.val_split:
-            return np.array(self.train.dataset.targets)[self.train.indices]
-        return np.array(self.train.targets)
+            return np.array(self.train.dataset.targets)[self.train.indices]  # type: ignore
+        return np.array(self.train.targets)  # type: ignore
