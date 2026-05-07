@@ -1,6 +1,6 @@
 import copy
 from pathlib import Path
-from typing import Literal
+from typing import Any, Literal
 
 import torch
 from torch import Tensor, nn
@@ -18,8 +18,11 @@ class _DeepEnsembles(nn.Module):
         self.num_estimators = len(core_models)
         self.store_on_cpu = store_on_cpu
 
-    def forward(self, x: Tensor) -> Tensor:
-        r"""Return the logits of the ensemble.
+    def forward(self, x: Tensor) -> Tensor | dict[str, Tensor]:
+        r"""Return the output of the ensemble.
+
+        For classification, return logits. For regression, return distribution parameters in a
+            dict.
 
         Args:
             x (Tensor): The input of the model.
@@ -29,6 +32,7 @@ class _DeepEnsembles(nn.Module):
                 where :math:`B` is the batch size, :math:`N` is the number of
                 estimators, and :math:`C` is the number of classes.
         """
+        #TODO: This probably doesn't work for regression
         preds: list[Tensor] = []
         if self.store_on_cpu:
             for model in self.core_models:
@@ -39,7 +43,7 @@ class _DeepEnsembles(nn.Module):
             preds = [model.forward(x) for model in self.core_models]
         return torch.cat(preds, dim=0)
 
-    def to(self, *args, **kwargs: dict):
+    def to(self, *args: Any, **kwargs: Any) -> "_DeepEnsembles":
         device, dtype, non_blocking = torch._C._nn._parse_to(*args, **kwargs)[:3]
 
         if self.store_on_cpu:
@@ -158,8 +162,9 @@ def deep_ensembles(
         if reset_model_parameters:
             for model in core_models:
                 for layer in model.modules():
-                    if hasattr(layer, "reset_parameters"):
-                        layer.reset_parameters()
+                    reset_parameters = getattr(layer, "reset_parameters", None)
+                    if callable(reset_parameters):
+                        reset_parameters()
 
     elif isinstance(core_models, list) and len(core_models) > 1 and num_estimators is not None:
         raise ValueError("num_estimators must be None if you provided a non-singleton list.")
