@@ -453,7 +453,7 @@ class MixupMPLoss(nn.CrossEntropyLoss):
             raise ValueError(f"mixup_ratio must be > 0. Got {mixup_ratio} < 0.")
         self.mixup_ratio = mixup_ratio
 
-    def forward(self, input: Tensor, target: Tensor) -> Tensor: # noqa: A002
+    def forward(self, input: Tensor, target: Tensor) -> Tensor:  # noqa: A002
         """The mixup transform should arrange outputs as `[mixup, normal]` or
         `[normal, mixup]` depending on r; this splits them accordingly.
 

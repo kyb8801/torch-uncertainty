@@ -60,7 +60,7 @@ class _MCBatchNorm(_BatchNorm):
         self.reset_mc_statistics()
 
     @torch.no_grad()
-    def forward(self, input: Tensor) -> Tensor: # noqa: A002
+    def forward(self, input: Tensor) -> Tensor:  # noqa: A002
         """Forward pass.
 
         There are three different operating modes:

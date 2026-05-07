@@ -210,6 +210,7 @@ class DeepLabV3Decoder(nn.Module):
             of parameters. Defaults to False.
         dropout_rate (float, optional): Dropout rate of the ASPP. Defaults to 0.1.
     """
+
     conv: nn.Module
 
     def __init__(
