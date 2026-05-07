@@ -80,7 +80,7 @@ class SILog(Metric):
         """Update state with predictions and targets.
 
         Args:
-            pred (Tensor): A prediction tensor of shape (batch)
+            preds (Tensor): A prediction tensor of shape (batch)
             target (Tensor): A tensor of ground truth labels of shape (batch)
         """
         self.log_dists += torch.sum(preds.log() - target.log())

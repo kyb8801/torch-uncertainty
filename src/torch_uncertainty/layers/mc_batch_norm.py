@@ -60,7 +60,7 @@ class _MCBatchNorm(_BatchNorm):
         self.reset_mc_statistics()
 
     @torch.no_grad()
-    def forward(self, input: Tensor) -> Tensor:
+    def forward(self, input: Tensor) -> Tensor: # noqa: A002
         """Forward pass.
 
         There are three different operating modes:
@@ -73,7 +73,7 @@ class _MCBatchNorm(_BatchNorm):
             predictions.
 
         Args:
-            inputs (Tensor): Input tensor.
+            input (Tensor): Input tensor.
         """
         if not self.training:
             if self.accumulate:
@@ -123,7 +123,7 @@ class MCBatchNorm1d(_MCBatchNorm):
         See `this issue/discussion <https://github.com/torch-uncertainty/torch-uncertainty/issues/218>`_.
     """
 
-    def _check_input_dim(self, input) -> None:  # pyrefly: ignore[bad-override]
+    def _check_input_dim(self, input) -> None:  # pyrefly: ignore[bad-override] # noqa: A002
         if input.dim() != 2 and input.dim() != 3:
             raise ValueError(f"expected 2D or 3D input (got {input.dim()}D input)")
 
@@ -150,7 +150,7 @@ class MCBatchNorm2d(_MCBatchNorm):
         See `this issue/discussion <https://github.com/torch-uncertainty/torch-uncertainty/issues/218>`_.
     """
 
-    def _check_input_dim(self, input) -> None:  # pyrefly: ignore[bad-override]
+    def _check_input_dim(self, input) -> None:  # pyrefly: ignore[bad-override] # noqa: A002
         if input.dim() != 3 and input.dim() != 4:
             raise ValueError(f"expected 3D or 4D input (got {input.dim()}D input)")
 
@@ -177,6 +177,6 @@ class MCBatchNorm3d(_MCBatchNorm):
         See `this issue/discussion <https://github.com/torch-uncertainty/torch-uncertainty/issues/218>`_.
     """
 
-    def _check_input_dim(self, input) -> None:  # pyrefly: ignore[bad-override]
+    def _check_input_dim(self, input) -> None:  # pyrefly: ignore[bad-override] # noqa: A002
         if input.dim() != 4 and input.dim() != 5:
             raise ValueError(f"expected 4D or 5D input (got {input.dim()}D input)")

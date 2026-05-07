@@ -57,6 +57,8 @@ class SeparableConv2d(nn.Module):
 
 
 class InnerConv(nn.Module):
+    conv: nn.Module
+
     def __init__(
         self,
         in_channels: int,
@@ -136,7 +138,7 @@ class ASPP(nn.Module):
         """
         super().__init__()
         out_channels = 256
-        modules = []
+        modules: list[nn.Module] = []
         modules.append(
             nn.Sequential(
                 nn.Conv2d(in_channels, out_channels, kernel_size=1, bias=False),
@@ -189,8 +191,8 @@ class DeepLabV3Backbone(Backbone):
             )
         else:
             raise ValueError(f"Unknown backbone: {backbone_name}.")
-        base_model.avgpool = nn.Identity()
-        base_model.fc = nn.Identity()
+        base_model.avgpool = nn.Identity()  # pyrefly: ignore[bad-assignment]
+        base_model.fc = nn.Identity()  # pyrefly: ignore[bad-assignment]
         set_bn_momentum(base_model, norm_momentum)
 
         feat_names = ["layer1", "layer4"] if style == "v3+" else ["layer4"]
@@ -208,6 +210,7 @@ class DeepLabV3Decoder(nn.Module):
             of parameters. Defaults to False.
         dropout_rate (float, optional): Dropout rate of the ASPP. Defaults to 0.1.
     """
+    conv: nn.Module
 
     def __init__(
         self,
@@ -232,6 +235,8 @@ class DeepLabV3Decoder(nn.Module):
 
 
 class DeepLabV3PlusDecoder(nn.Module):
+    conv: nn.Module
+
     def __init__(
         self,
         in_channels: int,
@@ -285,7 +290,7 @@ class _DeepLabV3(nn.Module):
     def __init__(
         self,
         num_classes: int,
-        backbone_name: str,
+        backbone_name: Literal["resnet50", "resnet101"],
         style: Literal["v3", "v3+"],
         output_stride: int = 16,
         separable: bool = False,
@@ -296,7 +301,7 @@ class _DeepLabV3(nn.Module):
 
         Args:
             num_classes (int): Number of classes.
-            backbone_name (str): Backbone name.
+            backbone_name (Literal["resnet50", "resnet101"]): Backbone name.
             style (Literal["v3", "v3+"]):  Whether to use a DeepLab V3 or
                 V3+ model.
             output_stride (int, optional): Output stride. Defaults to 16.
