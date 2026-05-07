@@ -347,12 +347,12 @@ class BCEWithLogitsLSLoss(nn.BCEWithLogitsLoss):
             )
         self.label_smoothing = label_smoothing
 
-    def forward(self, inputs: Tensor, targets: Tensor) -> Tensor:
+    def forward(self, input: Tensor, target: Tensor) -> Tensor:
         if self.label_smoothing == 0.0:
-            return super().forward(inputs, targets.type_as(inputs))
-        targets = targets.float()
-        targets = targets * (1 - self.label_smoothing) + self.label_smoothing / 2
-        loss = targets * F.logsigmoid(inputs) + (1 - targets) * F.logsigmoid(-inputs)
+            return super().forward(input, target.type_as(input))
+        target = target.float()
+        target = target * (1 - self.label_smoothing) + self.label_smoothing / 2
+        loss = target * F.logsigmoid(input) + (1 - target) * F.logsigmoid(-input)
         if self.weight is not None:
             loss = loss * self.weight
         if self.reduction == "mean":
@@ -380,18 +380,24 @@ class CrossEntropyMaxSupLoss(nn.CrossEntropyLoss):
         Reference:
             MaxSup: Fixing Label-smoothing for improved feature representation. Y. Zhou et al.
         """
-        super().__init__(weight, size_average, reduction=reduction, label_smoothing=label_smoothing)
+        reduction = "none" if reduction is None else reduction
+        super().__init__(
+            weight=weight,
+            size_average=size_average,
+            reduction=reduction,
+            label_smoothing=label_smoothing,
+        )
         self.max_sup = max_sup
 
-    def forward(self, inputs: Tensor, targets: Tensor) -> Tensor:
+    def forward(self, input: Tensor, target: Tensor) -> Tensor:
         if self.max_sup == 0.0:
-            return super().forward(inputs, targets)
-        z_top1 = inputs.topk(1, -1)[0]
-        reg = z_top1 - inputs.mean(-1, keepdim=True)
+            return super().forward(input, target)
+        z_top1 = input.topk(1, -1)[0]
+        reg = z_top1 - input.mean(-1, keepdim=True)
         loss = (
             F.cross_entropy(
-                inputs,
-                targets,
+                input,
+                target,
                 label_smoothing=self.label_smoothing,
             )
             + self.max_sup * reg
@@ -447,7 +453,7 @@ class MixupMPLoss(nn.CrossEntropyLoss):
             raise ValueError(f"mixup_ratio must be > 0. Got {mixup_ratio} < 0.")
         self.mixup_ratio = mixup_ratio
 
-    def forward(self, inputs: Tensor, targets: Tensor) -> Tensor:
+    def forward(self, input: Tensor, target: Tensor) -> Tensor:
         """The mixup transform should arrange outputs as `[mixup, normal]` or
         `[normal, mixup]` depending on r; this splits them accordingly.
 
@@ -459,11 +465,11 @@ class MixupMPLoss(nn.CrossEntropyLoss):
             targets (Tensor): target labels (one-hot or class indices) shape (N_total, ...)
         """
         # determine how many samples correspond to mixup vs normal
-        mixup_count = round((self.mixup_ratio / (self.mixup_ratio + 1)) * inputs.size(0))
+        mixup_count = round((self.mixup_ratio / (self.mixup_ratio + 1)) * input.size(0))
 
         # slices: assume mixup first, then normal
-        mixup_preds, mixup_targets = inputs[:mixup_count], targets[:mixup_count]
-        norm_preds, norm_targets = inputs[mixup_count:], targets[mixup_count:]
+        mixup_preds, mixup_targets = input[:mixup_count], target[:mixup_count]
+        norm_preds, norm_targets = input[mixup_count:], target[mixup_count:]
 
         # standard cross entropy for normal samples
         loss_norm = super().forward(norm_preds, norm_targets)
