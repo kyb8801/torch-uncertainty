@@ -1,5 +1,6 @@
 from collections.abc import Callable
 from functools import partial
+from typing import cast
 
 import torch
 import torch.nn.functional as F
@@ -116,7 +117,9 @@ def lenet(
     groups: int = 1,
     dropout_rate: float = 0.0,
 ) -> _LeNet:
-    return _lenet(
+    return cast(
+        _LeNet,
+        _lenet(
         stochastic=False,
         in_channels=in_channels,
         num_classes=num_classes,
@@ -127,6 +130,7 @@ def lenet(
         norm=norm,
         groups=groups,
         dropout_rate=dropout_rate,
+        ),
     )
 
 
@@ -139,7 +143,7 @@ def batchensemble_lenet(
     groups: int = 1,
     dropout_rate: float = 0.0,
     repeat_training_inputs: bool = False,
-) -> _LeNet:
+) -> BatchEnsemble:
     model = lenet(
         in_channels=in_channels,
         num_classes=num_classes,
@@ -172,7 +176,9 @@ def packed_lenet(
         "alpha": alpha,
         "gamma": gamma,
     }
-    return _lenet(
+    return cast(
+        _LeNet,
+        _lenet(
         stochastic=False,
         in_channels=in_channels,
         num_classes=num_classes,
@@ -185,6 +191,7 @@ def packed_lenet(
         activation=activation,
         groups=groups,
         dropout_rate=dropout_rate,
+        ),
     )
 
 
@@ -214,7 +221,9 @@ def bayesian_lenet(
     if sigma_init is not None:
         layers_args["sigma_init"] = sigma_init
 
-    return _lenet(
+    return cast(
+        StochasticModel,
+        _lenet(
         stochastic=True,
         num_samples=num_samples,
         in_channels=in_channels,
@@ -226,4 +235,5 @@ def bayesian_lenet(
         activation=activation,
         groups=groups,
         dropout_rate=dropout_rate,
+        ),
     )

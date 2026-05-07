@@ -61,6 +61,7 @@ class _Down(nn.Module):
 
 
 class _Up(nn.Module):
+    up: nn.Module
     def __init__(
         self, in_channels: int, out_channels: int, num_estimators: int, bilinear: bool = True
     ) -> None:
@@ -75,7 +76,7 @@ class _Up(nn.Module):
                 mid_channels=in_channels // 2,
             )
         else:
-            self.up = self.up = BatchConvTranspose2d(
+            self.up = BatchConvTranspose2d(
                 in_channels, in_channels // 2, 2, num_estimators, stride=2
             )
             self.conv = _DoubleConv(in_channels, out_channels, num_estimators=num_estimators)

@@ -129,7 +129,7 @@ def bayesian_inception_time(
     num_blocks: int = 6,
     dropout: float = 0.0,
     residual: bool = True,
-) -> _BayesianInceptionTime:
+) -> StochasticModel:
     """Bayesian InceptionTime.
 
     Args:
@@ -143,7 +143,7 @@ def bayesian_inception_time(
         residual (bool): Whether to use residual connections. Default is ``True``.
 
     Returns:
-        _InceptionTime: An instance of the InceptionTime model.
+        StochasticModel: A stochastic InceptionTime model.
     """
     return StochasticModel(
         _BayesianInceptionTime(
