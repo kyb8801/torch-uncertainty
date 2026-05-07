@@ -31,7 +31,7 @@ class SegmentationBinaryAveragePrecision(Metric):
         self.add_state("binary_aupr", default=torch.tensor(0.0), dist_reduce_fx="sum")
         self.add_state("total", default=torch.tensor(0.0), dist_reduce_fx="sum")
 
-    def update(self, preds: Tensor, target: Tensor) -> None:
+    def update(self, preds: Tensor, target: Tensor) -> None:  # pyrefly: ignore[bad-override]
         batch_size = preds.size(0)
         aupr = self.aupr_metric(preds, target)
         self.binary_aupr += aupr * batch_size
