@@ -1,6 +1,5 @@
 import copy
 from collections.abc import Mapping
-from typing import Any, TypeVar, overload
 
 import torch
 from torch import Tensor, nn

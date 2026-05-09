@@ -96,6 +96,7 @@ class _PackedDown(nn.Module):
 
 class _PackedUp(nn.Module):
     up: nn.Module
+
     def __init__(
         self,
         in_channels: int,

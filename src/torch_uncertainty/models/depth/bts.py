@@ -1,5 +1,4 @@
 import math
-from typing import Any, cast
 
 import torch
 import torch.nn.functional as F
@@ -15,6 +14,7 @@ from torchvision.models.resnet import (
 
 from torch_uncertainty.layers.distributions import get_dist_conv_layer
 from torch_uncertainty.models.utils import Backbone
+
 from .utils import BackboneName
 
 resnet_feat_out_channels = [64, 256, 512, 1024, 2048]
@@ -57,7 +57,8 @@ class AtrousBlock2d(nn.Module):
             norm_first (bool): Whether to apply normalization before the 1x1 convolution.
                 Defaults to ``True``.
             norm_momentum (float): Momentum for the normalization layer. Defaults to ``0.1``.
-            factory_kwargs: Additional arguments for the PyTorch layers.
+            device: torch device. Defaults to ``None``.
+            dtype: torch dtype. Defaults to ``None``.
         """
         super().__init__()
 
@@ -115,8 +116,8 @@ class UpConv2d(nn.Module):
             in_channels (int): Number of input channels.
             out_channels (int): Number of output channels.
             ratio (int): Upsampling ratio.
-            device: torch device. Defaults to None.
-            dtype: torch dtype. Defaults to None.
+            device: torch device. Defaults to ``None``.
+            dtype: torch dtype. Defaults to ``None``.
         """
         super().__init__()
         self.conv = nn.Conv2d(
@@ -227,6 +228,7 @@ class Reduction1x1(nn.Module):
 class LocalPlanarGuidance(nn.Module):
     u: Tensor
     v: Tensor
+
     def __init__(self, up_ratio: int) -> None:
         super().__init__()
         self.register_buffer("u", torch.arange(up_ratio).reshape([1, 1, up_ratio]))

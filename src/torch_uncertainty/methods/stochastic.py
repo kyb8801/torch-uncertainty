@@ -35,7 +35,7 @@ class StochasticModel(nn.Module):
             module (nn.Module): The module to sample.
 
         Raises:
-            AttributeError: Triggered when the module doesn't implement sample.
+            TypeError: Triggered when the module doesn't implement sample.
             TypeError: Triggered when the module sampling function does not return a
                 tuple.
 
@@ -44,7 +44,7 @@ class StochasticModel(nn.Module):
         """
         sample_fn = getattr(module, "sample", None)
         if not callable(sample_fn):
-            raise AttributeError("Bayesian module must implement `sample()`.")
+            raise TypeError("Bayesian module must implement `sample()`.")
         weight_bias = sample_fn()
         if not isinstance(weight_bias, tuple) or len(weight_bias) != 2:
             raise TypeError("`sample()` must return (weight, bias).")
