@@ -84,6 +84,6 @@ class LaplaceApprox(PostProcessing):
         inputs: Tensor,
     ) -> Tensor:
         out = self.la(inputs, pred_type=self.pred_type, link_approx=self.link_approx, n_samples=100)
-        if isinstance(out, tuple): # coverage: ignore
+        if isinstance(out, tuple):  # coverage: ignore
             return out[0]
         return out
