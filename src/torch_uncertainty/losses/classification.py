@@ -14,9 +14,10 @@ class DECLoss(nn.Module):
         """The Deep Evidential Classification loss.
 
         Args:
-            annealing_step (int): Annealing step for the weight of the
-                regularization term.
-            reg_weight (float): Fixed weight of the regularization term.
+            annealing_step (int | None): Annealing step for the weight of the
+                regularization term. Defaults to None.
+            reg_weight (float | None): Fixed weight of the regularization term.
+                Defaults to None.
             loss_type (str, optional): Specifies the loss type to apply to the
                 Dirichlet parameters: ``'mse'`` | ``'log'`` | ``'digamma'``.
             reduction (str, optional): Specifies the reduction to apply to the
@@ -131,17 +132,28 @@ class DECLoss(nn.Module):
             loss_dirichlet = self._digamma_loss(evidence, targets)
 
         if self.reg_weight is None and self.annealing_step is None:
-            annealing_coef = 0
-        elif self.annealing_step is None and self.reg_weight > 0:
-            annealing_coef = self.reg_weight
+            annealing_coef = torch.tensor(0.0, dtype=evidence.dtype, device=evidence.device)
+        elif self.annealing_step is None and self.reg_weight is not None:
+            annealing_coef = torch.tensor(
+                float(self.reg_weight),
+                dtype=evidence.dtype,
+                device=evidence.device,
+            )
         else:
+            if current_epoch is None:
+                raise ValueError("current_epoch must be set when annealing_step is used.")
+            if self.annealing_step is None:
+                raise ValueError("annealing_step must be set when using annealing.")
             annealing_coef = torch.min(
-                input=torch.tensor(1.0, dtype=evidence.dtype),
-                other=torch.tensor(current_epoch / self.annealing_step, dtype=evidence.dtype),
+                input=torch.tensor(1.0, dtype=evidence.dtype, device=evidence.device),
+                other=torch.tensor(
+                    float(current_epoch) / float(self.annealing_step),
+                    dtype=evidence.dtype,
+                    device=evidence.device,
+                ),
             )
 
-        loss_reg = self._kldiv_reg(evidence, targets)
-        loss = loss_dirichlet + annealing_coef * loss_reg
+        loss = loss_dirichlet + annealing_coef * self._kldiv_reg(evidence, targets)
         if self.reduction == "mean":
             loss = loss.mean()
         elif self.reduction == "sum":

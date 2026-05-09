@@ -30,8 +30,8 @@ def _equal_binning_bucketize(
     confidences, indices = torch.sort(confidences)
     accuracies = accuracies[indices]
     acc_bin, conf_bin = (
-        accuracies.tensor_split(num_bins),
-        confidences.tensor_split(num_bins),
+        list(accuracies.tensor_split(num_bins)),
+        list(confidences.tensor_split(num_bins)),
     )
     count_bin = torch.as_tensor(
         [len(cb) for cb in conf_bin],
@@ -75,7 +75,7 @@ def _ace_compute(
     if norm == "l1":
         return torch.sum(torch.abs(acc_bin - conf_bin) * prop_bin)
     if norm == "max":
-        ace = torch.max(torch.abs(acc_bin - conf_bin))
+        return torch.max(torch.abs(acc_bin - conf_bin))
     if norm == "l2":
         ace = torch.sum(torch.pow(acc_bin - conf_bin, 2) * prop_bin)
         if debias:  # coverage: ignore
@@ -86,7 +86,7 @@ def _ace_compute(
                 torch.nan_to_num(debias_bins)
             )  # replace nans with zeros if nothing appeared in a bin
         return torch.sqrt(ace) if ace > 0 else torch.tensor(0)
-    return ace
+    raise ValueError(f"Unexpected norm. Got {norm}.")
 
 
 class BinaryAdaptiveCalibrationError(Metric):
@@ -118,7 +118,7 @@ class BinaryAdaptiveCalibrationError(Metric):
         self.add_state("confidences", [], dist_reduce_fx="cat")
         self.add_state("accuracies", [], dist_reduce_fx="cat")
 
-    def update(self, probs: Tensor, targets: Tensor) -> None:
+    def update(self, probs: Tensor, targets: Tensor) -> None:  # pyrefly: ignore[bad-override]
         """Update metric states with predictions and targets."""
         confidences, preds = torch.max(probs, 1 - probs), torch.round(probs)
         accuracies = preds == targets
@@ -133,9 +133,9 @@ class BinaryAdaptiveCalibrationError(Metric):
 
 
 class MulticlassAdaptiveCalibrationError(Metric):
-    is_differentiable: bool = False
-    higher_is_better: bool = False
-    full_state_update: bool = False
+    is_differentiable: bool | None = False
+    higher_is_better: bool | None = False
+    full_state_update: bool | None = False
 
     confidences: list[Tensor]
     accuracies: list[Tensor]
@@ -162,7 +162,7 @@ class MulticlassAdaptiveCalibrationError(Metric):
         self.add_state("confidences", [], dist_reduce_fx="cat")
         self.add_state("accuracies", [], dist_reduce_fx="cat")
 
-    def update(self, probs: Tensor, targets: Tensor) -> None:
+    def update(self, probs: Tensor, targets: Tensor) -> None:  # pyrefly: ignore[bad-override]
         """Update metric states with predictions and targets."""
         confidences, preds = torch.max(probs, 1)
         accuracies = preds == targets
@@ -243,7 +243,7 @@ class AdaptiveCalibrationError:
         .. seealso::
             - See `:class:`CalibrationError` for a metric that uses uniform binning.
         """
-        task = ClassificationTaskNoMultilabel.from_str(task)
+        task_enum = ClassificationTaskNoMultilabel.from_str(task)
         kwargs.update(
             {
                 "n_bins": num_bins,
@@ -252,7 +252,7 @@ class AdaptiveCalibrationError:
                 "validate_args": validate_args,
             }
         )
-        if task == ClassificationTaskNoMultilabel.BINARY:
+        if task_enum == ClassificationTaskNoMultilabel.BINARY:
             return BinaryAdaptiveCalibrationError(**kwargs)
         # task is ClassificationTaskNoMultilabel.MULTICLASS
         if not isinstance(num_classes, int):

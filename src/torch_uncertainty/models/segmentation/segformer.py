@@ -39,19 +39,21 @@ class MLP(nn.Module):
 
         self.apply(self._init_weights)
 
-    def _init_weights(self, m) -> None:
-        if isinstance(m, nn.Linear):
-            trunc_normal_(m.weight, std=0.02)
-            nn.init.constant_(m.bias, 0)
-        elif isinstance(m, nn.Conv2d):
-            fan_out = m.kernel_size[0] * m.kernel_size[1] * m.out_channels
-            fan_out //= m.groups
-            m.weight.data.normal_(0, math.sqrt(2.0 / fan_out))
-            nn.init.constant_(m.bias, 0)
+    def _init_weights(self, module: nn.Module) -> None:
+        if isinstance(module, nn.Linear):
+            trunc_normal_(module.weight, std=0.02)
+            if module.bias is not None:
+                nn.init.constant_(module.bias, 0)
+        elif isinstance(module, nn.Conv2d):
+            fan_out = module.kernel_size[0] * module.kernel_size[1] * module.out_channels
+            fan_out //= module.groups
+            module.weight.data.normal_(0, math.sqrt(2.0 / fan_out))
+            if module.bias is not None:
+                nn.init.constant_(module.bias, 0)
 
-    def forward(self, inputs: Tensor, h, w) -> Tensor:
+    def forward(self, inputs: Tensor, height: int, width: int) -> Tensor:
         inputs = self.fc1(inputs)
-        inputs = self.dwconv(inputs, h, w)
+        inputs = self.dwconv(inputs, height, width)
         inputs = self.act(inputs)
         inputs = self.dropout(inputs)
         inputs = self.fc2(inputs)
@@ -90,18 +92,20 @@ class Attention(nn.Module):
 
         self.apply(self._init_weights)
 
-    def _init_weights(self, m) -> None:
-        if isinstance(m, nn.Linear):
-            trunc_normal_(m.weight, std=0.02)
-            nn.init.constant_(m.bias, 0)
-        elif isinstance(m, nn.LayerNorm):
-            nn.init.constant_(m.bias, 0)
-            nn.init.constant_(m.weight, 1.0)
-        elif isinstance(m, nn.Conv2d):
-            fan_out = m.kernel_size[0] * m.kernel_size[1] * m.out_channels
-            fan_out //= m.groups
-            m.weight.data.normal_(0, math.sqrt(2.0 / fan_out))
-            nn.init.constant_(m.bias, 0)
+    def _init_weights(self, module: nn.Module) -> None:
+        if isinstance(module, nn.Linear):
+            trunc_normal_(module.weight, std=0.02)
+            if module.bias is not None:
+                nn.init.constant_(module.bias, 0)
+        elif isinstance(module, nn.LayerNorm):
+            nn.init.constant_(module.bias, 0)
+            nn.init.constant_(module.weight, 1.0)
+        elif isinstance(module, nn.Conv2d):
+            fan_out = module.kernel_size[0] * module.kernel_size[1] * module.out_channels
+            fan_out //= module.groups
+            module.weight.data.normal_(0, math.sqrt(2.0 / fan_out))
+            if module.bias is not None:
+                nn.init.constant_(module.bias, 0)
 
     def forward(self, inputs: Tensor, h: int, w: int) -> Tensor:
         b, n, c = inputs.shape
@@ -173,34 +177,43 @@ class Block(nn.Module):
 
         self.apply(self._init_weights)
 
-    def _init_weights(self, m) -> None:
-        if isinstance(m, nn.Linear):
-            trunc_normal_(m.weight, std=0.02)
-            nn.init.constant_(m.bias, 0)
-        elif isinstance(m, nn.LayerNorm):
-            nn.init.constant_(m.bias, 0)
-            nn.init.constant_(m.weight, 1.0)
-        elif isinstance(m, nn.Conv2d):
-            fan_out = m.kernel_size[0] * m.kernel_size[1] * m.out_channels
-            fan_out //= m.groups
-            m.weight.data.normal_(0, math.sqrt(2.0 / fan_out))
-            nn.init.constant_(m.bias, 0)
+    def _init_weights(self, module: nn.Module) -> None:
+        if isinstance(module, nn.Linear):
+            trunc_normal_(module.weight, std=0.02)
+            if module.bias is not None:
+                nn.init.constant_(module.bias, 0)
+        elif isinstance(module, nn.LayerNorm):
+            nn.init.constant_(module.bias, 0)
+            nn.init.constant_(module.weight, 1.0)
+        elif isinstance(module, nn.Conv2d):
+            fan_out = module.kernel_size[0] * module.kernel_size[1] * module.out_channels
+            fan_out //= module.groups
+            module.weight.data.normal_(0, math.sqrt(2.0 / fan_out))
+            if module.bias is not None:
+                nn.init.constant_(module.bias, 0)
 
-    def forward(self, inputs, h, w):
-        inputs = inputs + self.drop_path(self.attn(self.norm1(inputs), h, w))
-        return inputs + self.drop_path(self.mlp(self.norm2(inputs), h, w))
+    def forward(self, inputs: Tensor, height: int, width: int) -> Tensor:
+        inputs = inputs + self.drop_path(self.attn(self.norm1(inputs), height, width))
+        return inputs + self.drop_path(self.mlp(self.norm2(inputs), height, width))
 
 
 class OverlapPatchEmbed(nn.Module):
     """Image to Patch Embedding."""
 
-    def __init__(self, img_size=224, patch_size=7, stride=4, in_chans=3, embed_dim=768) -> None:
+    def __init__(
+        self,
+        img_size: int = 224,
+        patch_size: int = 7,
+        stride: int = 4,
+        in_chans: int = 3,
+        embed_dim: int = 768,
+    ) -> None:
         super().__init__()
         img_size = to_2tuple(img_size)
         patch_size = to_2tuple(patch_size)
 
-        self.img_size = img_size
-        self.patch_size = patch_size
+        self.img_size: tuple[int, int] = img_size
+        self.patch_size: tuple[int, int] = patch_size
         self.h, self.w = (
             img_size[0] // patch_size[0],
             img_size[1] // patch_size[1],
@@ -217,23 +230,23 @@ class OverlapPatchEmbed(nn.Module):
 
         self.apply(self._init_weights)
 
-    def _init_weights(self, m) -> None:
-        if isinstance(m, nn.LayerNorm):
-            nn.init.constant_(m.bias, 0)
-            nn.init.constant_(m.weight, 1.0)
-        elif isinstance(m, nn.Conv2d):
-            fan_out = m.kernel_size[0] * m.kernel_size[1] * m.out_channels
-            fan_out //= m.groups
-            m.weight.data.normal_(0, math.sqrt(2.0 / fan_out))
-            nn.init.constant_(m.bias, 0)
+    def _init_weights(self, module: nn.Module) -> None:
+        if isinstance(module, nn.LayerNorm):
+            nn.init.constant_(module.bias, 0)
+            nn.init.constant_(module.weight, 1.0)
+        elif isinstance(module, nn.Conv2d):
+            fan_out = module.kernel_size[0] * module.kernel_size[1] * module.out_channels
+            fan_out //= module.groups
+            module.weight.data.normal_(0, math.sqrt(2.0 / fan_out))
+            if module.bias is not None:
+                nn.init.constant_(module.bias, 0)
 
-    def forward(self, inputs):
+    def forward(self, inputs: Tensor) -> tuple[Tensor, int, int]:
         inputs = self.proj(inputs)
-        _, _, h, w = inputs.shape
+        _, _, height, width = inputs.shape
         inputs = inputs.flatten(2).transpose(1, 2)
         inputs = self.norm(inputs)
-
-        return inputs, h, w
+        return inputs, height, width
 
 
 class MixVisionTransformer(nn.Module):
@@ -374,20 +387,22 @@ class MixVisionTransformer(nn.Module):
 
         self.apply(self._init_weights)
 
-    def _init_weights(self, m: nn.Module) -> None:
-        if isinstance(m, nn.Linear):
-            trunc_normal_(m.weight, std=0.02)
-            nn.init.constant_(m.bias, 0)
-        elif isinstance(m, nn.LayerNorm):
-            nn.init.constant_(m.bias, 0)
-            nn.init.constant_(m.weight, 1.0)
-        elif isinstance(m, nn.Conv2d):
-            fan_out = m.kernel_size[0] * m.kernel_size[1] * m.out_channels
-            fan_out //= m.groups
-            m.weight.data.normal_(0, math.sqrt(2.0 / fan_out))
-            nn.init.constant_(m.bias, 0)
+    def _init_weights(self, module: nn.Module) -> None:
+        if isinstance(module, nn.Linear):
+            trunc_normal_(module.weight, std=0.02)
+            if module.bias is not None:
+                nn.init.constant_(module.bias, 0)
+        elif isinstance(module, nn.LayerNorm):
+            nn.init.constant_(module.bias, 0)
+            nn.init.constant_(module.weight, 1.0)
+        elif isinstance(module, nn.Conv2d):
+            fan_out = module.kernel_size[0] * module.kernel_size[1] * module.out_channels
+            fan_out //= module.groups
+            module.weight.data.normal_(0, math.sqrt(2.0 / fan_out))
+            if module.bias is not None:
+                nn.init.constant_(module.bias, 0)
 
-    def forward_features(self, inputs: Tensor) -> Tensor:
+    def forward_features(self, inputs: Tensor) -> list[Tensor]:
         b = inputs.shape[0]
         outs = []
 
@@ -425,7 +440,7 @@ class MixVisionTransformer(nn.Module):
 
         return outs
 
-    def forward(self, inputs: Tensor) -> Tensor:
+    def forward(self, inputs: Tensor) -> list[Tensor]:
         return self.forward_features(inputs)
 
 
@@ -484,7 +499,7 @@ class MLPHead(nn.Module):
 def resize(
     inputs: Tensor,
     size: torch.Size | None = None,
-    scale_factor: float | tuple[float] | None = None,
+    scale_factor: float | tuple[float, float] | None = None,
     mode: str = "nearest",
     align_corners: bool | None = None,
     warning: bool = True,
@@ -543,20 +558,20 @@ class SegFormerHead(nn.Module):
         self.classifier = nn.Conv2d(embed_dim, num_classes, kernel_size=1)
         self.dropout = nn.Dropout2d(dropout_ratio)
 
-    def forward(self, inputs: Tensor) -> Tensor:
+    def forward(self, inputs: list[Tensor]) -> Tensor:
         # x [inputs[i] for i in self.in_index] # len=4, 1/4,1/8,1/16,1/32
         c1, c2, c3, c4 = inputs[0], inputs[1], inputs[2], inputs[3]
 
         n, _, _, _ = c4.shape
 
         _c4 = self.linear_c4(c4).permute(0, 2, 1).reshape(n, -1, c4.shape[2], c4.shape[3])
-        _c4 = resize(_c4, size=c1.size()[2:], mode="bilinear", align_corners=False)
+        _c4 = resize(_c4, size=torch.Size(c1.shape[2:]), mode="bilinear", align_corners=False)
 
         _c3 = self.linear_c3(c3).permute(0, 2, 1).reshape(n, -1, c3.shape[2], c3.shape[3])
-        _c3 = resize(_c3, size=c1.size()[2:], mode="bilinear", align_corners=False)
+        _c3 = resize(_c3, size=torch.Size(c1.shape[2:]), mode="bilinear", align_corners=False)
 
         _c2 = self.linear_c2(c2).permute(0, 2, 1).reshape(n, -1, c2.shape[2], c2.shape[3])
-        _c2 = resize(_c2, size=c1.size()[2:], mode="bilinear", align_corners=False)
+        _c2 = resize(_c2, size=torch.Size(c1.shape[2:]), mode="bilinear", align_corners=False)
 
         _c1 = self.linear_c1(c1).permute(0, 2, 1).reshape(n, -1, c1.shape[2], c1.shape[3])
 
