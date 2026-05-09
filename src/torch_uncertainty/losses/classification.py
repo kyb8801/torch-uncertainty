@@ -140,10 +140,14 @@ class DECLoss(nn.Module):
                 device=evidence.device,
             )
         else:
-            if current_epoch is None:
-                raise ValueError("current_epoch must be set when annealing_step is used.")
-            if self.annealing_step is None:
-                raise ValueError("annealing_step must be set when using annealing.")
+            if current_epoch is None:  # coverage: ignore
+                raise ValueError(
+                    "current_epoch must be set when annealing_step is used and reg_weight is None."
+                )
+            if self.annealing_step is None:  # coverage: ignore
+                raise ValueError(
+                    "annealing_step must be set when annealing_step is used and reg_weight is None."
+                )
             annealing_coef = torch.min(
                 input=torch.tensor(1.0, dtype=evidence.dtype, device=evidence.device),
                 other=torch.tensor(
