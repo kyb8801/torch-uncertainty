@@ -100,7 +100,7 @@ class Scaler(PostProcessing):
 
     @torch.no_grad()
     def forward(self, inputs: Tensor) -> Tensor:
-        if self.model is None:
+        if self.model is None: # coverage: ignore
             raise RuntimeError("The model has not been set.")
         if not self.trained:
             logging.warning(

@@ -339,11 +339,9 @@ def packed_multi_head_attention_forward(  # noqa: D417
     )
     if isinstance(embed_dim, Tensor):
         # embed_dim can be a tensor when JIT tracing
-        head_dim = embed_dim.div(num_heads, rounding_mode="trunc")
+        head_dim = int(embed_dim.div(num_heads, rounding_mode="trunc").item())
     else:
         head_dim = embed_dim // num_heads
-    if isinstance(head_dim, Tensor):
-        head_dim = int(head_dim.item())
     assert head_dim * num_heads == embed_dim, (
         f"embed_dim {embed_dim} not divisible by num_heads {num_heads}"
     )
