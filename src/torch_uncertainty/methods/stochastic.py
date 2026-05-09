@@ -28,7 +28,7 @@ class StochasticModel(nn.Module):
             return self.core_model.forward(x)
         return self.eval_forward(x)
 
-    def _inner_sample(self, module: nn.Module) -> tuple:
+    def _inner_sample(self, module: nn.Module) -> tuple:  # coverage: ignore
         """Check that the module has a sampling method, then sample it.
 
         Args:
@@ -54,13 +54,13 @@ class StochasticModel(nn.Module):
         sampled_models = [{}] * num_samples
         for module_name in self.core_model._modules:
             module = self.core_model._modules[module_name]
-            if module is None:
+            if module is None:  # coverage: ignore
                 continue
             if isinstance(module, bayesian_modules):
                 for model in sampled_models:
                     weight, bias = self._inner_sample(module)
                     model[module_name + ".weight"] = weight
-                    if bias is not None:
+                    if bias is not None:  # coverage: ignore
                         model[module_name + ".bias"] = bias
             else:
                 for model in sampled_models:

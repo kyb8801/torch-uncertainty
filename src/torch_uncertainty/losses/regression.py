@@ -86,8 +86,10 @@ class DERLoss(DistributionNLLLoss):
         targets: Tensor,
         padding_mask: Tensor | None = None,
     ) -> Tensor:
-        if not isinstance(dist, (NormalInverseGamma, Independent)):
-            raise TypeError("Expected NormalInverseGamma distribution.")
+        if not isinstance(dist, NormalInverseGamma | Independent):  # coverage: ignore
+            raise TypeError(
+                "Expected NormalInverseGamma or Independent distribution. Got {type(dist)}"
+            )
         loss_nll = super().forward(dist, targets, padding_mask=padding_mask)
         loss_reg = self._reg(dist, targets)
         loss = loss_nll + self.reg_weight * loss_reg

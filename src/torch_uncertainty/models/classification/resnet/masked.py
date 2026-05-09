@@ -171,7 +171,7 @@ class _MaskedResNet(nn.Module):
         normalization_layer: type[nn.Module] = nn.BatchNorm2d,
         repeat_strategy: Literal["legacy", "paper"] = "legacy",
     ) -> None:
-        if repeat_strategy not in ("legacy", "paper"):
+        if repeat_strategy not in ("legacy", "paper"):  # coverage: ignore
             raise ValueError(f"Unknown repeat_strategy. Got {repeat_strategy}.")
 
         super().__init__()

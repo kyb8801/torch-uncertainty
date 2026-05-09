@@ -8,14 +8,30 @@ from timm.layers import DropPath, to_2tuple, trunc_normal_
 from torch import Tensor, nn
 
 
+def _init_weights(module: nn.Module) -> None:
+    if isinstance(module, nn.Linear):
+        trunc_normal_(module.weight, std=0.02)
+        if module.bias is not None:
+            nn.init.constant_(module.bias, 0)
+    elif isinstance(module, nn.LayerNorm):
+        nn.init.constant_(module.bias, 0)
+        nn.init.constant_(module.weight, 1.0)
+    elif isinstance(module, nn.Conv2d):
+        fan_out = module.kernel_size[0] * module.kernel_size[1] * module.out_channels
+        fan_out //= module.groups
+        module.weight.data.normal_(0, math.sqrt(2.0 / fan_out))
+        if module.bias is not None:
+            nn.init.constant_(module.bias, 0)
+
+
 class DWConv(nn.Module):
     def __init__(self, dim: int = 768) -> None:
         super().__init__()
         self.dwconv = nn.Conv2d(dim, dim, 3, 1, 1, bias=True, groups=dim)
 
-    def forward(self, inputs: Tensor, h: int, w: int) -> Tensor:
-        b, _, c = inputs.shape
-        inputs = self.dwconv(inputs.transpose(1, 2).view(b, c, h, w))
+    def forward(self, inputs: Tensor, height: int, width: int) -> Tensor:
+        batch, _, channels = inputs.shape
+        inputs = self.dwconv(inputs.transpose(1, 2).view(batch, channels, height, width))
         return inputs.flatten(2).transpose(1, 2)
 
 
@@ -37,19 +53,7 @@ class MLP(nn.Module):
         self.fc2 = nn.Linear(hidden_features, out_features)
         self.dropout = nn.Dropout(dropout_rate)
 
-        self.apply(self._init_weights)
-
-    def _init_weights(self, module: nn.Module) -> None:
-        if isinstance(module, nn.Linear):
-            trunc_normal_(module.weight, std=0.02)
-            if module.bias is not None:
-                nn.init.constant_(module.bias, 0)
-        elif isinstance(module, nn.Conv2d):
-            fan_out = module.kernel_size[0] * module.kernel_size[1] * module.out_channels
-            fan_out //= module.groups
-            module.weight.data.normal_(0, math.sqrt(2.0 / fan_out))
-            if module.bias is not None:
-                nn.init.constant_(module.bias, 0)
+        self.apply(_init_weights)
 
     def forward(self, inputs: Tensor, height: int, width: int) -> Tensor:
         inputs = self.fc1(inputs)
@@ -90,22 +94,7 @@ class Attention(nn.Module):
             self.sr = nn.Conv2d(dim, dim, kernel_size=sr_ratio, stride=sr_ratio)
             self.norm = nn.LayerNorm(dim)
 
-        self.apply(self._init_weights)
-
-    def _init_weights(self, module: nn.Module) -> None:
-        if isinstance(module, nn.Linear):
-            trunc_normal_(module.weight, std=0.02)
-            if module.bias is not None:
-                nn.init.constant_(module.bias, 0)
-        elif isinstance(module, nn.LayerNorm):
-            nn.init.constant_(module.bias, 0)
-            nn.init.constant_(module.weight, 1.0)
-        elif isinstance(module, nn.Conv2d):
-            fan_out = module.kernel_size[0] * module.kernel_size[1] * module.out_channels
-            fan_out //= module.groups
-            module.weight.data.normal_(0, math.sqrt(2.0 / fan_out))
-            if module.bias is not None:
-                nn.init.constant_(module.bias, 0)
+        self.apply(_init_weights)
 
     def forward(self, inputs: Tensor, h: int, w: int) -> Tensor:
         b, n, c = inputs.shape
@@ -175,22 +164,7 @@ class Block(nn.Module):
             dropout_rate=dropout,
         )
 
-        self.apply(self._init_weights)
-
-    def _init_weights(self, module: nn.Module) -> None:
-        if isinstance(module, nn.Linear):
-            trunc_normal_(module.weight, std=0.02)
-            if module.bias is not None:
-                nn.init.constant_(module.bias, 0)
-        elif isinstance(module, nn.LayerNorm):
-            nn.init.constant_(module.bias, 0)
-            nn.init.constant_(module.weight, 1.0)
-        elif isinstance(module, nn.Conv2d):
-            fan_out = module.kernel_size[0] * module.kernel_size[1] * module.out_channels
-            fan_out //= module.groups
-            module.weight.data.normal_(0, math.sqrt(2.0 / fan_out))
-            if module.bias is not None:
-                nn.init.constant_(module.bias, 0)
+        self.apply(_init_weights)
 
     def forward(self, inputs: Tensor, height: int, width: int) -> Tensor:
         inputs = inputs + self.drop_path(self.attn(self.norm1(inputs), height, width))
@@ -228,18 +202,7 @@ class OverlapPatchEmbed(nn.Module):
         )
         self.norm = nn.LayerNorm(embed_dim)
 
-        self.apply(self._init_weights)
-
-    def _init_weights(self, module: nn.Module) -> None:
-        if isinstance(module, nn.LayerNorm):
-            nn.init.constant_(module.bias, 0)
-            nn.init.constant_(module.weight, 1.0)
-        elif isinstance(module, nn.Conv2d):
-            fan_out = module.kernel_size[0] * module.kernel_size[1] * module.out_channels
-            fan_out //= module.groups
-            module.weight.data.normal_(0, math.sqrt(2.0 / fan_out))
-            if module.bias is not None:
-                nn.init.constant_(module.bias, 0)
+        self.apply(_init_weights)
 
     def forward(self, inputs: Tensor) -> tuple[Tensor, int, int]:
         inputs = self.proj(inputs)
@@ -385,22 +348,7 @@ class MixVisionTransformer(nn.Module):
         )
         self.norm4 = norm_layer(embed_dims[3])
 
-        self.apply(self._init_weights)
-
-    def _init_weights(self, module: nn.Module) -> None:
-        if isinstance(module, nn.Linear):
-            trunc_normal_(module.weight, std=0.02)
-            if module.bias is not None:
-                nn.init.constant_(module.bias, 0)
-        elif isinstance(module, nn.LayerNorm):
-            nn.init.constant_(module.bias, 0)
-            nn.init.constant_(module.weight, 1.0)
-        elif isinstance(module, nn.Conv2d):
-            fan_out = module.kernel_size[0] * module.kernel_size[1] * module.out_channels
-            fan_out //= module.groups
-            module.weight.data.normal_(0, math.sqrt(2.0 / fan_out))
-            if module.bias is not None:
-                nn.init.constant_(module.bias, 0)
+        self.apply(_init_weights)
 
     def forward_features(self, inputs: Tensor) -> list[Tensor]:
         b = inputs.shape[0]
