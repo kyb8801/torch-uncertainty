@@ -191,7 +191,7 @@ class _Bottleneck(nn.Module):
 class _ResNet(nn.Module):
     def __init__(
         self,
-        block: type[_BasicBlock | _Bottleneck],
+        block: type[_BasicBlock] | type[_Bottleneck],
         num_blocks: list[int],
         in_channels: int,
         num_classes: int,
