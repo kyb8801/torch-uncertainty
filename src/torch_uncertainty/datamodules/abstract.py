@@ -159,7 +159,7 @@ class TUDataModule(LightningDataModule, ABC):
         Args:
             dataset (Dataset): Dataset to create a dataloader for.
             training (bool): Whether it is a training or evaluation dataloader.
-            shuffle (bool, optional): Whether to shuffle the dataset. Defaults
+            shuffle (bool): Whether to shuffle the dataset. Defaults
                 to False.
 
         Return:

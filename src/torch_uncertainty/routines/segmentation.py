@@ -74,31 +74,31 @@ class SegmentationRoutine(LightningModule):
             num_classes (int): Number of classes in the segmentation task.
             loss (torch.nn.Module): Loss function to optimize the :attr:`model`.
                 Defaults to ``None``.
-            optim_recipe (Callable[[nn.Module], OptimizerLRScheduler] | OptimizerLRScheduler, optional): The optimizer and
+            optim_recipe (Callable[[nn.Module], OptimizerLRScheduler] | OptimizerLRScheduler): The optimizer and
                 optionally the scheduler to use, or a callable that returns them. Defaults to ``None``.
-            eval_shift (bool, optional): Indicates whether to evaluate the Distribution
+            eval_shift (bool): Indicates whether to evaluate the Distribution
                 shift performance. Defaults to ``False``.
-            format_batch_fn (torch.nn.Module, optional): The function to format the
+            format_batch_fn (torch.nn.Module): The function to format the
                 batch. Defaults to ``None``.
-            metric_subsampling_rate (float, optional): The rate of subsampling for the
+            metric_subsampling_rate (float): The rate of subsampling for the
                 memory consuming metrics. Defaults to ``1e-2``.
-            eval_ood (bool, optional): Indicates whether to evaluate the OOD
+            eval_ood (bool): Indicates whether to evaluate the OOD
                 performance. Defaults to ``False``.
-            ood_criterion (TUOODCriterion, optional): Criterion for the binary OOD detection task.
+            ood_criterion (TUOODCriterion): Criterion for the binary OOD detection task.
                 Defaults to ``"msp"`` which amounts to the maximum softmax probability score (MSP).
-            post_processing (PostProcessing, optional): The post-processing
+            post_processing (PostProcessing): The post-processing
                 technique to use. Defaults to ``None``. Warning: There is no
                 post-processing technique implemented yet for segmentation tasks.
-            log_plots (bool, optional): Indicates whether to log figures in the logger.
+            log_plots (bool): Indicates whether to log figures in the logger.
                 Defaults to ``False``.
-            num_samples_to_plot (int, optional): Number of segmentation prediction and
+            num_samples_to_plot (int): Number of segmentation prediction and
                 target to plot in the logger. Note that this is only used if
                 :attr:`log_plots` is set to ``True``. Defaults to ``3``.
-            num_bins_calibration_error (int, optional): Number of bins to compute calibration
+            num_bins_calibration_error (int): Number of bins to compute calibration
                 error metrics. Defaults to ``15``.
-            save_in_csv (bool, optional): Save the results in csv. Defaults to
+            save_in_csv (bool): Save the results in csv. Defaults to
                 ``False``.
-            csv_filename (str, optional): The name of the csv file to save the results in.
+            csv_filename (str): The name of the csv file to save the results in.
                 Defaults to ``"results.csv"``.
 
         Warning:
@@ -317,7 +317,7 @@ class SegmentationRoutine(LightningModule):
         Args:
             batch (tuple[Tensor, Tensor]): the test images and their corresponding targets
             batch_idx (int): the index of the batch in the test dataloader.
-            dataloader_idx (int, optional): the index of the dataloader. Defaults to ``0``.
+            dataloader_idx (int): the index of the dataloader. Defaults to ``0``.
         """
         img, targets = batch
 

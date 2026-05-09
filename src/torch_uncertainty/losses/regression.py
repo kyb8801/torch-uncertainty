@@ -12,7 +12,7 @@ class DistributionNLLLoss(nn.Module):
         """Negative Log-Likelihood loss using given distributions as inputs.
 
         Args:
-            reduction (str, optional): specifies the reduction to apply to the
+            reduction (str): specifies the reduction to apply to the
                 output:``'none'`` | ``'mean'`` | ``'sum'``. Defaults to "mean".
         """
         super().__init__()
@@ -29,7 +29,7 @@ class DistributionNLLLoss(nn.Module):
         Args:
             dist (Distribution): The predicted distributions
             targets (Tensor): The target values
-            padding_mask (Tensor, optional): The padding mask. Defaults to ``None.``
+            padding_mask (Tensor): The padding mask. Defaults to ``None.``
                 Sets the loss to ``0`` for padded values.
         """
         loss = -dist.log_prob(targets)
@@ -52,7 +52,7 @@ class DERLoss(DistributionNLLLoss):
 
         Args:
             reg_weight (float): The weight of the regularization term.
-            reduction (str, optional): specifies the reduction to apply to the
+            reduction (str): specifies the reduction to apply to the
                 output:``'none'`` | ``'mean'`` | ``'sum'``.
 
         References:
@@ -109,7 +109,7 @@ class BetaNLL(nn.Module):
             beta (float): Parameter from range [0, 1] controlling relative
                 weighting between data points, where `0` corresponds to
                 high weight on low error points and `1` to an equal weighting.
-            reduction (str, optional): specifies the reduction to apply to the
+            reduction (str): specifies the reduction to apply to the
                 output:``'none'`` | ``'mean'`` | ``'sum'``.
 
         References:

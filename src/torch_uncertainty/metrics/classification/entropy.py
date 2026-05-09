@@ -23,7 +23,7 @@ class Entropy(Metric):
         or the mean confidence across estimators.
 
         Args:
-            reduction (str, optional): Determines how to reduce over the
+            reduction (str): Determines how to reduce over the
                 :math:`B`/batch dimension:
 
                 - ``'mean'`` [default]: Averages score across samples

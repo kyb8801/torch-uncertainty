@@ -27,10 +27,10 @@ class SeparableConv2d(nn.Module):
             in_channels (int): Number of input channels.
             out_channels (int): Number of output channels.
             kernel_size (_size_2_t): Kernel size.
-            stride (_size_2_t, optional): Stride. Defaults to 1.
-            padding (_size_2_t, optional): Padding. Defaults to 0.
-            dilation (_size_2_t, optional): Dilation. Defaults to 1.
-            bias (bool, optional): Use biases. Defaults to True.
+            stride (_size_2_t): Stride. Defaults to 1.
+            padding (_size_2_t): Padding. Defaults to 0.
+            dilation (_size_2_t): Dilation. Defaults to 1.
+            bias (bool): Use biases. Defaults to True.
         """
         super().__init__()
         self.separable = nn.Conv2d(
@@ -205,10 +205,10 @@ class DeepLabV3Decoder(nn.Module):
     Args:
         in_channels (int): Number of channels of the input latent space.
         num_classes (int): Number of classes.
-        aspp_dilate (list[int], optional): Atrous rates for the ASPP module.
-        separable (bool, optional): Use separable convolutions to reduce the number
+        aspp_dilate (list[int]): Atrous rates for the ASPP module.
+        separable (bool): Use separable convolutions to reduce the number
             of parameters. Defaults to False.
-        dropout_rate (float, optional): Dropout rate of the ASPP. Defaults to 0.1.
+        dropout_rate (float): Dropout rate of the ASPP. Defaults to 0.1.
     """
 
     conv: nn.Module
@@ -256,7 +256,7 @@ class DeepLabV3PlusDecoder(nn.Module):
             aspp_dilate (list[int]): Atrous rates for the ASPP module.
             separable (bool): Use separable convolutions to reduce the number
                 of parameters.
-            dropout_rate (float, optional): Dropout rate of the ASPP. Defaults
+            dropout_rate (float): Dropout rate of the ASPP. Defaults
                 to 0.1.
         """
         super().__init__()
@@ -305,12 +305,12 @@ class _DeepLabV3(nn.Module):
             backbone_name (Literal["resnet50", "resnet101"]): Backbone name.
             style (Literal["v3", "v3+"]):  Whether to use a DeepLab V3 or
                 V3+ model.
-            output_stride (int, optional): Output stride. Defaults to 16.
-            separable (bool, optional): Use separable convolutions. Defaults
+            output_stride (int): Output stride. Defaults to 16.
+            separable (bool): Use separable convolutions. Defaults
                 to False.
-            pretrained_backbone (bool, optional): Use pretrained backbone.
+            pretrained_backbone (bool): Use pretrained backbone.
                 Defaults to True.
-            norm_momentum (float, optional): BatchNorm momentum. Defaults to
+            norm_momentum (float): BatchNorm momentum. Defaults to
                 0.01.
 
         References:
@@ -372,10 +372,10 @@ def deep_lab_v3_resnet(
         num_classes (int): Number of classes.
         arch (int): Number of layers of the underlying ResNet model: 50 or 101.
         style (Literal["v3", "v3+"]): Whether to use a DeepLab V3 or V3+ model.
-        output_stride (int, optional): Output stride. Defaults to 16.
-        separable (bool, optional): Use separable convolutions. Defaults to
+        output_stride (int): Output stride. Defaults to 16.
+        separable (bool): Use separable convolutions. Defaults to
             False.
-        pretrained_backbone (bool, optional): Use pretrained backbone. Defaults
+        pretrained_backbone (bool): Use pretrained backbone. Defaults
             to True.
     """
     return _DeepLabV3(

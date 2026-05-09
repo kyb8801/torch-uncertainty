@@ -28,15 +28,15 @@ class CUB(ImageFolder):
 
         Args:
             root (str): Root directory of the dataset.
-            train (bool, optional): If True, creates dataset from training set, otherwise creates
+            train (bool): If True, creates dataset from training set, otherwise creates
                 from test set. Defaults to True.
-            transform (callable, optional): A function/transform that takes in an PIL image and
+            transform (callable): A function/transform that takes in an PIL image and
                 returns a transformed version. E.g, transforms.RandomCrop. Defaults to None.
-            target_transform (callable, optional): A function/transform that takes in the target
+            target_transform (callable): A function/transform that takes in the target
                 and transforms it. Defaults to None.
-            return_attributes (bool, optional): If True, returns the attributes instead of the images.
+            return_attributes (bool): If True, returns the attributes instead of the images.
                 Defaults to False.
-            download (bool, optional): If True, downloads the dataset from the internet and puts it
+            download (bool): If True, downloads the dataset from the internet and puts it
                 in root directory. If dataset is already downloaded, it is not downloaded again.
 
         References:

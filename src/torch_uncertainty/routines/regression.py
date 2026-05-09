@@ -61,18 +61,18 @@ class RegressionRoutine(LightningModule):
             output_dim (int): Number of outputs of the model.
             loss (torch.nn.Module): Loss function to optimize the :attr:`model`.
                 Defaults to ``None``.
-            dist_family (str, optional): The distribution family to use for probabilistic regression. If ``None`` then point-wise regression. Defaults to ``None``.
-            dist_estimate (str | DistEstimate, optional): The estimate to use when computing the point-wise metrics. Defaults to ``"mean"``.
-            is_ensemble (bool, optional): Whether the model is an ensemble. Defaults to ``False``.
-            optim_recipe (Callable[[nn.Module], OptimizerLRScheduler] | OptimizerLRScheduler, optional): The optimizer and optionally the scheduler to use, or a callable that returns them. Defaults to ``None``.
-            eval_shift (bool, optional): Indicates whether to evaluate the Distribution shift performance. Defaults to ``False``.
-            format_batch_fn (torch.nn.Module, optional): The function to format the batch. Defaults to ``None``.
-            log_plots (bool, optional): Indicates whether to log figures in the logger.
+            dist_family (str): The distribution family to use for probabilistic regression. If ``None`` then point-wise regression. Defaults to ``None``.
+            dist_estimate (str | DistEstimate): The estimate to use when computing the point-wise metrics. Defaults to ``"mean"``.
+            is_ensemble (bool): Whether the model is an ensemble. Defaults to ``False``.
+            optim_recipe (Callable[[nn.Module], OptimizerLRScheduler] | OptimizerLRScheduler): The optimizer and optionally the scheduler to use, or a callable that returns them. Defaults to ``None``.
+            eval_shift (bool): Indicates whether to evaluate the Distribution shift performance. Defaults to ``False``.
+            format_batch_fn (torch.nn.Module): The function to format the batch. Defaults to ``None``.
+            log_plots (bool): Indicates whether to log figures in the logger.
                 Defaults to ``False``.
-            num_bins_calibration_error (int, optional): Number of bins to compute calibration
+            num_bins_calibration_error (int): Number of bins to compute calibration
                 error metrics. Defaults to ``15``.
-            save_in_csv (bool, optional): Save the results in csv. Defaults to ``False``.
-            csv_filename (str, optional): Name of the csv file. Defaults to ``"results.csv"``. Note that this is only used if
+            save_in_csv (bool): Save the results in csv. Defaults to ``False``.
+            csv_filename (str): Name of the csv file. Defaults to ``"results.csv"``. Note that this is only used if
                 :attr:`save_in_csv` is ``True``.
 
         Warning:

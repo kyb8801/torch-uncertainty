@@ -113,11 +113,11 @@ class AURC(Metric):
         ``update``.
 
         Args:
-            ax (Axes | None, optional): An matplotlib axis object. If provided
+            ax (Axes | None): An matplotlib axis object. If provided
                 will add plot to this axis. Defaults to None.
-            plot_value (bool, optional): Whether to print the AURC value on the
+            plot_value (bool): Whether to print the AURC value on the
                 plot. Defaults to True.
-            name (str | None, optional): Name of the model. Defaults to None.
+            name (str | None): Name of the model. Defaults to None.
 
         Returns:
             tuple[[Figure | None], Axes]: Figure object and Axes object
@@ -237,11 +237,11 @@ class AUGRC(AURC):
         ``update``.
 
         Args:
-            ax (Axes | None, optional): An matplotlib axis object. If provided
+            ax (Axes | None): An matplotlib axis object. If provided
                 will add plot to this axis. Defaults to None.
-            plot_value (bool, optional): Whether to print the AURC value on the
+            plot_value (bool): Whether to print the AURC value on the
                 plot. Defaults to True.
-            name (str | None, optional): Name of the model. Defaults to None.
+            name (str | None): Name of the model. Defaults to None.
 
         Returns:
             tuple[[Figure | None], Axes]: Figure object and Axes object

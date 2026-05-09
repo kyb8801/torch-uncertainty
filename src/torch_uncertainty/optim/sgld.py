@@ -21,10 +21,10 @@ class SGLD(Optimizer):
             params (ParamsT): Iterable of parameters or named_parameters to optimize or iterable of
                 dicts defining parameter groups. When using named_parameters, all parameters in all
                 groups should be named.
-            lr (float, optional): Learning rate for the optimization. Defaults to ``1e-3``.
-            noise_factor (float, optional): A factor to reduce the amount of noise and stabilize the training.
+            lr (float): Learning rate for the optimization. Defaults to ``1e-3``.
+            noise_factor (float): A factor to reduce the amount of noise and stabilize the training.
                 This parameter was not proposed in the original paper. Defaults to ``1e-2``.
-            weight_decay (float, optional): Weight decay (L2 penalty). Defaults to ``0``.
+            weight_decay (float): Weight decay (L2 penalty). Defaults to ``0``.
 
         Reference:
             - `Bayesian Learning via Stochastic Gradient Langevin Dynamics <https://www.stats.ox.ac.uk/~teh/research/compstats/WelTeh2011a.pdf>`_.

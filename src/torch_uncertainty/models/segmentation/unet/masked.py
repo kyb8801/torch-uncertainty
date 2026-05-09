@@ -24,7 +24,7 @@ class _DoubleConv(nn.Module):
             out_channels (int): Number of output channels.
             num_estimators (int): Number of estimators.
             scale (float): Scale for the MaskedConv2d layer.
-            mid_channels (int | None, optional): Number of intermediate channels.
+            mid_channels (int | None): Number of intermediate channels.
                 If ``None``, defaults to :attr:`out_channels`. Defaults to ``None``.
         """
         super().__init__()
@@ -130,9 +130,9 @@ class _MaskedUNet(nn.Module):
             num_blocks (list[int]): Number of channels in each layer of the U-Net.
             num_estimators (int): Number of estimators.
             scale (float): Scale for the MaskedConv2d layer.
-            bilinear (bool, optional): If ``True``, use bilinear interpolation instead of
+            bilinear (bool): If ``True``, use bilinear interpolation instead of
                 transposed convolutions for upsampling. Defaults to ``False``.
-            dropout_rate (float, optional): Dropout rate. Defaults to ``0.0``.
+            dropout_rate (float): Dropout rate. Defaults to ``0.0``.
 
         """
         check_unet_parameters(in_channels, num_classes, num_blocks, bilinear)
@@ -233,9 +233,9 @@ def _masked_unet(
         num_blocks (list[int]): Number of channels in each layer of the U-Net.
         num_estimators (int): Number of estimators.
         scale (float): Scale for the MaskedConv2d layer.
-        bilinear (bool, optional): If ``True``, use bilinear interpolation instead of
+        bilinear (bool): If ``True``, use bilinear interpolation instead of
             transposed convolutions for upsampling. Defaults to ``False``.
-        dropout_rate (float, optional): Dropout rate. Defaults to ``0.0``.
+        dropout_rate (float): Dropout rate. Defaults to ``0.0``.
 
     Returns:
         _MaskedUNet: Masked U-Net model.
@@ -266,9 +266,9 @@ def masked_small_unet(
         num_classes (int): Number of output classes.
         num_estimators (int): Number of estimators.
         scale (float): Scale for the MaskedConv2d layer.
-        bilinear (bool, optional): If ``True``, use bilinear interpolation instead of
+        bilinear (bool): If ``True``, use bilinear interpolation instead of
             transposed convolutions for upsampling. Defaults to ``False``.
-        dropout_rate (float, optional): Dropout rate. Defaults to ``0.0``.
+        dropout_rate (float): Dropout rate. Defaults to ``0.0``.
 
     Returns:
         _MaskedUNet: Small Masked U-Net model.
@@ -300,9 +300,9 @@ def masked_unet(
         num_classes (int): Number of output classes.
         num_estimators (int): Number of estimators.
         scale (float): Scale for the MaskedConv2d layer.
-        bilinear (bool, optional): If ``True``, use bilinear interpolation instead of
+        bilinear (bool): If ``True``, use bilinear interpolation instead of
             transposed convolutions for upsampling. Defaults to ``False``.
-        dropout_rate (float, optional): Dropout rate. Defaults to ``0.0``.
+        dropout_rate (float): Dropout rate. Defaults to ``0.0``.
 
     Returns:
         _MaskedUNet: Masked U-Net model.

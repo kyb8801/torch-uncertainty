@@ -177,10 +177,10 @@ class MaskedLinear(nn.Module):
             out_features (int): Number of channels produced by the linear layer.
             num_estimators (int): The number of estimators grouped in the layer.
             scale (float): The scale parameter for the masks.
-            bias (bool, optional): It ``True``, adds a learnable bias to the output. Defaults to ``True``.
-            groups (int, optional): Number of blocked connections from input channels to output channels. Defaults to ``1``.
-            device (Any, optional): The desired device of returned tensor. Defaults to ``None``.
-            dtype (Any, optional): The desired data type of returned tensor. Defaults to ``None``.
+            bias (bool): It ``True``, adds a learnable bias to the output. Defaults to ``True``.
+            groups (int): Number of blocked connections from input channels to output channels. Defaults to ``1``.
+            device (Any): The desired device of returned tensor. Defaults to ``None``.
+            dtype (Any): The desired data type of returned tensor. Defaults to ``None``.
 
         Warning:
             Be sure to apply a repeat on the batch at the start of the training
@@ -235,13 +235,13 @@ class MaskedConv2d(nn.Module):
             kernel_size (int or tuple): Size of the convolving kernel.
             num_estimators (int): Number of estimators in the ensemble.
             scale (float): The scale parameter for the masks.
-            stride (int or tuple, optional): Stride of the convolution. Defaults to ``1``.
-            padding (int, tuple or str, optional): Padding added to all four sides of the input. Defaults to ``0``.
-            dilation (int or tuple, optional): Spacing between kernel elements. Defaults to ``1``.
-            groups (int, optional): Number of blocked connexions from input channels to output channels for each estimator. Defaults to ``1``.
-            bias (bool, optional): If ``True``, adds a learnable bias to the output. Defaults to ``True``.
-            device (Any, optional): The desired device of returned tensor. Defaults to ``None``.
-            dtype (Any, optional): The desired data type of returned tensor. Defaults to ``None``.
+            stride (int or tuple): Stride of the convolution. Defaults to ``1``.
+            padding (int, tuple or str): Padding added to all four sides of the input. Defaults to ``0``.
+            dilation (int or tuple): Spacing between kernel elements. Defaults to ``1``.
+            groups (int): Number of blocked connexions from input channels to output channels for each estimator. Defaults to ``1``.
+            bias (bool): If ``True``, adds a learnable bias to the output. Defaults to ``True``.
+            device (Any): The desired device of returned tensor. Defaults to ``None``.
+            dtype (Any): The desired data type of returned tensor. Defaults to ``None``.
 
         Warning:
             Be sure to apply a repeat on the batch at the start of the training
@@ -305,15 +305,15 @@ class MaskedConvTranspose2d(nn.Module):
             kernel_size (int or tuple): Size of the convolving kernel.
             num_estimators (int): Number of estimators in the ensemble.
             scale (float): The scale parameter for the masks.
-            stride (int or tuple, optional): Stride of the convolution. Defaults to ``1``.
-            padding (int or tuple, optional): Padding added to all four sides of the input. Defaults to ``0``.
-            output_padding (int, tuple or str, optional): Additional size added to one side of each dimension in the output shape. Defaults to ``0``.
-            groups (int, optional): Number of blocked connexions from input channels to output channels for each estimator. Defaults to ``1``.
-            bias (bool, optional): If ``True``, adds a learnable bias to the output. Defaults to ``True``.
-            dilation (int or tuple, optional): Spacing between kernel elements. Defaults to ``1``.
-            padding_mode (str, optional): _description_. Defaults to ``'zeros'``.
-            device (Any, optional): The desired device of returned tensor. Defaults to ``None``.
-            dtype (Any, optional): The desired data type of returned tensor. Defaults to ``None``.
+            stride (int or tuple): Stride of the convolution. Defaults to ``1``.
+            padding (int or tuple): Padding added to all four sides of the input. Defaults to ``0``.
+            output_padding (int, tuple or str): Additional size added to one side of each dimension in the output shape. Defaults to ``0``.
+            groups (int): Number of blocked connexions from input channels to output channels for each estimator. Defaults to ``1``.
+            bias (bool): If ``True``, adds a learnable bias to the output. Defaults to ``True``.
+            dilation (int or tuple): Spacing between kernel elements. Defaults to ``1``.
+            padding_mode (str): _description_. Defaults to ``'zeros'``.
+            device (Any): The desired device of returned tensor. Defaults to ``None``.
+            dtype (Any): The desired data type of returned tensor. Defaults to ``None``.
 
         Warning:
             Be sure to apply a repeat on the batch at the start of the training

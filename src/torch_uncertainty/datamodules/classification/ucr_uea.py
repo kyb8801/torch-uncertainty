@@ -32,11 +32,11 @@ class UCRUEADataModule(TUDataModule):
             val_split (float | None): Share of validation samples. Defaults to ``0``.
             eval_ood (bool): Whether to evaluate on out-of-distribution (OOD) data. Defaults to
                 ``False``.
-            num_workers (int, optional): How many subprocesses to use for data loading. Defaults
+            num_workers (int): How many subprocesses to use for data loading. Defaults
                 to ``1``.
-            pin_memory (bool, optional): Whether to pin memory in the GPU. Defaults to ``True``.
-            persistent_workers (bool, optional): Whether to use persistent workers. Defaults to ``True``.
-            split_seed (int, optional): The seed to use for splitting the dataset.
+            pin_memory (bool): Whether to pin memory in the GPU. Defaults to ``True``.
+            persistent_workers (bool): Whether to use persistent workers. Defaults to ``True``.
+            split_seed (int): The seed to use for splitting the dataset.
                 Defaults to ``42``.
         """
         super().__init__(

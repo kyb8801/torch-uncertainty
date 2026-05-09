@@ -25,8 +25,8 @@ def packed_linear(
             - "sparse": uses a sparse weight tensor directly to apply the linear transformation.
             - "einsum": uses `torch.einsum` to apply the packed linear transformation.
             - "conv1d": uses `torch.nn.functional.conv1d` to apply the packed linear transformation.
-        rearrange (bool, optional): _description_. Defaults to True.
-        bias (Tensor | None, optional): _description_. Defaults to None.
+        rearrange (bool): _description_. Defaults to True.
+        bias (Tensor | None): _description_. Defaults to None.
 
     Returns:
         Tensor:
@@ -206,7 +206,7 @@ def packed_multi_head_attention_forward(  # noqa: D417
                        value sequences at dim=1.
         dropout_p: probability of an element to be zeroed.
         out_proj_weight, out_proj_bias: the output projection weight and bias.
-        implementation (str, optional): the implementation of the packed linear operation. Three
+        implementation (str): the implementation of the packed linear operation. Three
             implementations are currently supported:
             - ``"full"``: creates a block diagonal matrix from the weight tensor and applies the
                 linear transformation using `torch.nn.functional.linear`.

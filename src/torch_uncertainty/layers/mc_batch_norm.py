@@ -20,10 +20,10 @@ class _MCBatchNorm(_BatchNorm):
         Args:
             num_features (int): number of input features.
             num_estimators (int): number of stochastic estimators.
-            eps (float, optional): eps arg. for the core batch normalization. Defaults to ``0.00001``.
-            affine (bool, optional): affine arg. for the core batch normalization. Defaults to `True`.
-            dtype (torch.dtype, optional): The dtype to use for the layer's parameters. Defaults to ``None``.
-            device (Literal["cpu", "cuda"] | torch.device | None, optional): device.
+            eps (float): eps arg. for the core batch normalization. Defaults to ``0.00001``.
+            affine (bool): affine arg. for the core batch normalization. Defaults to `True`.
+            dtype (torch.dtype): The dtype to use for the layer's parameters. Defaults to ``None``.
+            device (Literal["cpu", "cuda"] | torch.device | None): device.
                 Defaults to ``None``
 
         Warning:
@@ -107,8 +107,8 @@ class MCBatchNorm1d(_MCBatchNorm):
     Args:
         num_features (int): Number of features.
         num_estimators (int): Number of estimators.
-        eps (float, optional): Epsilon. Defaults to ``0.00001``.
-        affine (bool, optional): Affine. Defaults to ``True``.
+        eps (float): Epsilon. Defaults to ``0.00001``.
+        affine (bool): Affine. Defaults to ``True``.
         device (optional): Device. Defaults to ``None``.
         dtype (optional): Data type. Defaults to ``None``.
 
@@ -134,8 +134,8 @@ class MCBatchNorm2d(_MCBatchNorm):
     Args:
         num_features (int): Number of features.
         num_estimators (int): Number of estimators.
-        eps (float, optional): Epsilon. Defaults to ``0.00001``.
-        affine (bool, optional): Affine. Defaults to ``True``.
+        eps (float): Epsilon. Defaults to ``0.00001``.
+        affine (bool): Affine. Defaults to ``True``.
         device (optional): Device. Defaults to ``None``.
         dtype (optional): Data type. Defaults to ``None``.
 
@@ -161,8 +161,8 @@ class MCBatchNorm3d(_MCBatchNorm):
     Args:
         num_features (int): Number of features.
         num_estimators (int): Number of estimators.
-        eps (float, optional): Epsilon. Defaults to ``0.00001``.
-        affine (bool, optional): Affine. Defaults to ``True``.
+        eps (float): Epsilon. Defaults to ``0.00001``.
+        affine (bool): Affine. Defaults to ``True``.
         device (optional): Device. Defaults to ``None``.
         dtype (optional): Data type. Defaults to ``None``.
 

@@ -36,10 +36,10 @@ class _MLP(nn.Module):
             activation (Callable): Activation function.
             layer_args (Dict): Arguments for the layer class.
             dropout_rate (float): Dropout probability.
-            dist_family (str, optional): Distribution family name. ``None`` means point-wise
+            dist_family (str): Distribution family name. ``None`` means point-wise
                 prediction.
-            dist_args (Dict, optional): Arguments for the distribution layer class.
-            flatten_start_dim (int, optional): Dimension to start flattening the input.
+            dist_args (Dict): Arguments for the distribution layer class.
+            flatten_start_dim (int): Dimension to start flattening the input.
         """
         super().__init__()
         self.activation = activation
@@ -197,13 +197,13 @@ def mlp(
         in_features (int): Number of input features.
         num_outputs (int): Number of output features.
         hidden_dims (list[int]): Number of features in each hidden layer.
-        activation (Callable, optional): Activation function. Defaults to
+        activation (Callable): Activation function. Defaults to
             ``F.relu``.
-        dropout_rate (float, optional): Dropout probability. Defaults to ``0.0``.
-        dist_family (str, optional): Distribution family. Defaults to ``None``.
-        dist_args (Dict, optional): Arguments for the distribution layer class. Defaults
+        dropout_rate (float): Dropout probability. Defaults to ``0.0``.
+        dist_family (str): Distribution family. Defaults to ``None``.
+        dist_args (Dict): Arguments for the distribution layer class. Defaults
             to ``None``.
-        flatten_start_dim (int, optional): Dimension to start flattening the input.
+        flatten_start_dim (int): Dimension to start flattening the input.
             Defaults to ``-1``.
 
     Returns:

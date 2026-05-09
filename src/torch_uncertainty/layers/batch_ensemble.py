@@ -39,11 +39,11 @@ class BatchLinear(nn.Module):
             out_features (int): Number of output features.
             num_estimators (int): Number of estimators in the ensemble, referred as
                 :math:`M`.
-            bias (bool, optional): If ``True``, adds a learnable bias to the
+            bias (bool): If ``True``, adds a learnable bias to the
                 output. Defaults to ``True``.
-            device (Any, optional): Device to use for the parameters and
+            device (Any): Device to use for the parameters and
                 buffers of this module. Defaults to ``None``.
-            dtype (Any, optional): Data type to use for the parameters and
+            dtype (Any): Data type to use for the parameters and
                 buffers of this module. Defaults to ``None``.
 
         Reference:
@@ -249,19 +249,19 @@ class BatchConv1d(nn.Module):
             kernel_size (int): Size of the convolving kernel.
             num_estimators (int): Number of estimators in the ensemble referred as
                 :math:`M` here.
-            stride (int, optional): Stride of the convolution. Defaults to
+            stride (int): Stride of the convolution. Defaults to
                 ``1``.
-            padding (int or str, optional): Padding added to all four sides
+            padding (int or str): Padding added to all four sides
                 of the input. Defaults to ``0``.
-            dilation (int, optional): Spacing between kernel elements.
+            dilation (int): Spacing between kernel elements.
                 Defaults to ``1``.
-            groups (int, optional): Number of blocked connections from input
+            groups (int): Number of blocked connections from input
                 channels to output channels. Defaults to ``1``.
-            bias (bool, optional): If ``True``, adds a learnable bias to the
+            bias (bool): If ``True``, adds a learnable bias to the
                 output. Defaults to ``True``.
-            device (Any, optional): Device to use for the parameters and
+            device (Any): Device to use for the parameters and
                 buffers of this module. Defaults to ``None``.
-            dtype (Any, optional): Data type to use for the parameters and
+            dtype (Any): Data type to use for the parameters and
                 buffers of this module. Defaults to ``None``.
 
         Attributes:
@@ -481,19 +481,19 @@ class BatchConv2d(nn.Module):
             kernel_size (int or tuple): Size of the convolving kernel.
             num_estimators (int): Number of estimators in the ensemble referred as
                 :math:`M` here.
-            stride (int or tuple, optional): Stride of the convolution. Defaults to
+            stride (int or tuple): Stride of the convolution. Defaults to
                 ``1``.
-            padding (int, tuple or str, optional): Padding added to all four sides
+            padding (int, tuple or str): Padding added to all four sides
                 of the input. Defaults to ``0``.
-            dilation (int or tuple, optional): Spacing between kernel elements.
+            dilation (int or tuple): Spacing between kernel elements.
                 Defaults to ``1``.
-            groups (int, optional): Number of blocked connections from input
+            groups (int): Number of blocked connections from input
                 channels to output channels. Defaults to ``1``.
-            bias (bool, optional): If ``True``, adds a learnable bias to the
+            bias (bool): If ``True``, adds a learnable bias to the
                 output. Defaults to ``True``.
-            device (Any, optional): Device to use for the parameters and
+            device (Any): Device to use for the parameters and
                 buffers of this module. Defaults to ``None``.
-            dtype (Any, optional): Data type to use for the parameters and
+            dtype (Any): Data type to use for the parameters and
                 buffers of this module. Defaults to ``None``.
 
         Attributes:
@@ -673,20 +673,20 @@ class BatchConvTranspose2d(nn.Module):
             kernel_size (_size_2_t): Size of the convolving kernel.
             num_estimators (int): Number of estimators in the ensemble referred as
                 :math:`M` here.
-            stride (_size_2_t, optional): Stride of the convolution. Defaults to ``1``.
-            padding (_size_2_t, optional): ``dilation * (kernel_size - 1) - padding`` zero-padding
+            stride (_size_2_t): Stride of the convolution. Defaults to ``1``.
+            padding (_size_2_t): ``dilation * (kernel_size - 1) - padding`` zero-padding
                 will be added to both sides of each dimension in the input. Defaults to ``0``.
-            output_padding (_size_2_t, optional): Additional size added to one side
+            output_padding (_size_2_t): Additional size added to one side
                 of each dimension in the output shape. Defaults to ``0``.
-            groups (int, optional): Number of blocked connections from input channels to output
+            groups (int): Number of blocked connections from input channels to output
                 channels. Defaults to ``1``.
-            bias (bool, optional): If ``True``, adds a learnable bias to the output. Defaults to
+            bias (bool): If ``True``, adds a learnable bias to the output. Defaults to
                 ``True``.
-            dilation (_size_2_t, optional): Spacing between kernel elements. Defaults to ``1``.
-            padding_mode (str, optional): Padding mode for the convolution. Defaults to ``"zeros"``.
-            device (Any, optional): Device to use for the parameters and
+            dilation (_size_2_t): Spacing between kernel elements. Defaults to ``1``.
+            padding_mode (str): Padding mode for the convolution. Defaults to ``"zeros"``.
+            device (Any): Device to use for the parameters and
                 buffers of this module. Defaults to ``None``.
-            dtype (Any, optional): Data type to use for the parameters and
+            dtype (Any): Data type to use for the parameters and
                 buffers of this module. Defaults to ``None``.
         """
         factory_kwargs = {"device": device, "dtype": dtype}

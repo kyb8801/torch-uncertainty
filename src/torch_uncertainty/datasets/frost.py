@@ -36,9 +36,9 @@ class FrostImages(VisionDataset):
         and each sample consists only of an image.
 
         Args:
-            transform (Callable[..., Any] | None, optional): A function/transform
+            transform (Callable[..., Any] | None): A function/transform
                 applied to the input image. Default: ``None``.
-            target_transform (Callable[..., Any] | None, optional): A function/transform
+            target_transform (Callable[..., Any] | None): A function/transform
                 applied to the target. Since no targets are provided, this argument is
                 kept for API compatibility. Default: ``None``.
 

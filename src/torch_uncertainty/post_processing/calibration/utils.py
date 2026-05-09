@@ -25,7 +25,7 @@ def _extract_data(
     Args:
         dataloader (DataLoader): The calibration dataloader.
         model (nn.Module): Model to calibrate.
-        device (Optional[Literal["cpu", "cuda"]], optional): Device to use for
+        device (Optional[Literal["cpu", "cuda"]]): Device to use for
             tensor operations.
         progress (bool): Whether to show the progress bar.
 

@@ -20,12 +20,12 @@ class MeanIntersectionOverUnion(MulticlassStatScores):
 
         Args:
             num_classes (int): Integer specifying the number of classes.
-            top_k (int, optional): Number of highest probability or logit score predictions
+            top_k (int): Number of highest probability or logit score predictions
                 considered to find the correct label. Only works when ``preds`` contain
                 probabilities/logits. Defaults to ``1``.
-            ignore_index (int | None, optional): Specifies a target value that is ignored and does
+            ignore_index (int | None): Specifies a target value that is ignored and does
                 not contribute to the metric calculation. Defaults to ``None``.
-            validate_args (bool, optional): Bool indicating if input arguments and tensors should
+            validate_args (bool): Bool indicating if input arguments and tensors should
                 be validated for correctness. Set to ``False`` for faster computations. Defaults to
                 ``True``.
             **kwargs: kwargs: Additional keyword arguments, see

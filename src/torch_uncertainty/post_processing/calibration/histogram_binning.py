@@ -34,7 +34,7 @@ class HistogramBinningScaler(PostProcessing):
             num_bins (int): Number of equal-width bins to use. Defaults to ``15``.
             eps (float): Small value for stability when converting probs back to logits.
                 Defaults to ``1e-6``.
-            device (Optional[Literal["cpu", "cuda"]], optional): Device to use for
+            device (Optional[Literal["cpu", "cuda"]]): Device to use for
                 tensor operations. Defaults to ``None``.
 
         References:
@@ -60,7 +60,7 @@ class HistogramBinningScaler(PostProcessing):
 
         Args:
             dataloader (DataLoader): Dataloader providing the calibration data.
-            progress (bool, optional): Whether to show a progress bar.
+            progress (bool): Whether to show a progress bar.
                 Defaults to ``True``.
         """
         if self.model is None or isinstance(self.model, nn.Identity):  # coverage: ignore

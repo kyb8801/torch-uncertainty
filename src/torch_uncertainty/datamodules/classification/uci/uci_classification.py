@@ -30,16 +30,16 @@ class UCIClassificationDataModule(TUDataModule):
             batch_size (int): The batch size for training and testing.
             eval_batch_size (int | None) : Number of samples per batch during evaluation (val
                 and test). Set to :attr:`batch_size` if ``None``. Defaults to ``None``.
-            val_split (float, optional): Share of validation samples among the
+            val_split (float): Share of validation samples among the
                 non-test samples. Defaults to ``0``.
-            test_split (float, optional): Share of test samples. Defaults to ``0.2``.
-            num_workers (int, optional): How many subprocesses to use for data
+            test_split (float): Share of test samples. Defaults to ``0.2``.
+            num_workers (int): How many subprocesses to use for data
                 loading. Defaults to ``1``.
-            pin_memory (bool, optional): Whether to pin memory in the GPU. Defaults
+            pin_memory (bool): Whether to pin memory in the GPU. Defaults
                 to ``True``.
-            persistent_workers (bool, optional): Whether to use persistent workers.
+            persistent_workers (bool): Whether to use persistent workers.
                 Defaults to ``True``.
-            binary (bool, optional): Whether to use binary classification. Defaults
+            binary (bool): Whether to use binary classification. Defaults
                 to ``True``.
         """
         super().__init__(
@@ -64,7 +64,7 @@ class UCIClassificationDataModule(TUDataModule):
         """Split the datasets into train, val, and test.
 
         Args:
-            stage (str | None, optional): Stage to set up. Defaults to ``None``.
+            stage (str | None): Stage to set up. Defaults to ``None``.
         """
         if stage == "fit" or stage is None:
             full = self.dataset(

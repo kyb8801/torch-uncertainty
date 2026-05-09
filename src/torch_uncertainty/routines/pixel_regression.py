@@ -76,25 +76,25 @@ class PixelRegressionRoutine(LightningModule):
             output_dim (int): Number of outputs of the model.
             loss (nn.Module): Loss function to optimize the :attr:`model`.
                 Defaults to ``None``.
-            dist_family (str, optional): The distribution family to use for
+            dist_family (str): The distribution family to use for
                 probabilistic pixel regression. If ``None`` then point-wise regression.
                 Defaults to ``None``.
-            dist_estimate (str, optional): The estimate to use when computing the
+            dist_estimate (str): The estimate to use when computing the
                 point-wise metrics. Defaults to ``"mean"``.
-            is_ensemble (bool, optional): Whether the model is an ensemble.
+            is_ensemble (bool): Whether the model is an ensemble.
                 Defaults to ``False``.
-            optim_recipe (Callable[[nn.Module], OptimizerLRScheduler] | OptimizerLRScheduler, optional): The optimizer and
+            optim_recipe (Callable[[nn.Module], OptimizerLRScheduler] | OptimizerLRScheduler): The optimizer and
                 optionally the scheduler to use, or a callable that returns them. Defaults to ``None``.
-            eval_shift (bool, optional): Indicates whether to evaluate the Distribution
+            eval_shift (bool): Indicates whether to evaluate the Distribution
                 shift performance. Defaults to ``False``.
-            format_batch_fn (nn.Module, optional): The function to format the
+            format_batch_fn (nn.Module): The function to format the
                 batch. Defaults to ``None``.
-            num_image_plot (int, optional): Number of images to plot. Defaults to ``4``.
-            log_plots (bool, optional): Indicates whether to log plots from
+            num_image_plot (int): Number of images to plot. Defaults to ``4``.
+            log_plots (bool): Indicates whether to log plots from
                 metrics. Defaults to ``False``.
-            save_in_csv (bool, optional): Save the results in csv. Defaults to
+            save_in_csv (bool): Save the results in csv. Defaults to
                 ``False``.
-            csv_filename (str, optional): Name of the csv file. Defaults to
+            csv_filename (str): Name of the csv file. Defaults to
                 ``"results.csv"``. Note that this is only used if
                 :attr:`save_in_csv` is ``True``.
         """
@@ -429,9 +429,9 @@ def colorize(
 
     Args:
         value (Tensor): The tensor of depth values.
-        vmin (float, optional): The minimum depth value. Defaults to None.
-        vmax (float, optional): The maximum depth value. Defaults to None.
-        cmap (str, optional): The colormap to use. Defaults to 'magma'.
+        vmin (float): The minimum depth value. Defaults to None.
+        vmax (float): The maximum depth value. Defaults to None.
+        cmap (str): The colormap to use. Defaults to 'magma'.
     """
     vmin = value.min().item() if vmin is None else vmin
     vmax = value.max().item() if vmax is None else vmax

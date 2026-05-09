@@ -29,20 +29,20 @@ class OnlineShoppers(UCIClassificationDataset):
 
         Args:
             root (str | Path): Root directory of the datasets.
-            train (bool, optional): If ``True``, creates dataset from training set,
+            train (bool): If ``True``, creates dataset from training set,
                 otherwise creates from test set.
-            transform (callable, optional): A function/transform that takes in a
+            transform (callable): A function/transform that takes in a
                 numpy array and returns a transformed version. Defaults to ``None``.
-            target_transform (callable, optional): A function/transform that takes
+            target_transform (callable): A function/transform that takes
                 in the target and transforms it. Defaults to ``None``.
-            download (bool, optional): If ``True``, downloads the dataset from the
+            download (bool): If ``True``, downloads the dataset from the
                 internet and puts it in root directory. If dataset is already
                 downloaded, it is not downloaded again. Defaults to ``False``.
-            binary (bool, optional): Whether to use binary classification. Defaults
+            binary (bool): Whether to use binary classification. Defaults
                 to ``True``.
-            test_split (float, optional): The fraction of the dataset to use as test set.
+            test_split (float): The fraction of the dataset to use as test set.
                 Defaults to ``0.2``.
-            split_seed (int, optional): The random seed for splitting the dataset.
+            split_seed (int): The random seed for splitting the dataset.
                 Defaults to ``21893027``.
 
         Note:

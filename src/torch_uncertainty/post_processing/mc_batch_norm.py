@@ -28,9 +28,9 @@ class MCBatchNorm(PostProcessing):
             model (nn.Module): model to be converted.
             num_estimators (int): number of estimators.
             convert (bool): whether to convert the model. Defaults to ``True``.
-            mc_batch_size (int, optional): Monte Carlo batch size. The smaller the more variability
+            mc_batch_size (int): Monte Carlo batch size. The smaller the more variability
                 in the predictions. Defaults to ``32``.
-            device (Literal["cpu", "cuda"] | torch.device | None, optional): device.
+            device (Literal["cpu", "cuda"] | torch.device | None): device.
                 Defaults to ``None``.
 
         Warning:

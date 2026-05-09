@@ -53,7 +53,7 @@ class ELBOLoss(nn.Module):
             inner_loss (nn.Module): The loss function to use during training
             kl_weight (float): The weight of the KL divergence term
             num_samples (int): The number of samples to use for the ELBO loss
-            dist_family (str, optional): The distribution family to use for the output of the
+            dist_family (str): The distribution family to use for the output of the
                 model. ``None`` means point-wise prediction. Defaults to ``None``.
 
         Note:

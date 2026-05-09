@@ -81,7 +81,7 @@ class BBQScaler(PostProcessing):
 
         Args:
             dataloader (DataLoader): Dataloader providing the calibration data.
-            progress (bool, optional): Whether to show a progress bar.
+            progress (bool): Whether to show a progress bar.
                 Defaults to ``True``.
         """
         if self.model is None or isinstance(self.model, nn.Identity):
