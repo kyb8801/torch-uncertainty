@@ -28,11 +28,11 @@ class Scaler(PostProcessing):
         """Virtual class for scaling post-processing for calibrated probabilities.
 
         Args:
-            model (nn.Module): Model to calibrate. Defaults to ``None``.
-            lr (float): Learning rate for the optimizer. Defaults to ``0.1``.
-            max_iter (int): Maximum number of iterations for the optimizer. Defaults to ``100``.
-            eps (float): Small value for stability. Defaults to ``1e-6``.
-            device (Optional[Literal["cpu", "cuda"]]): Device to use for optimization. Defaults to ``None``.
+            model: Model to calibrate. Defaults to ``None``.
+            lr: Learning rate for the optimizer. Defaults to ``0.1``.
+            max_iter: Maximum number of iterations for the optimizer. Defaults to ``100``.
+            eps: Small value for stability. Defaults to ``1e-6``.
+            device: Device to use for optimization. Defaults to ``None``.
 
         References:
             [1] `On calibration of modern neural networks. In ICML 2017
@@ -66,11 +66,9 @@ class Scaler(PostProcessing):
         """Fit the temperature parameters to the calibration data.
 
         Args:
-            dataloader (DataLoader): Dataloader with the logits and target of the calibration data.
-            save_logits (bool): Whether to save the logits and
-                labels in memory. Defaults to ``False``.
-            progress (bool): Whether to show a progress bar.
-                Defaults to ``True``.
+            dataloader: Dataloader with the logits and target of the calibration data.
+            save_logits: Whether to save the logits and labels in memory. Defaults to ``False``.
+            progress: Whether to show a progress bar. Defaults to ``True``.
 
         Warning:
             Please provide logits and not probabilities/likelihoods within the dataloader, otherwise
@@ -140,7 +138,7 @@ class Scaler(PostProcessing):
         """Scale the logits with the optimal temperature.
 
         Args:
-            logits (Tensor): Logits to be scaled.
+            logits: Logits to be scaled.
 
         Returns:
             Tensor: Scaled logits.

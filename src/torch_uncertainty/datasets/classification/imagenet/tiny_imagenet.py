@@ -65,7 +65,7 @@ class TinyImageNet(Dataset):
         """Get the samples and targets of the dataset.
 
         Args:
-            index (int): The index of the sample to get.
+            index: The index of the sample to get.
         """
         sample = self.samples[index]
         target = self.label_data[index]

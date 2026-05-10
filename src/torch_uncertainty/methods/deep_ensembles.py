@@ -12,7 +12,7 @@ class _DeepEnsembles(nn.Module):
         core_models: list[nn.Module],
         store_on_cpu: bool = False,
     ) -> None:
-        """Create a classification deep ensembles from a list of models."""
+        """Create a classification deep ensemble from a list of models."""
         super().__init__()
         self.core_models = nn.ModuleList(core_models)
         self.num_estimators = len(core_models)
@@ -25,7 +25,7 @@ class _DeepEnsembles(nn.Module):
             dict.
 
         Args:
-            x (Tensor): The input of the model.
+            x: The input of the model.
 
         Returns:
             Tensor: The output of the model with shape :math:`(N \times B, C)`,
@@ -67,7 +67,7 @@ class _RegDeepEnsembles(_DeepEnsembles):
         r"""Return the logits of the ensemble.
 
         Args:
-            x (Tensor): The input of the model.
+            x: The input of the model.
 
         Returns:
             Tensor | dict[str, Tensor]: The output of the model with shape :math:`(N \times B, *)`
@@ -105,20 +105,20 @@ def deep_ensembles(
     """Build a Deep Ensembles out of the original models.
 
     Args:
-        core_models (list[nn.Module] | nn.Module): The model to be ensembled.
-        num_estimators (int | None): The number of estimators in the ensemble.
-        task (Literal[``"classification"``, ``"regression"``, ``"segmentation"``, ``"pixel_regression"``]): The model task. Defaults to ``"classification"``.
-        probabilistic (bool): Whether the regression model is probabilistic.
-        reset_model_parameters (bool): Whether to reset the model parameters
-            when :attr:core_models is a module or a list of length 1. Defaults to ``True``.
-        store_on_cpu (bool): Whether to store the models on CPU. Defaults to ``False``.
-            This is useful for large models that do not fit in GPU memory. Only one
-            model will be stored on GPU at a time during forward. The rest will be stored on CPU.
+        core_models: The model to be ensembled.
+        num_estimators: The number of estimators in the ensemble.
+        task: The model task. Defaults to ``"classification"``.
+        probabilistic: Whether the regression model is probabilistic.
+        reset_model_parameters: Whether to reset the model parameters when :attr:`core_models` is a module or
+            a list of length 1. Defaults to ``True``.
+        store_on_cpu: Whether to store the models on CPU. Defaults to ``False``.
+        This is useful for large models that do not fit in GPU memory. Only one
+        model will be stored on GPU at a time during forward. The rest will be stored on CPU.
         ckpt_paths (list[str | Path] | None): The paths to the checkpoints of the models.
             If provided, the models will be loaded from the checkpoints. The number of
             models and the number of checkpoint paths must be the same. If not provided,
             the models will be used as is. Defaults to ``None``.
-        use_tu_ckpt_format (bool): Whether the checkpoint is from torch-uncertainty. If ``True``,
+        use_tu_ckpt_format: Whether the checkpoint is from torch-uncertainty. If ``True``,
             the checkpoint will be loaded using the torch-uncertainty loading function. If
             ``False``, the checkpoint will be loaded using the default PyTorch loading function.
             Note that this option is only used if :attr:ckpt_paths is provided. Defaults to
@@ -136,8 +136,7 @@ def deep_ensembles(
             a (non-singleton) list.
 
     Warning:
-        The :attr:`store_on_cpu` option is not supported for training. It is
-        only supported for inference.
+        The :attr:`store_on_cpu` option is not supported for training. It is only supported for evaluation.
 
     References:
             [1] `Simple and scalable predictive uncertainty estimation using deep ensembles. In NeurIPS, 2017

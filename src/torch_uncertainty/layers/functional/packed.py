@@ -17,19 +17,19 @@ def packed_linear(
         inputs (Tensor): :math:`(\star, \text{in\_features})` where :math:`\star` is any number of
             additional dimensions including none.
         weight (Tensor): :math:(\text{num\_groups}, \frac{\text{out\_features}}{\text{num\_groups}}, \frac{\text{in\_features}}{\text{num\_groups}})`.
-        num_groups (int): number of groups to split the input.
-        implementation (str): the implementation of the packed linear operation. Three
+        num_groups: number of groups to split the input.
+        implementation: the implementation of the packed linear operation. Three
             implementations are currently supported:
             - "full": creates a block diagonal matrix from the weight tensor and applies the linear
                 transformation using `torch.nn.functional.linear`.
             - "sparse": uses a sparse weight tensor directly to apply the linear transformation.
             - "einsum": uses `torch.einsum` to apply the packed linear transformation.
             - "conv1d": uses `torch.nn.functional.conv1d` to apply the packed linear transformation.
-        rearrange (bool): _description_. Defaults to True.
-        bias (Tensor | None): _description_. Defaults to None.
+        rearrange (bool): _description_. Defaults to ``True``.
+        bias (Tensor | None): _description_. Defaults to ``None``.
 
     Returns:
-        Tensor:
+        Tensor: Output tensor after applying the packed linear transform.
     """
     if implementation == "full":
         block_diag = torch.block_diag(*weight)
@@ -206,7 +206,7 @@ def packed_multi_head_attention_forward(  # noqa: D417
                        value sequences at dim=1.
         dropout_p: probability of an element to be zeroed.
         out_proj_weight, out_proj_bias: the output projection weight and bias.
-        implementation (str): the implementation of the packed linear operation. Three
+        implementation: the implementation of the packed linear operation. Three
             implementations are currently supported:
             - ``"full"``: creates a block diagonal matrix from the weight tensor and applies the
                 linear transformation using `torch.nn.functional.linear`.

@@ -43,7 +43,7 @@ routine:
       num_samples: 3
       dist_family: normal
   dist_family: normal
-  save_in_csv: true
+  save_to_csv: true
 data:
   root: ./data
   batch_size: 128

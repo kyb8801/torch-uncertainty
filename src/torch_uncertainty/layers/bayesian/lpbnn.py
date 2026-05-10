@@ -51,14 +51,14 @@ class LPBNNLinear(nn.Module):
         """LPBNN-style linear layer.
 
         Args:
-            in_features (int): Number of input features.
-            out_features (int): Number of output features.
-            num_estimators (int): Number of models to sample from.
-            hidden_size (int): Size of the hidden layer. Defaults to ``32``.
-            std_factor (float): Factor to multiply the standard deviation of the latent noise. Defaults to ``1e-2``.
-            bias (bool): If ``True``, adds a learnable bias to the output. Defaults to ``True``.
-            device (torch.device): Device on which the layer is stored. Defaults to ``None``.
-            dtype (torch.dtype): Data type of the layer. Defaults to ``None``.
+            in_features: Number of input features.
+            out_features: Number of output features.
+            num_estimators: Number of models to sample from.
+            hidden_size: Size of the hidden layer. Defaults to ``32``.
+            std_factor: Factor to multiply the standard deviation of the latent noise. Defaults to ``1e-2``.
+            bias: If ``True``, adds a learnable bias to the output. Defaults to ``True``.
+            device: Device on which the layer is stored. Defaults to ``None``.
+            dtype: Data type of the layer. Defaults to ``None``.
 
         References:
             [1] `Encoding the latent posterior of Bayesian Neural Networks for uncertainty quantification
@@ -167,20 +167,20 @@ class LPBNNConv2d(nn.Module):
         """LPBNN-style 2D convolutional layer.
 
         Args:
-            in_channels (int): Number of input channels.
-            out_channels (int): Number of output channels.
-            num_estimators (int): Number of models to sample from.
-            kernel_size (int or tuple): Size of the convolving kernel.
-            stride (int or tuple): Stride of the convolution. Default: ``1``.
-            padding (int or tuple): Zero-padding added to both sides of the input. Default: ``0``.
-            groups (int): Number of blocked connections from input channels to output channels. Default: ``1``.
-            hidden_size (int): Size of the hidden layer. Defaults to ``32``.
-            std_factor (float): Factor to multiply the standard deviation of the latent noise. Defaults to ``1e-2``.
-            gamma (bool): If ``True``, adds a learnable gamma to the output. Defaults to ``True``.
-            bias (bool): If ``True``, adds a learnable bias to the output. Defaults to ``True``.
-            padding_mode (str): 'zeros', 'reflect', 'replicate' or 'circular'. Default: 'zeros'.
-            device (torch.device): Device on which the layer is stored. Defaults to ``None``.
-            dtype (torch.dtype): Data type of the layer. Defaults to ``None``.
+            in_channels: Number of input channels.
+            out_channels: Number of output channels.
+            num_estimators: Number of models to sample from.
+            kernel_size: Size of the convolving kernel.
+            stride: Stride of the convolution. Default: ``1``.
+            padding: Zero-padding added to both sides of the input. Default: ``0``.
+            groups: Number of blocked connections from input channels to output channels. Default: ``1``.
+            hidden_size: Size of the hidden layer. Defaults to ``32``.
+            std_factor: Factor to multiply the standard deviation of the latent noise. Defaults to ``1e-2``.
+            gamma: If ``True``, adds a learnable gamma to the output. Defaults to ``True``.
+            bias: If ``True``, adds a learnable bias to the output. Defaults to ``True``.
+            padding_mode: 'zeros', 'reflect', 'replicate' or 'circular'. Default: 'zeros'.
+            device: Device on which the layer is stored. Defaults to ``None``.
+            dtype: Data type of the layer. Defaults to ``None``.
 
         References:
             [1] `Encoding the latent posterior of Bayesian Neural Networks for uncertainty quantification

@@ -266,14 +266,14 @@ class RandomRescale(Transform):
         the image can have ``[..., C, H, W]`` shape. A bounding box can have ``[..., 4]`` shape.
 
         Args:
-            min_scale (int): Minimum scale for random sampling
-            max_scale (int): Maximum scale for random sampling
+            min_scale: Minimum scale for random sampling
+            max_scale: Maximum scale for random sampling
             interpolation (InterpolationMode): Desired interpolation enum defined by
                 :class:`torchvision.transforms.InterpolationMode`. Default is ``InterpolationMode.BILINEAR``.
                 If input is Tensor, only ``InterpolationMode.NEAREST``, ``InterpolationMode.NEAREST_EXACT``,
                 ``InterpolationMode.BILINEAR`` and ``InterpolationMode.BICUBIC`` are supported.
                 The corresponding Pillow integer constants, e.g. ``PIL.Image.BILINEAR`` are accepted as well.
-            antialias (bool): Whether to apply antialiasing.
+            antialias: Whether to apply antialiasing.
                 It only affects **tensors** with bilinear or bicubic modes and it is
                 ignored otherwise: on PIL images, antialiasing is always applied on
                 bilinear or bicubic modes; on other modes (for PIL images and

@@ -23,7 +23,7 @@ routine:
   is_ensemble: true
   num_classes: 3
   loss: CrossEntropyLoss
-  save_in_csv: true
+  save_to_csv: true
   format_batch_fn:
     class_path: torch_uncertainty.transforms.MIMOBatchFormat
     init_args:

@@ -25,13 +25,12 @@ class MCBatchNorm(PostProcessing):
         """Monte Carlo Batch Normalization wrapper for 2d inputs.
 
         Args:
-            model (nn.Module): model to be converted.
-            num_estimators (int): number of estimators.
-            convert (bool): whether to convert the model. Defaults to ``True``.
-            mc_batch_size (int): Monte Carlo batch size. The smaller the more variability
-                in the predictions. Defaults to ``32``.
-            device (Literal["cpu", "cuda"] | torch.device | None): device.
-                Defaults to ``None``.
+            model: model to be converted.
+            num_estimators: number of estimators.
+            convert: whether to convert the model. Defaults to ``True``.
+            mc_batch_size: Monte-Carlo batch size. The smaller the more variability in the
+                predictions. Defaults to ``32``.
+            device: device. Defaults to ``None``.
 
         Warning:
             The update of the batch statistics slightly differs from the method as worded in the
@@ -75,7 +74,7 @@ class MCBatchNorm(PostProcessing):
         """Fit the model on the dataset.
 
         Args:
-            dataloader (DataLoader): DataLoader with the post-processing dataset.
+            dataloader: DataLoader with the post-processing dataset.
 
         Warning:
             The ``batch_size`` of the DataLoader (i.e. :attr:`mc_batch_size`) should be carefully
@@ -146,7 +145,7 @@ class MCBatchNorm(PostProcessing):
         """Set the accumulate flag for all MCBatchNorm2d layers.
 
         Args:
-            accumulate (bool): accumulate flag.
+            accumulate: accumulate flag.
         """
         for layer in self.mc_batch_norm_layers:
             layer.accumulate = accumulate
@@ -155,7 +154,7 @@ class MCBatchNorm(PostProcessing):
         """Replace all BatchNorm2d layers with MCBatchNorm2d layers.
 
         Args:
-            model (nn.Module): model to be converted.
+            model: model to be converted.
         """
         for name, module in model.named_children():
             if len(list(module.children())) > 0:
@@ -190,8 +189,8 @@ def init_dataloader(dataloader: DataLoader, batch_size: int):
     It is impossible to change the ``batch_size`` of an already-instantiated dataloader.
 
     Args:
-        dataloader (DataLoader): the dataloader to be reinitialized with
-        batch_size (int): the given batch_size.
+        dataloader: the dataloader to be reinitialized with
+        batch_size: the given batch_size.
     """
     return DataLoader(
         dataloader.dataset,

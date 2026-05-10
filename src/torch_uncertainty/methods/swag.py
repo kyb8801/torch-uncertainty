@@ -36,14 +36,15 @@ class SWAG(SWA):
         the batchnorm statistics of the current SWAG samples.
 
         Args:
-            core_model (nn.Module): PyTorch model to be trained.
-            cycle_start (int): Begininning of the first SWAG averaging cycle.
-            cycle_length (int): Number of epochs between SWAG updates. The first update occurs at :attr:`cycle_start` + :attr:`cycle_length`.
-            scale (float): Scale of the Gaussian. Defaults to ``1.0``.
-            diag_covariance (bool): Whether to use a diagonal covariance. Defaults to ``False``.
-            max_num_models (int): Maximum number of models to store. Defaults to ``0``.
-            var_clamp (float): Minimum variance. Defaults to ``1e-30``.
-            num_estimators (int): Number of posterior estimates to use. Defaults to ``16``.
+            core_model: PyTorch model to be trained.
+            cycle_start: Beginning of the first SWAG averaging cycle.
+            cycle_length: Number of epochs between SWAG updates. The first update occurs at
+                :attr:`cycle_start` + :attr:`cycle_length`.
+            scale: Scale of the Gaussian. Defaults to ``1.0``.
+            diag_covariance: Whether to use a diagonal covariance. Defaults to ``False``.
+            max_num_models: Maximum number of models to store. Defaults to ``0``.
+            var_clamp: Minimum variance. Defaults to ``1e-30``.
+            num_estimators: Number of posterior estimates to use. Defaults to ``16``.
 
         References:
             [1] `A simple baseline for bayesian uncertainty in deep learning. In NeurIPS 2019
@@ -101,7 +102,7 @@ class SWAG(SWA):
         of the cycle length.
 
         Args:
-            epoch (int): Current epoch.
+            epoch : Current epoch.
         """
         if not (epoch > self.cycle_start and (epoch - self.cycle_start) % self.cycle_length == 0):
             return
@@ -138,11 +139,11 @@ class SWAG(SWA):
         self.fit = True
 
     def bn_update(self, loader: DataLoader, device: torch.device | str | int | None) -> None:
-        """Update the bachnorm statistics of the current SWAG samples.
+        """Update the batchnorm statistics of the current SWAG samples.
 
         Args:
-            loader (DataLoader): DataLoader to update the batchnorm statistics.
-            device (torch.device): Device to perform the update.
+            loader: DataLoader to update the batchnorm statistics.
+            device: Device to perform the update.
         """
         if self.need_bn_update:
             for mod in self.samples:
@@ -159,12 +160,10 @@ class SWAG(SWA):
         """Sample a model from the SWAG posterior.
 
         Args:
-            scale (float): Rescale coefficient of the Gaussian.
-            diag_covariance (bool): Whether to use a diagonal
-                covariance. Defaults to None.
-            block (bool): Whether to sample a block diagonal
-                covariance. Defaults to False.
-            seed (int): Random seed. Defaults to None.
+            scale: Rescale coefficient of the Gaussian.
+            diag_covariance: Whether to use a diagonal covariance. Defaults to ``None``.
+            block: Whether to sample a block diagonal covariance. Defaults to ``False``.
+            seed: Random seed. Defaults to ``None``.
 
         Returns:
             nn.Module: Sampled model.

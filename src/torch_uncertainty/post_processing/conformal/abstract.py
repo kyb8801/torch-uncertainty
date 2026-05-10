@@ -9,12 +9,6 @@ from torch_uncertainty.post_processing.abstract import PostProcessing
 
 
 class Conformal(PostProcessing):
-    """Conformal base class.
-
-    Warning:
-        This implementation only works in the multiclass setting. Raise an issue if binary is needed.
-    """
-
     q_hat: Tensor | None = None
 
     def __init__(
@@ -27,6 +21,11 @@ class Conformal(PostProcessing):
         enable_ts: bool,
         device: Literal["cpu", "cuda"] | torch.device | None,
     ) -> None:
+        """Conformal base class.
+
+        Warning:
+            This implementation only works in the multiclass setting. Raise an issue if binary is needed.
+        """
         super().__init__(model=model)
         self.alpha = alpha
         self.enable_ts = enable_ts
@@ -56,7 +55,8 @@ class Conformal(PostProcessing):
         return self.model(inputs.to(self.device)).softmax(-1)
 
     @abstractmethod
-    def conformal(self, inputs: Tensor) -> Tensor: ...
+    def conformal(self, inputs: Tensor) -> Tensor:
+        """Apply the conformal prediction rule to the inputs."""
 
     def forward(self, inputs: Tensor) -> Tensor:
         return self.conformal(inputs)

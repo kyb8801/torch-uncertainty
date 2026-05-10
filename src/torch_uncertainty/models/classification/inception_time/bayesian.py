@@ -102,7 +102,7 @@ class _BayesianInceptionTime(nn.Module):
         """Forward pass through the model.
 
         Args:
-            x (Tensor): Input tensor of shape (batch_size, in_channels, seq_len).
+            x: Input tensor of shape (batch_size, in_channels, seq_len).
 
         Returns:
             Tensor: Output tensor of shape (batch_size, num_classes).
@@ -133,14 +133,14 @@ def bayesian_inception_time(
     """Bayesian InceptionTime.
 
     Args:
-        in_channels (int): Number of input channels.
-        num_classes (int): Number of output classes.
-        num_samples (int): Number of samples for stochastic modeling. Default is ``16``.
-        kernel_size (int): Size of the convolutional kernels. Default is ``40``.
-        embed_dim (int): Dimension of the embedding. Default is ``32``.
-        num_blocks (int): Number of inception blocks. Default is ``6``.
-        dropout (float): Dropout rate. Default is ``0.0``.
-        residual (bool): Whether to use residual connections. Default is ``True``.
+        in_channels: Number of input channels.
+        num_classes: Number of output classes.
+        num_samples: Number of samples for stochastic modeling. Defaults to ``16``.
+        kernel_size: Size of the convolutional kernels. Defaults to ``40``.
+        embed_dim: Dimension of the embedding. Defaults to ``32``.
+        num_blocks: Number of inception blocks. Defaults to ``6``.
+        dropout: Dropout rate. Defaults to ``0.0``.
+        residual: Whether to use residual connections. Defaults to ``True``.
 
     Returns:
         StochasticModel: A stochastic InceptionTime model.

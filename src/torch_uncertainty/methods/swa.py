@@ -21,9 +21,9 @@ class SWA(nn.Module):
         uses the base model for training.
 
         Args:
-            core_model (nn.Module): PyTorch model to be trained.
-            cycle_start (int): Epoch to start SWA.
-            cycle_length (int): Number of epochs between SWA updates.
+            core_model: PyTorch model to be trained.
+            cycle_start: Epoch to start SWA.
+            cycle_length: Number of epochs between SWA updates.
 
         References:
             [1] `Averaging Weights Leads to Wider Optima and Better Generalization.. In UAI 2018

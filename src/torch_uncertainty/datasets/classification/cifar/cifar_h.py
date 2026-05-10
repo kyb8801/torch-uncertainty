@@ -24,16 +24,16 @@ class CIFAR10H(CIFAR10):
         """`CIFAR-10H <https://github.com/jcpeterson/cifar-10h>`_ Dataset.
 
         Args:
-            root (str): Root directory of dataset where file
+            root: Root directory of dataset where file
                 ``cifar-10h-probs.npy`` exists or will be saved to if download
                 is set to ``True``.
-            train (bool): For API consistency, not used.
-            transform (callable): A function/transform that takes in
+            train: For API consistency, not used.
+            transform: A function/transform that takes in
                 a PIL image and returns a transformed version. E.g,
                 ``transforms.RandomCrop``. Defaults to ``None``.
-            target_transform (callable): A function/transform that
+            target_transform: A function/transform that
                 takes in the target and transforms it. Defaults to ``None``.
-            download (bool): If ``True``, downloads the dataset from the
+            download: If ``True``, downloads the dataset from the
                 internet and puts it in root directory. If dataset is already
                 downloaded, it is not downloaded again. Defaults to ``False``.
         """

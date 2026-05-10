@@ -52,8 +52,8 @@ class AUSE(Metric):
         """Store the scores and their associated errors for later computation.
 
         Args:
-            scores (Tensor): uncertainty scores of shape :math:`(B,)`
-            errors (Tensor): errors of shape :math:`(B,)`
+            scores: uncertainty scores of shape :math:`(B,)`
+            errors: errors of shape :math:`(B,)`
         """
         self.scores.append(scores)
         self.errors.append(errors)
@@ -93,12 +93,10 @@ class AUSE(Metric):
         ``update``, and the oracle sparsification curve.
 
         Args:
-            ax (Axes | None): An matplotlib axis object. If provided
-                will add plot to this axis. Defaults to None.
-            plot_oracle (bool): Whether to plot the oracle
-                sparsification curve. Defaults to True.
-            plot_value (bool): Whether to plot the AUSE value.
-                Defaults to True.
+            ax: An matplotlib axis object. If provided will add plot to this axis.
+                Defaults to ``None``.
+            plot_oracle: Whether to plot the oracle sparsification curve. Defaults to ``True``.
+            plot_value: Whether to plot the AUSE value. Defaults to ``True``.
 
         Returns:
             tuple[[Figure | None], Axes]: Figure object and Axes object
@@ -155,8 +153,8 @@ def _ause_rejection_rate_compute(
     """Compute the cumulative error rates for a given set of scores and errors.
 
     Args:
-        scores (Tensor): uncertainty scores of shape :math:`(B,)`
-        errors (Tensor): errors of shape :math:`(B,)`
+        scores: uncertainty scores of shape :math:`(B,)`
+        errors: errors of shape :math:`(B,)`
     """
     num_samples = errors.size(0)
 

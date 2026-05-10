@@ -99,7 +99,7 @@ class _InceptionTime(nn.Module):
         """Forward pass through the model.
 
         Args:
-            x (Tensor): Input tensor of shape (batch_size, in_channels, seq_len).
+            x: Input tensor of shape (batch_size, in_channels, seq_len).
 
         Returns:
             Tensor: Output tensor of shape (batch_size, num_classes).
@@ -130,13 +130,13 @@ def inception_time(
     <https://arxiv.org/abs/1909.04939>`_.
 
     Args:
-        in_channels (int): Number of input channels.
-        num_classes (int): Number of output classes.
-        kernel_size (int): Size of the convolutional kernels. Default is ``40``.
-        embed_dim (int): Dimension of the embedding. Default is ``32``.
-        num_blocks (int): Number of inception blocks. Default is ``6``.
-        dropout (float): Dropout rate. Default is ``0.0``.
-        residual (bool): Whether to use residual connections. Default is ``True``.
+        in_channels: Number of input channels.
+        num_classes: Number of output classes.
+        kernel_size: Size of the convolutional kernels. Default is ``40``.
+        embed_dim: Dimension of the embedding. Default is ``32``.
+        num_blocks: Number of inception blocks. Default is ``6``.
+        dropout: Dropout rate. Default is ``0.0``.
+        residual: Whether to use residual connections. Default is ``True``.
 
     Returns:
         _InceptionTime: An instance of the InceptionTime model.

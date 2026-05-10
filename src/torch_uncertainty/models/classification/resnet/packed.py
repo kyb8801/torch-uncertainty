@@ -399,23 +399,21 @@ def packed_resnet(
     """Packed-Ensembles of ResNet.
 
     Args:
-        in_channels (int): Number of input channels.
-        num_classes (int): Number of classes to predict.
-        arch (int): The architecture of the ResNet.
-        conv_bias (bool): Whether to use bias in convolutions. Defaults to ``True``.
-        dropout_rate (float): Dropout rate. Defaults to ``0``.
-        num_estimators (int): Number of estimators in the ensemble.
-        alpha (int): Expansion factor affecting the width of the estimators.
-        gamma (int): Number of groups within each estimator.
-        width_multiplier (float): Width multiplier. Defaults to ``1``.
-        groups (int): Number of groups within each estimator group.
-        style (ResNetStyle | Literal["imagenet", "cifar"]): Whether to use the ImageNet or CIFAR
-            structure. Defaults to ``ResNetStyle.IMAGENET``.
-        normalization_layer (nn.Module): Normalization layer. Defaults to ``nn.BatchNorm2d``.
-        pretrained (bool): Whether to load pretrained weights.
-            Defaults to ``False``.
-        linear_implementation (str): Implementation of the
-            packed linear layer. Defaults to ``"conv1d"``.
+        in_channels: Number of input channels.
+        num_classes: Number of classes to predict.
+        arch: The architecture of the ResNet.
+        conv_bias: Whether to use bias in convolutions. Defaults to ``True``.
+        dropout_rate: Dropout rate. Defaults to ``0``.
+        num_estimators: Number of estimators in the ensemble.
+        alpha: Expansion factor affecting the width of the estimators.
+        gamma: Number of groups within each estimator.
+        width_multiplier: Width multiplier. Defaults to ``1``.
+        groups: Number of groups within each estimator group.
+        style: Whether to use the ImageNet or CIFAR structure.
+            Defaults to ``ResNetStyle.IMAGENET``.
+        normalization_layer: Normalization layer. Defaults to ``nn.BatchNorm2d``.
+        pretrained: Whether to load pretrained weights. Defaults to ``False``.
+        linear_implementation: Implementation of the packed linear layer. Defaults to ``"conv1d"``.
 
     Returns:
         _PackedResNet: A Packed-Ensembles ResNet.

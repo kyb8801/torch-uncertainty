@@ -21,21 +21,16 @@ class BankMarketingDataModule(UCIClassificationDataModule):
         """The Bank Marketing UCI classification datamodule.
 
         Args:
-            root (str | Path): Root directory of the datasets.
-            batch_size (int): The batch size for training and testing.
-            eval_batch_size (int | None) : Number of samples per batch during evaluation (val
+            root: Root directory of the datasets.
+            batch_size: The batch size for training and testing.
+            eval_batch_size: Number of samples per batch during evaluation (val
                 and test). Set to :attr:`batch_size` if ``None``. Defaults to ``None``.
-            val_split (float): Share of validation samples among the
-                non-test samples. Defaults to ``0``.
-            test_split (float): Share of test samples. Defaults to ``0.2``.
-            num_workers (int): How many subprocesses to use for data
-                loading. Defaults to ``1``.
-            pin_memory (bool): Whether to pin memory in the GPU. Defaults
-                to ``True``.
-            persistent_workers (bool): Whether to use persistent workers.
-                Defaults to ``True``.
-            binary (bool): Whether to use binary classification. Defaults
-                to ``True``.
+            val_split: Share of validation samples among the non-test samples. Defaults to ``0``.
+            test_split: Share of test samples. Defaults to ``0.2``.
+            num_workers: How many subprocesses to use for data loading. Defaults to ``1``.
+            pin_memory: Whether to pin memory in the GPU. Defaults to ``True``.
+            persistent_workers: Whether to use persistent workers. Defaults to ``True``.
+            binary: Whether to perform binary classification. Defaults to ``True``.
         """
         super().__init__(
             root=root,

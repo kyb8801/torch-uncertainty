@@ -37,7 +37,7 @@ routine:
   output_dim: 1
   loss: torch_uncertainty.losses.DistributionNLLLoss
   dist_family: normal
-  save_in_csv: true
+  save_to_csv: true
   format_batch_fn:
     class_path: torch_uncertainty.transforms.MIMOBatchFormat
     init_args:

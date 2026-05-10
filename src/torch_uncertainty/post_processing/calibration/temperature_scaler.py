@@ -21,12 +21,12 @@ class TemperatureScaler(Scaler):
         """Temperature scaling post-processing for calibrated probabilities.
 
         Args:
-            model (nn.Module): Model to calibrate.
-            init_temperature (float | Tensor): Initial value for the temperature. Defaults to ``1``.
-            lr (float): Learning rate for the optimizer. Defaults to ``0.1``.
-            max_iter (int): Maximum number of iterations for the optimizer. Defaults to ``100``.
-            eps (float): Small value for stability. Defaults to ``1e-8``.
-            device (Optional[Literal["cpu", "cuda"]]): Device to use for optimization. Defaults to ``None``.
+            model: Model to calibrate.
+            init_temperature: Initial value for the temperature. Defaults to ``1``.
+            lr: Learning rate for the optimizer. Defaults to ``0.1``.
+            max_iter: Maximum number of iterations for the optimizer. Defaults to ``100``.
+            eps: Small value for stability. Defaults to ``1e-8``.
+            device: Device to use for optimization. Defaults to ``None``.
 
         References:
             [1] `On calibration of modern neural networks. In ICML 2017
@@ -62,7 +62,7 @@ class TemperatureScaler(Scaler):
         """Set the temperature to a fixed value.
 
         Args:
-            val (float | Tensor): Temperature value.
+            val: Temperature value.
         """
         if val <= 0:
             raise ValueError(f"Temperature value must be strictly positive. Got {val}.")

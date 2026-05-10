@@ -29,17 +29,16 @@ class _MLP(nn.Module):
         """Multi-layer perceptron class.
 
         Args:
-            in_features (int): Number of input features.
-            num_outputs (int): Number of output features.
-            hidden_dims (list[int]): Number of features for each hidden layer.
-            layer (nn.Module): Layer class.
-            activation (Callable): Activation function.
-            layer_args (Dict): Arguments for the layer class.
-            dropout_rate (float): Dropout probability.
-            dist_family (str): Distribution family name. ``None`` means point-wise
-                prediction.
-            dist_args (Dict): Arguments for the distribution layer class.
-            flatten_start_dim (int): Dimension to start flattening the input.
+            in_features: Number of input features.
+            num_outputs: Number of output features.
+            hidden_dims: Number of features for each hidden layer.
+            layer: Layer class.
+            activation: Activation function.
+            layer_args: Arguments for the layer class.
+            dropout_rate: Dropout probability.
+            dist_family: Distribution family name. ``None`` means point-wise prediction.
+            dist_args: Arguments for the distribution layer class.
+            flatten_start_dim: Dimension to start flattening the input.
         """
         super().__init__()
         self.activation = activation
@@ -194,17 +193,14 @@ def mlp(
     """Multi-layer perceptron.
 
     Args:
-        in_features (int): Number of input features.
-        num_outputs (int): Number of output features.
-        hidden_dims (list[int]): Number of features in each hidden layer.
-        activation (Callable): Activation function. Defaults to
-            ``F.relu``.
-        dropout_rate (float): Dropout probability. Defaults to ``0.0``.
-        dist_family (str): Distribution family. Defaults to ``None``.
-        dist_args (Dict): Arguments for the distribution layer class. Defaults
-            to ``None``.
-        flatten_start_dim (int): Dimension to start flattening the input.
-            Defaults to ``-1``.
+        in_features: Number of input features.
+        num_outputs: Number of output features.
+        hidden_dims: Number of features in each hidden layer.
+        activation: Activation function. Defaults to ``F.relu``.
+        dropout_rate: Dropout probability. Defaults to ``0.0``.
+        dist_family: Distribution family. Defaults to ``None``.
+        dist_args: Arguments for the distribution layer class. Defaults to ``None``.
+        flatten_start_dim: Dimension to start flattening the input. Defaults to ``-1``.
 
     Returns:
         _MLP: A Multi-Layer-Perceptron model.

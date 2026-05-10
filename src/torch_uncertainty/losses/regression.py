@@ -12,8 +12,8 @@ class DistributionNLLLoss(nn.Module):
         """Negative Log-Likelihood loss using given distributions as inputs.
 
         Args:
-            reduction (str): specifies the reduction to apply to the
-                output:``'none'`` | ``'mean'`` | ``'sum'``. Defaults to "mean".
+            reduction: Specifies the reduction to apply to the output.
+                Must be one of ``'none'``, ``'mean'`` or ``'sum'``. Defaults to ``"mean"``.
         """
         super().__init__()
         self.reduction = reduction
@@ -27,10 +27,10 @@ class DistributionNLLLoss(nn.Module):
         """Compute the NLL of the targets given predicted distributions.
 
         Args:
-            dist (Distribution): The predicted distributions
-            targets (Tensor): The target values
-            padding_mask (Tensor): The padding mask. Defaults to ``None.``
-                Sets the loss to ``0`` for padded values.
+            dist: The predicted distributions.
+            targets: The target values.
+            padding_mask: The padding mask. Sets the loss to ``0`` for padded values.
+                Defaults to ``None``.
         """
         loss = -dist.log_prob(targets)
         if padding_mask is not None:
@@ -51,9 +51,9 @@ class DERLoss(DistributionNLLLoss):
         inverse gamma distribution and a weighted regularization term.
 
         Args:
-            reg_weight (float): The weight of the regularization term.
-            reduction (str): specifies the reduction to apply to the
-                output:``'none'`` | ``'mean'`` | ``'sum'``.
+            reg_weight: The weight of the regularization term.
+            reduction: Specifies the reduction to apply to the output.
+                Must be one of ``'none'``, ``'mean'`` or ``'sum'``.
 
         References:
             [1] `Amini, A., Schwarting, W., Soleimany, A., & Rus, D. (2019). Deep evidential regression
@@ -106,11 +106,10 @@ class BetaNLL(nn.Module):
         """The Beta Negative Log-likelihood loss.
 
         Args:
-            beta (float): Parameter from range [0, 1] controlling relative
-                weighting between data points, where `0` corresponds to
-                high weight on low error points and `1` to an equal weighting.
-            reduction (str): specifies the reduction to apply to the
-                output:``'none'`` | ``'mean'`` | ``'sum'``.
+            beta: Parameter from range [0, 1] controlling relative weighting between data points,
+                where ``0`` corresponds to high weight on low error points and ``1`` to an equal weighting.
+            reduction: Specifies the reduction to apply to the output.
+                Must be one of ``'none'``, ``'mean'`` or ``'sum'``.
 
         References:
             [1] `Seitzer, M., Tavakoli, A., Antic, D., & Martius, G. (2022). On the pitfalls of heteroscedastic uncertainty estimation with probabilistic neural networks

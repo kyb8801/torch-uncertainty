@@ -23,18 +23,17 @@ class CoverageRate(Metric):
         """Empirical coverage rate metric.
 
         Args:
-            num_classes (int | None): Number of classes. Defaults to ``None``.
-            average (str): Defines the reduction that is applied over labels. Should be
-                one of the following:
+            num_classes: Number of classes. Defaults to ``None``.
+            average: Defines the reduction that is applied over labels.  Defaults to ``"macro"``.
+                Should be one of the following:
 
-                - ``'macro'`` (default): Compute the metric for each class separately and find their
+                - ``'macro'``: Compute the metric for each class separately and find their
                   unweighted mean. This does not take label imbalance into account.
                 - ``'micro'``: Sum statistics across over all labels.
 
-            validate_args (bool): Whether to validate the arguments. Defaults to ``True``.
+            validate_args: Whether to validate the arguments. Defaults to ``True``.
             kwargs: Additional keyword arguments, see `Advanced metric settings
                 <https://torchmetrics.readthedocs.io/en/stable/pages/overview.html#metric-kwargs>`_.
-
 
         Raises:
             ValueError: If `num_classes` is `None` and `average` is not `micro`.
@@ -68,9 +67,9 @@ class CoverageRate(Metric):
         """Update the metric state with predictions and targets.
 
         Args:
-            preds (torch.Tensor): predicted sets tensor of shape (B, C), where B is the batch size
+            preds: Predicted sets tensor of shape (B, C), where B is the batch size
                 and C is the number of classes.
-            target (torch.Tensor): target sets tensor of shape (B,).
+            target: Target labels tensor of shape (B,).
         """
         batch_size = preds.size(0)
         target = target.long()

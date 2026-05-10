@@ -25,7 +25,7 @@ class MutualInformation(Metric):
         ensemble of estimators.
 
         Args:
-            reduction (str): Determines how to reduce over the :math:`B`/batch dimension:
+            reduction: Determines how to reduce over the :math:`B`/batch dimension:
 
                 - ``'mean'`` [default]: Averages score across samples
                 - ``'sum'``: Sum score across samples
@@ -79,7 +79,7 @@ class MutualInformation(Metric):
         probabilities.
 
         Args:
-            probs (torch.Tensor): Likelihoods from the ensemble of shape
+            probs: Likelihoods from the ensemble of shape
                 :math:`(B, N, C)`, where :math:`B` is the batch size,
                 :math:`N` is the number of estimators and :math:`C` is the
                 number of classes.
@@ -99,9 +99,7 @@ class MutualInformation(Metric):
             self.total += batch_size
 
     def compute(self) -> torch.Tensor:
-        r"""Computes Mutual Information based on inputs passed in to ``update``
-        previously.
-        """
+        r"""Compute mutual information based on inputs passed to ``update``."""
         values = torch.clamp(dim_zero_cat(self.values), min=0)
         if self.reduction == "sum":
             return values.sum(dim=-1)

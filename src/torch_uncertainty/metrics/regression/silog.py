@@ -12,7 +12,7 @@ class SILog(Metric):
     total: Tensor
 
     def __init__(self, sqrt: bool = False, lmbda: float = 1.0, **kwargs: Any) -> None:
-        r"""Computes The Scale-Invariant Logarithmic Loss metric.
+        r"""Compute The Scale-Invariant Logarithmic Loss metric.
 
         The Scale-Invariant Logarithmic Loss (SILog), a metric designed for depth estimation tasks.
 
@@ -80,8 +80,8 @@ class SILog(Metric):
         """Update state with predictions and targets.
 
         Args:
-            preds (Tensor): A prediction tensor of shape (batch)
-            target (Tensor): A tensor of ground truth labels of shape (batch)
+            preds: A prediction tensor of shape (batch)
+            target: A tensor of ground truth labels of shape (batch)
         """
         self.log_dists += torch.sum(preds.log() - target.log())
         self.sq_log_dists += torch.sum((preds.log() - target.log()) ** 2)

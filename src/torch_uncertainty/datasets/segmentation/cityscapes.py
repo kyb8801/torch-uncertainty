@@ -44,32 +44,26 @@ class Cityscapes(TVCityscapes):
         target_transform: Callable[..., Any] | None = None,
         transforms: Callable[..., Any] | None = None,
     ) -> None:
-        """Cityscapes dataset wrapper with train ID color mapping.
+        """Cityscapes dataset wrapper with train-ID color mapping.
 
-        This class extends the `TVCityscapes` dataset to provide a fixed
-        color palette for visualization and encode/decode utilities for
-        semantic segmentation targets using Cityscapes train IDs. It also
-        sets up mapping from train IDs to RGB colors for easier interpretation
-        of predicted masks.
+        Extends :class:`torchvision.datasets.Cityscapes` to provide a
+        stable color palette for visualization and convenience helpers to
+        encode and decode semantic segmentation targets using Cityscapes
+        train IDs. A tensor mapping train IDs to RGB colors is constructed
+        on initialization for decoding predicted masks.
 
         Attributes:
-            color_palette (list[tuple[int, int, int]]):
-                List of RGB tuples for each class label in the Cityscapes dataset.
-            train_id_to_color (torch.Tensor):
-                Tensor mapping train IDs to RGB colors for output decoding.
+            color_palette: List of RGB tuples for each class label in Cityscapes.
+            train_id_to_color: Tensor mapping train IDs to RGB colors for decoding.
 
         Args:
-            root (str): Root directory of the Cityscapes dataset.
-            split (str): Dataset split to use, such as "train", "val", or "test".
-            mode (str): Annotation mode, e.g., "fine" or "coarse".
-            target_type (list[str] | str):
-                One or more target types to load ("instance", "semantic", etc.).
-            transform (Callable[..., Any] | None):
-                Transformation applied to the input image.
-            target_transform (Callable[..., Any] | None):
-                Transformation applied to the target.
-            transforms (Callable[..., Any] | None):
-                Combined transformation for image and target.
+            root: Root directory of the Cityscapes dataset.
+            split: Dataset split to use (e.g., "train", "val", or "test"). Defaults to ``"train"``.
+            mode: Annotation mode ("fine" or "coarse"). Defaults to ``"fine"``.
+            target_type: One or more target types to load ("instance", "semantic", etc.). Defaults to ``"instance"``.
+            transform: Transformation applied to the input image. Defaults to ``None``.
+            target_transform: Transformation applied to the target. Defaults to ``None``.
+            transforms: Combined transformation for image and target. Defaults to ``None``.
 
         """
         super().__init__(
@@ -89,13 +83,17 @@ class Cityscapes(TVCityscapes):
 
     @classmethod
     def encode_target(cls, target: Image.Image) -> Image.Image:
-        """Encode target image to tensor.
+        """Encode a Cityscapes target PIL image into a train-ID image.
+
+        The input is a color-coded PIL image (train-ID or label colors). The
+        method converts it to a single-channel image where each pixel value
+        is the corresponding train ID.
 
         Args:
-            target (Image.Image): Target PIL image.
+            target: A PIL image containing the ground-truth target map.
 
         Returns:
-            torch.Tensor: Encoded target.
+            A PIL image where pixel values correspond to Cityscapes train IDs.
         """
         colored_target = F.pil_to_tensor(target)
         colored_target = rearrange(colored_target, "c h w -> h w c")
@@ -111,27 +109,32 @@ class Cityscapes(TVCityscapes):
         return F.to_pil_image(rearrange(target, "h w c -> c h w"))
 
     def decode_target(self, target: torch.Tensor) -> torch.Tensor:
-        """Decode target tensor to RGB tensor.
+        """Decode a train-ID tensor into an RGB tensor using the palette.
+
+        Pixels with value ``255`` are treated as void and mapped to the
+        last palette entry (black). The returned tensor contains RGB color
+        values for each pixel according to the dataset palette.
 
         Args:
-            target (torch.Tensor): Target RGB tensor.
+            target: Integer tensor of train IDs.
 
         Returns:
-            Image.Image: Decoded target.
+            A tensor of RGB colors with shape ``(H, W, 3)`` mapped from train IDs.
         """
         target[target == 255] = -1
         return self.train_id_to_color[target]
 
     def __getitem__(self, index: int) -> tuple[Any, Any]:
-        """Get the sample at the given index.
+        """Return the sample at the given index.
 
         Args:
-            index (int): Index
+            index: Integer index of the sample to retrieve.
 
         Returns:
-            tuple: (image, target) where target is a tuple of all target types if ``target_type``
-                is a list with more than one item. Otherwise, target is a json object if
-                ``target_type="polygon"``, else the image segmentation.
+            ``(image, target)`` tuple: If ``target_type`` contains multiple
+            types, ``target`` is a tuple with each corresponding target. If
+            ``target_type=="polygon"``, the target is a JSON object; for
+            semantic targets the returned object is a mask or ``tv_tensors.Mask``.
         """
         image = tv_tensors.Image(Image.open(self.images[index]).convert("RGB"))
 
@@ -154,13 +157,22 @@ class Cityscapes(TVCityscapes):
         return image, target
 
     def plot_sample(self, index: int, ax: _AX_TYPE | None = None) -> _PLOT_OUT_TYPE:
-        """Plot a sample from the dataset.
+        """Plot a dataset sample (image and decoded target) for inspection.
+
+        Intended behavior: load the sample at ``index``, decode the target
+        to RGB using :attr:`train_id_to_color`, and render the image and
+        overlay/target on the provided axis. If ``ax`` is ``None``, a new
+        matplotlib figure and axis should be created.
 
         Args:
-            index: The index of the sample to plot.
-            ax: Optional matplotlib axis to plot on.
+            index: Index of the sample to plot.
+            ax: Optional matplotlib axis to draw on. Defaults to ``None``.
 
         Returns:
-            The axis on which the sample was plotted.
+            A tuple ``(fig, ax)`` or the axis object used for plotting, depending on
+            the plotting utility in use.
+
+        Raises:
+            NotImplementedError: This plotting helper is not implemented yet.
         """
-        raise NotImplementedError("This method is not implemented yet.")
+        raise NotImplementedError("plot_sample is not implemented yet.")

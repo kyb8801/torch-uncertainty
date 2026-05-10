@@ -45,32 +45,32 @@ class MNISTDataModule(TUDataModule):
         """DataModule for MNIST.
 
         Args:
-            root (str): Root directory of the datasets.
-            eval_ood (bool): Whether to evaluate on out-of-distribution data. Defaults to ``False``.
-            eval_shift (bool): Whether to evaluate on shifted data. Defaults to ``False``.
-            batch_size (int): Number of samples per batch during training.
-            eval_batch_size (int | None) : Number of samples per batch during evaluation (val
+            root: Root directory of the datasets.
+            eval_ood: Whether to evaluate on out-of-distribution data. Defaults to ``False``.
+            eval_shift: Whether to evaluate on shifted data. Defaults to ``False``.
+            batch_size: Number of samples per batch during training.
+            eval_batch_size: Number of samples per batch during evaluation (val
                 and test). Set to :attr:`batch_size` if ``None``. Defaults to ``None``.
-            ood_ds (str): Which out-of-distribution dataset to use. Defaults to
+            ood_ds: Which out-of-distribution dataset to use. Defaults to
                 ``"fashion"``; `fashion` stands for FashionMNIST and `notMNIST` for notMNIST.
-            val_split (float): Share of samples to use for validation. Defaults to ``0.0``.
-            num_tta (int): Number of test-time augmentations (TTA). Defaults to ``1`` (no TTA).
-            postprocess_set (str): The post-hoc calibration dataset to
+            val_split: Share of samples to use for validation. Defaults to ``0.0``.
+            num_tta: Number of test-time augmentations (TTA). Defaults to ``1`` (no TTA).
+            postprocess_set: The post-hoc calibration dataset to
                 use for the post-processing method. Defaults to ``val``.
-            num_workers (int): Number of workers to use for data loading. Defaults
+            num_workers: Number of workers to use for data loading. Defaults
                 to ``1``.
-            train_transform (nn.Module | None): Custom training transform. Defaults
+            train_transform: Custom training transform. Defaults
                 to ``None``. If not provided, a default transform is used.
-            test_transform (nn.Module | None): Custom test transform. Defaults to
+            test_transform: Custom test transform. Defaults to
                 ``None``. If not provided, a default transform is used.
-            ood_transform (nn.Module | None): Custom transform for out-of-distribution
+            ood_transform: Custom transform for out-of-distribution
                 datasets. Defaults to ``None``. If not provided, a default transform
                 is used.
-            basic_augment (bool): Whether to apply base augmentations. Defaults to
+            basic_augment: Whether to apply base augmentations. Defaults to
                 ``True``.
-            cutout (int): Size of cutout to apply to images. Defaults to ``None``.
-            pin_memory (bool): Whether to pin memory. Defaults to ``True``.
-            persistent_workers (bool): Whether to use persistent workers. Defaults to ``True``.
+            cutout: Size of cutout to apply to images. Defaults to ``None``.
+            pin_memory: Whether to pin memory. Defaults to ``True``.
+            persistent_workers: Whether to use persistent workers. Defaults to ``True``.
         """
         super().__init__(
             root=root,

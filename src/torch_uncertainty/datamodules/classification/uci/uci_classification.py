@@ -25,22 +25,17 @@ class UCIClassificationDataModule(TUDataModule):
         """The UCI classification datamodule base class.
 
         Args:
-            root (str | Path): Root directory of the datasets.
-            dataset (type[Dataset]): The UCI classification dataset class.
-            batch_size (int): The batch size for training and testing.
-            eval_batch_size (int | None) : Number of samples per batch during evaluation (val
-                and test). Set to :attr:`batch_size` if ``None``. Defaults to ``None``.
-            val_split (float): Share of validation samples among the
-                non-test samples. Defaults to ``0``.
-            test_split (float): Share of test samples. Defaults to ``0.2``.
-            num_workers (int): How many subprocesses to use for data
-                loading. Defaults to ``1``.
-            pin_memory (bool): Whether to pin memory in the GPU. Defaults
-                to ``True``.
-            persistent_workers (bool): Whether to use persistent workers.
-                Defaults to ``True``.
-            binary (bool): Whether to use binary classification. Defaults
-                to ``True``.
+            root: Root directory of the datasets.
+            dataset: The UCI classification dataset class.
+            batch_size: The batch size for training and testing.
+            eval_batch_size: Number of samples per batch during evaluation (val and test). Set to
+                :attr:`batch_size` if ``None``. Defaults to ``None``.
+            val_split: Share of validation samples among the non-test samples. Defaults to ``0``.
+            test_split: Share of test samples. Defaults to ``0.2``.
+            num_workers: How many subprocesses to use for data loading. Defaults to ``1``.
+            pin_memory: Whether to pin memory in the GPU. Defaults to ``True``.
+            persistent_workers: Whether to use persistent workers. Defaults to ``True``.
+            binary: Whether to use binary classification. Defaults to ``True``.
         """
         super().__init__(
             root=root,
@@ -64,7 +59,7 @@ class UCIClassificationDataModule(TUDataModule):
         """Split the datasets into train, val, and test.
 
         Args:
-            stage (str | None): Stage to set up. Defaults to ``None``.
+            stage: Stage to set up. Defaults to ``None``.
         """
         if stage == "fit" or stage is None:
             full = self.dataset(

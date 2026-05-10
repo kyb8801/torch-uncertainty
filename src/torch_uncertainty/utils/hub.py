@@ -24,8 +24,8 @@ def load_hf(weight_id: str, version: int = 0) -> tuple[dict[str, torch.Tensor], 
     """Load a model from the HuggingFace hub.
 
     Args:
-        weight_id (str): The id of the model to load.
-        version (int): The id of the version when there are several on HF.
+        weight_id: The id of the model to load.
+        version: The id of the version when there are several on HF.
 
     Returns:
         tuple[dict[str, torch.Tensor], dict[str, str]]: The model weights and config.

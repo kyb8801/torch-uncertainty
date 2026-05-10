@@ -26,7 +26,7 @@ class Disagreement(Metric):
         estimators.
 
         Args:
-            reduction (str): Determines how to reduce over the :math:`B`/batch dimension:
+            reduction: Determines how to reduce over the :math:`B`/batch dimension:
 
                 - ``'mean'`` [default]: Averages score across samples
                 - ``'sum'``: Sum score across samples
@@ -101,7 +101,7 @@ class Disagreement(Metric):
         """Update state with prediction probabilities and targets.
 
         Args:
-            probs (torch.Tensor): Probabilities from the model.
+            probs: Probabilities from the model.
         """
         preds = probs.argmax(dim=-1)
         if self.reduction is None or self.reduction == "none":

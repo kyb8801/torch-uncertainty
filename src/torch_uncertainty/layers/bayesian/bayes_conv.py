@@ -19,6 +19,7 @@ __all__ = ["BayesConv1d", "BayesConv2d", "BayesConv3d"]
 
 
 class _BayesConvNd(Module):
+    # TODO: make abstract
     __constants__ = [
         "stride",
         "padding",
@@ -35,7 +36,8 @@ class _BayesConvNd(Module):
     def _conv_forward(
         self, inputs: Tensor, weight: Tensor, bias: Tensor | None
     ) -> Tensor:  # coverage: ignore
-        ...
+        """Run the convolution forward pass for a concrete Bayesian layer implementation."""
+        raise NotImplementedError
 
     in_channels: int
     _reversed_padding_repeated_twice: list[int]

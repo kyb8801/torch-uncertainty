@@ -31,17 +31,17 @@ class BayesLinear(nn.Module):
         """Bayesian Linear Layer with Mixture of Normals prior and Normal posterior.
 
         Args:
-            in_features (int): Number of input features
-            out_features (int): Number of output features
-            prior_sigma_1 (float): Standard deviation of the first prior distribution. Defaults to ``0.1``.
-            prior_sigma_2 (float): Standard deviation of the second prior distribution. Defaults to ``0.4``.
-            prior_pi (float): Mixture control variable. Defaults to ``1``.
-            mu_init (float): Initial mean of the posterior distribution. Defaults to ``0.0``.
-            sigma_init (float): Initial standard deviation of the posterior distribution. Defaults to ``-7.0``.
-            frozen (bool): Whether to freeze the posterior distribution. Defaults to ``False``.
-            bias (bool): Whether to use a bias term. Defaults to ``True.``
-            device (optional): Device to use. Defaults to ``None``.
-            dtype (optional): Data type to use. Defaults to ``None``.
+            in_features: Number of input features
+            out_features: Number of output features
+            prior_sigma_1: Standard deviation of the first prior distribution. Defaults to ``0.1``.
+            prior_sigma_2: Standard deviation of the second prior distribution. Defaults to ``0.4``.
+            prior_pi: Mixture control variable. Defaults to ``1``.
+            mu_init: Initial mean of the posterior distribution. Defaults to ``0.0``.
+            sigma_init: Initial standard deviation of the posterior distribution. Defaults to ``-7.0``.
+            frozen: Whether to freeze the posterior distribution. Defaults to ``False``.
+            bias: Whether to use a bias term. Defaults to ``True.``
+            device: Device to use. Defaults to ``None``.
+            dtype: Data type to use. Defaults to ``None``.
 
         References:
             [1] `Blundell, Charles, et al. "Weight uncertainty in neural networks", in ICML 2015

@@ -13,9 +13,9 @@ def create_train_val_split(
     """Split a dataset for training and validation.
 
     Args:
-        dataset (Dataset): The dataset to be split.
-        val_split_rate (float): The amount of the original dataset to use as validation split.
-        val_transforms (Callable | None): The transformations to apply on the validation set.
+        dataset: The dataset to be split.
+        val_split_rate: The amount of the original dataset to use as validation split.
+        val_transforms: The transformations to apply on the validation set.
             Defaults to ``None``.
 
     Returns:
@@ -34,8 +34,8 @@ class TTADataset(Dataset):
         This is useful for test-time augmentation (TTA).
 
         Args:
-            dataset (Dataset): The dataset to be adapted for TTA.
-            num_augmentations (int): The number of augmentations to apply.
+            dataset: The dataset to be adapted for TTA.
+            num_augmentations: The number of augmentations to apply.
         """
         super().__init__()
         self.dataset = dataset

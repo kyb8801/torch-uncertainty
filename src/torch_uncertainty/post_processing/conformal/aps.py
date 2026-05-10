@@ -22,17 +22,15 @@ class ConformalClsAPS(Conformal):
         r"""Conformal prediction with APS scores.
 
         Args:
-            alpha (float): The confidence level meaning we allow :math:`1-\alpha` error.
-            model (nn.Module | None): Trained classification model. Defaults to ``None``.
-            randomized (bool): Whether to use randomized smoothing in APS. Defaults to ``True``.
-            ts_init_val (float): Initial value for the temperature.
-                Defaults to ``1.0``.
-            ts_lr (float): Learning rate for the temperature scaling optimizer. Defaults to ``0.1``.
-            ts_max_iter (int): Maximum number of iterations for the temperature scaling
-                optimizer. Defaults to ``100``.
-            enable_ts (bool): Whether to scale the logits. Defaults to ``False``.
-            device (Literal["cpu", "cuda"] | torch.device | None): device.
-                Defaults to ``None``.
+            alpha: The confidence level meaning we allow :math:`1-\alpha` error.
+            model: Trained classification model. Defaults to ``None``.
+            randomized: Whether to use randomized smoothing in APS. Defaults to ``True``.
+            ts_init_val: Initial value for the temperature. Defaults to ``1.0``.
+            ts_lr: Learning rate for the temperature scaling optimizer. Defaults to ``0.1``.
+            ts_max_iter: Maximum number of iterations for the temperature scaling optimizer.
+                Defaults to ``100``.
+            enable_ts: Whether to scale the logits. Defaults to ``False``.
+            device: device. Defaults to ``None``.
 
         Warning:
             This implementation only works in the multiclass setting. Raise an issue if binary is needed.

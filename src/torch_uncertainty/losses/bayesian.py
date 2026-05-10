@@ -12,7 +12,7 @@ class KLDiv(nn.Module):
         modules computed in the forward passes.
 
         Args:
-            model (nn.Module): Bayesian Neural Network
+            model: Bayesian Neural Network
         """
         super().__init__()
         self.model = model
@@ -49,11 +49,11 @@ class ELBOLoss(nn.Module):
         objective that you seek to minimize as :attr:`inner_loss`.
 
         Args:
-            model (nn.Module): The Bayesian Neural Network to compute the loss for
-            inner_loss (nn.Module): The loss function to use during training
-            kl_weight (float): The weight of the KL divergence term
-            num_samples (int): The number of samples to use for the ELBO loss
-            dist_family (str): The distribution family to use for the output of the
+            model: The Bayesian Neural Network to compute the loss for
+            inner_loss: The loss function to use during training
+            kl_weight: The weight of the KL divergence term
+            num_samples: The number of samples to use for the ELBO loss
+            dist_family: The distribution family to use for the output of the
                 model. ``None`` means point-wise prediction. Defaults to ``None``.
 
         Note:
@@ -75,8 +75,8 @@ class ELBOLoss(nn.Module):
         the ELBO loss for a given network.
 
         Args:
-            inputs (Tensor): The inputs of the Bayesian Neural Network
-            targets (Tensor): The target values
+            inputs: The inputs of the Bayesian Neural Network
+            targets: The target values
 
         Returns:
             Tensor: The aggregated ELBO loss

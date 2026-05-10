@@ -486,7 +486,6 @@ class SegFormerHead(nn.Module):
         References:
             [1] `SegFormer: Simple and Efficient Design for Semantic Segmentation with Transformers
             <https://arxiv.org/abs/2105.15203>`_.
-
         """
         super().__init__()
         self.in_channels = in_channels
@@ -556,6 +555,15 @@ class _SegFormer(nn.Module):
 
 
 def seg_former(num_classes: int, arch: int) -> _SegFormer:
+    """Create a SegFormer model.
+
+    Args:
+        num_classes: Number of segmentation classes.
+        arch: MiT architecture index (0-5).
+
+    Returns:
+        _SegFormer: Configured SegFormer model.
+    """
     in_channels = _get_embed_dims(arch)
     return _SegFormer(
         in_channels=in_channels,

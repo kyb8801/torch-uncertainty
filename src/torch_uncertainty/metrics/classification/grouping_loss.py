@@ -87,12 +87,12 @@ class GroupingLoss(Metric):
         """Accumulate the tensors for the estimation of the Grouping Loss.
 
         Args:
-            probs (Tensor): A probability tensor of shape (batch, num_classes),
+            probs: A probability tensor of shape (batch, num_classes),
                 (batch, num_estimators, num_classes), or (batch) if binary
                 classification
-            target (Tensor): A tensor of ground truth labels of shape
+            target: A tensor of ground truth labels of shape
                 (batch, num_classes) or (batch)
-            features (Tensor): A tensor of features of shape
+            features: A tensor of features of shape
                 (batch, num_estimators, num_features) or (batch, num_features)
         """
         if target.ndim == 2:

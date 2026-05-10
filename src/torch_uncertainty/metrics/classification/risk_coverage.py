@@ -55,8 +55,7 @@ class AURC(Metric):
             tensor(0.0833)  # Example output
 
         References:
-            [1] `Geifman & El-Yaniv.`Selective classification for deep neural networks. In NeurIPS, 2017
-            <https://papers.nips.cc/paper_files/paper/2017/file/4a8423d5e91fda00bb7e46540e2b0cf1-Paper.pdf>`_.
+            [1] `Geifman & El-Yaniv. Selective classification for deep neural networks. In NeurIPS, 2017 <https://papers.nips.cc/paper_files/paper/2017/file/4a8423d5e91fda00bb7e46540e2b0cf1-Paper.pdf>`_.
         """
         super().__init__(**kwargs)
         self.add_state("scores", default=[], dist_reduce_fx="cat")
@@ -66,8 +65,8 @@ class AURC(Metric):
         """Store the scores and their associated errors for later computation.
 
         Args:
-            probs (Tensor): The predicted probabilities of shape :math:`(N, C)`.
-            targets (Tensor): The ground truth labels of shape :math:`(N,)`.
+            probs: The predicted probabilities of shape :math:`(N, C)`.
+            targets: The ground truth labels of shape :math:`(N,)`.
         """
         if probs.ndim == 1:
             probs = torch.stack([1 - probs, probs], dim=-1)
@@ -113,14 +112,12 @@ class AURC(Metric):
         ``update``.
 
         Args:
-            ax (Axes | None): An matplotlib axis object. If provided
-                will add plot to this axis. Defaults to None.
-            plot_value (bool): Whether to print the AURC value on the
-                plot. Defaults to True.
-            name (str | None): Name of the model. Defaults to None.
+            ax: A matplotlib axis object. If provided, the plot is added to this axis. Defaults to ``None``.
+            plot_value: Whether to print the AURC value on the plot. Defaults to ``True``.
+            name: Name of the model. Defaults to ``None``.
 
         Returns:
-            tuple[[Figure | None], Axes]: Figure object and Axes object
+            tuple[Figure | None, Axes]: Figure object and axes object.
         """
         fig, ax = plt.subplots(figsize=(6, 6)) if ax is None else (None, ax)
         ax = cast("plt.Axes", ax)
@@ -172,8 +169,8 @@ def _aurc_rejection_rate_compute(
     """Compute the cumulative error rates for a given set of scores and errors.
 
     Args:
-        scores (Tensor): uncertainty scores of shape :math:`(B,)`
-        errors (Tensor): binary errors of shape :math:`(B,)`
+        scores: uncertainty scores of shape :math:`(B,)`
+        errors: binary errors of shape :math:`(B,)`
     """
     errors = errors[scores.argsort(descending=True)]
     return errors.cumsum(dim=-1) / torch.arange(
@@ -185,8 +182,8 @@ class AUGRC(AURC):
     def __init__(self, **kwargs) -> None:
         r"""Calculate The Area Under the Generalized Risk-Coverage curve (AUGRC).
 
-        The Area Under the Generalized Risk-Coverage curve (AUGRC) for Selective Classification (SC) performance assessment. It avoids putting too much
-        weight on the most confident samples.
+        The Area Under the Generalized Risk-Coverage curve (AUGRC) for selective classification
+        performance assessment. It avoids putting too much weight on the most confident samples.
 
         As input to ``forward`` and ``update`` the metric accepts the following input:
 
@@ -205,8 +202,7 @@ class AUGRC(AURC):
             kwargs: Additional keyword arguments.
 
         References:
-            [1] `Traub et al. Overcoming Common Flaws in the Evaluation of Selective Classification Systems
-            <https://arxiv.org/pdf/2407.01032>`_.
+            [1] `Traub et al. Overcoming Common Flaws in the Evaluation of Selective Classification Systems <https://arxiv.org/pdf/2407.01032>`_.
 
         .. seealso::
             - :class:`~torch_uncertainty.metrics.classification.AURC` : Parent class, the AURC metric
@@ -237,14 +233,12 @@ class AUGRC(AURC):
         ``update``.
 
         Args:
-            ax (Axes | None): An matplotlib axis object. If provided
-                will add plot to this axis. Defaults to None.
-            plot_value (bool): Whether to print the AURC value on the
-                plot. Defaults to True.
-            name (str | None): Name of the model. Defaults to None.
+            ax: A matplotlib axis object. If provided, the plot is added to this axis. Defaults to ``None``.
+            plot_value: Whether to print the AURC value on the plot. Defaults to ``True``.
+            name: Name of the model. Defaults to ``None``.
 
         Returns:
-            tuple[[Figure | None], Axes]: Figure object and Axes object
+            tuple[Figure | None, Axes]: Figure object and axes object.
         """
         fig, ax = plt.subplots(figsize=(6, 6)) if ax is None else (None, ax)
         ax = cast("plt.Axes", ax)
@@ -303,11 +297,10 @@ class CovAtxRisk(Metric):
         If there are multiple coverage values corresponding to the given risk,
         i.e., the risk(coverage) is not monotonic, the coverage at x risk is
         the maximum coverage value corresponding to the given risk. If no
-        there is no coverage value corresponding to the given risk, return
-        float("nan").
+        there is no coverage value corresponding to the given risk, this metric returns ``float("nan")``.
 
         Args:
-            risk_threshold (float): The risk threshold at which to compute the coverage.
+            risk_threshold: The risk threshold at which to compute the coverage.
             kwargs: Additional arguments to pass to the metric class.
 
         Example:
@@ -347,8 +340,8 @@ class CovAtxRisk(Metric):
         """Store the scores and their associated errors for later computation.
 
         Args:
-            probs (Tensor): The predicted probabilities of shape :math:`(N, C)`.
-            targets (Tensor): The ground truth labels of shape :math:`(N,)`.
+            probs: The predicted probabilities of shape :math:`(N, C)`.
+            targets: The ground truth labels of shape :math:`(N,)`.
         """
         if probs.ndim == 1:
             probs = torch.stack([1 - probs, probs], dim=-1)
@@ -383,10 +376,10 @@ class CovAt5Risk(CovAtxRisk):
 
         If there are multiple coverage values corresponding to 5% risk, the
         coverage at 5% risk is the maximum coverage value corresponding to 5%
-        risk. If no there is no coverage value corresponding to the given risk,
-        this metric returns float("nan").
+        risk. If there is no coverage value corresponding to the given risk,
+        this metric returns ``float("nan")``.
 
-        This is a specific case of the more general CovAtxRisk metric, where the risk level is fixed at 5%.
+        This is a specific case of the more general :class:`CovAtxRisk` metric, where the risk level is fixed at 5%.
 
         .. seealso::
             - :class:`CovAtxRisk` : Parent class, the CovAtxRisk metric
@@ -411,7 +404,7 @@ class RiskAtxCov(Metric):
         trade-off between coverage and risk in predictive models.
 
         Args:
-            cov_threshold (float): The coverage threshold at which to compute the risk.
+            cov_threshold: The coverage threshold at which to compute the risk.
             kwargs: Additional arguments to pass to the metric class.
 
         Example:
@@ -461,8 +454,8 @@ class RiskAtxCov(Metric):
         """Store the scores and their associated errors for later computation.
 
         Args:
-            probs (Tensor): The predicted probabilities of shape :math:`(N, C)`.
-            targets (Tensor): The ground truth labels of shape :math:`(N,)`.
+            probs: The predicted probabilities of shape :math:`(N, C)`.
+            targets: The ground truth labels of shape :math:`(N,)`.
         """
         if probs.ndim == 1:
             probs = torch.stack([1 - probs, probs], dim=-1)
@@ -485,7 +478,7 @@ class RiskAt80Cov(RiskAtxCov):
     def __init__(self, **kwargs) -> None:
         r"""Compute the risk at 80% coverage.
 
-        This is a specific case of the more general RiskAtxCov metric, where the risk level is fixed at 80%.
+        This is a specific case of the more general :class:`RiskAtxCov` metric, where the coverage level is fixed at 80%.
 
         .. seealso::
             - :class:`RiskAtxCov` : Parent class, the RiskAtxCov metric

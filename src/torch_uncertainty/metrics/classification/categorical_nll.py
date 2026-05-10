@@ -34,7 +34,7 @@ class CategoricalNLL(Metric):
         of sample :math:`i`.
 
         Args:
-            reduction (str): Determines how to reduce the computed loss over
+            reduction: Determines how to reduce the computed loss over
                 the batch dimension:
 
                 - ``'mean'`` [default]: Averages the loss across samples in the batch.
@@ -101,8 +101,8 @@ class CategoricalNLL(Metric):
         r"""Update state with prediction probabilities and targets.
 
         Args:
-            probs (Tensor): Probabilities from the model.
-            target (Tensor): Ground truth labels.
+            probs: Probabilities from the model.
+            target: Ground truth labels.
 
         For each sample :math:`i`, the negative log likelihood is computed as:
 

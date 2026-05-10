@@ -12,7 +12,7 @@ def smooth_round_to_grid(f: Tensor, y: Tensor, num_eval_points: int) -> Tensor:
 
     Args:
         f: A 1D Tensor of positions, expected to be normalized in the range [0, 1].
-        y: A 1D Tensor of weights or values associated with each position in `f`.
+        y: A 1D Tensor of weights or values associated with each position in ``f``.
         num_eval_points: The number of bins in the output grid.
 
     Returns:
@@ -39,7 +39,7 @@ def interpolate(t: Tensor, y: Tensor) -> Tensor:
         y: A 1D Tensor representing the discrete grid of values.
 
     Returns:
-        The interpolated values at positions `t`.
+        The interpolated values at positions ``t``.
     """
     num_buckets = y.size(0)
     bucket_size = 1.0 / (num_buckets - 1)
@@ -58,7 +58,7 @@ class GaussianKernel:
         $$K(d) = \\frac{1}{\\sigma\\sqrt{2\\pi}} \\exp\\left(-\\frac{d^2}{2\\sigma^2}\\right)$$
 
         Args:
-            sigma (float): The standard deviation (bandwidth) of the Gaussian kernel.
+            sigma: The standard deviation (bandwidth) of the Gaussian kernel.
         """
         self.sigma = sigma
 
@@ -98,10 +98,10 @@ class GaussianKernel:
         """Performs kernel smoothing.
 
         Args:
-            f (Tensor): Input positions [0, 1].
-            y (Tensor): Input values.
-            eval_coordinates (Tensor): Point coordinates at which to evaluate the smoothed function.
-            eps (float): A small constant to prevent division by zero in low-density regions.
+            f: Input positions [0, 1].
+            y: Input values.
+            eval_coordinates: Point coordinates at which to evaluate the smoothed function.
+            eps: A small constant to prevent division by zero in low-density regions.
                 Defaults to ``1e-4``.
 
         Returns:
@@ -141,7 +141,7 @@ class LogitGaussianKernel:
         smoothing in the unconstrained space, and maps back.
 
         Args:
-            sigma (float): Bandwidth applied in the logit-transformed space.
+            sigma: Bandwidth applied in the logit-transformed space.
         """
         self.sigma = sigma
 

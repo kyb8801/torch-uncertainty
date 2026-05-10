@@ -4,7 +4,7 @@ from torchmetrics import MeanSquaredError
 
 class MeanSquaredLogError(MeanSquaredError):
     def __init__(self, squared: bool = True, **kwargs) -> None:
-        r"""Computes the Mean Squared Logarithmic Error (MSLE) regression metric.
+        r"""Compute the Mean Squared Logarithmic Error (MSLE).
 
         This metric is commonly used in regression problems where the relative
         difference between predictions and targets is of greater importance than
@@ -26,11 +26,11 @@ class MeanSquaredLogError(MeanSquaredError):
         As output of ``forward`` and ``compute`` the metric returns the
         following output:
 
-        - **mse_log** (:class:`~torch.Tensor`): A tensor with the
-          relative mean absolute error over the state
+            - **mse_log** (:class:`~torch.Tensor`): A tensor with the
+                mean squared logarithmic error over the state
 
         Args:
-            squared: If True returns MSELog value, if False returns EMSELog value.
+            squared: If ``True``, returns MSLE. If ``False``, returns RMSLE.
             kwargs: Additional keyword arguments, see `Advanced metric settings <https://torchmetrics.readthedocs.io/en/stable/pages/overview.html#metric-kwargs>`_.
 
         Reference:

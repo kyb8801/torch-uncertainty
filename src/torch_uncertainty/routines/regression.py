@@ -51,29 +51,25 @@ class RegressionRoutine(LightningModule):
         format_batch_fn: nn.Module | None = None,
         log_plots: bool = False,
         num_bins_calibration_error: int = 15,
-        save_in_csv: bool = False,
+        save_to_csv: bool = False,
         csv_filename: str = "results.csv",
     ) -> None:
         r"""Routine for training & testing on **regression** tasks.
 
         Args:
-            model (torch.nn.Module): Model to train.
-            output_dim (int): Number of outputs of the model.
-            loss (torch.nn.Module): Loss function to optimize the :attr:`model`.
-                Defaults to ``None``.
-            dist_family (str): The distribution family to use for probabilistic regression. If ``None`` then point-wise regression. Defaults to ``None``.
-            dist_estimate (str | DistEstimate): The estimate to use when computing the point-wise metrics. Defaults to ``"mean"``.
-            is_ensemble (bool): Whether the model is an ensemble. Defaults to ``False``.
-            optim_recipe (Callable[[nn.Module], OptimizerLRScheduler] | OptimizerLRScheduler): The optimizer and optionally the scheduler to use, or a callable that returns them. Defaults to ``None``.
-            eval_shift (bool): Indicates whether to evaluate the Distribution shift performance. Defaults to ``False``.
-            format_batch_fn (torch.nn.Module): The function to format the batch. Defaults to ``None``.
-            log_plots (bool): Indicates whether to log figures in the logger.
-                Defaults to ``False``.
-            num_bins_calibration_error (int): Number of bins to compute calibration
-                error metrics. Defaults to ``15``.
-            save_in_csv (bool): Save the results in csv. Defaults to ``False``.
-            csv_filename (str): Name of the csv file. Defaults to ``"results.csv"``. Note that this is only used if
-                :attr:`save_in_csv` is ``True``.
+            model: Model to train.
+            output_dim: Number of outputs of the model.
+            loss: Loss function to optimize the :attr:`model`. Defaults to ``None``.
+            dist_family: Distribution family to use for probabilistic regression. If ``None``, performs point-wise regression. Defaults to ``None``.
+            dist_estimate: The estimate to use when computing point-wise metrics. Defaults to ``mean``.
+            is_ensemble: Whether the model is an ensemble. Defaults to ``False``.
+            optim_recipe: The optimizer and optionally the scheduler to use, or a callable that returns them. Defaults to ``None``.
+            eval_shift: Whether to evaluate distribution-shift performance. Defaults to ``False``.
+            format_batch_fn: Function to format a batch. Defaults to ``None``.
+            log_plots: Whether to log figures in the logger. Defaults to ``False``.
+            num_bins_calibration_error: Number of bins used for calibration error metrics. Defaults to ``15``.
+            save_to_csv: Save the results in CSV. Defaults to ``False``.
+            csv_filename: Name of the CSV file. Defaults to ``results.csv``. Used only when ``save_to_csv`` is ``True``.
 
         Warning:
             If :attr:`probabilistic` is True, the model must output a `PyTorch
@@ -103,7 +99,7 @@ class RegressionRoutine(LightningModule):
         self.loss = loss
         self.is_ensemble = is_ensemble
         self.log_plots = log_plots
-        self.save_in_csv = save_in_csv
+        self.save_to_csv = save_to_csv
         self.csv_filename = csv_filename
         self.needs_epoch_update = isinstance(model, EPOCH_UPDATE_MODEL)
         self.needs_step_update = isinstance(model, STEP_UPDATE_MODEL)
@@ -188,7 +184,7 @@ class RegressionRoutine(LightningModule):
         is one-dimensional and if the routine contains a single model.
 
         Args:
-            inputs (Tensor): The input tensor.
+            inputs: The input tensor.
 
         Returns:
             Tensor | dict[str, Tensor]: The output tensor or the parameters of the output
@@ -217,7 +213,7 @@ class RegressionRoutine(LightningModule):
         """Perform a single training step based on the input tensors.
 
         Args:
-            batch (tuple[Tensor, Tensor]): the training data and their corresponding targets
+            batch: Tuple of training inputs and targets.
 
         Returns:
             Tensor: the loss corresponding to this training step.
@@ -255,7 +251,7 @@ class RegressionRoutine(LightningModule):
         """Get the prediction and handle predicted eventual distribution parameters.
 
         Args:
-            inputs (Tensor): the input data.
+            inputs: The input data.
 
         Returns:
             tuple[Tensor, Distribution | None]: the prediction as a Tensor and a distribution.
@@ -280,7 +276,7 @@ class RegressionRoutine(LightningModule):
         Compute the prediction of the model and the value of the metrics on the validation batch.
 
         Args:
-            batch (tuple[Tensor, Tensor]): the validation data and their corresponding targets.
+            batch: Tuple of validation inputs and targets.
         """
         inputs, targets = batch
         if self.one_dim_regression:
@@ -303,9 +299,9 @@ class RegressionRoutine(LightningModule):
         handle OOD and distribution-shifted images.
 
         Args:
-            batch (tuple[Tensor, Tensor]): the test data and their corresponding targets.
-            batch_idx (int): the number of the current batch (unused).
-            dataloader_idx (int): 0 if in-distribution, 1 if out-of-distribution.
+            batch: Tuple of test inputs and targets.
+            batch_idx: Index of the batch in the dataloader (unused here).
+            dataloader_idx: 0 for in-distribution, 1 for out-of-distribution.
         """
         if dataloader_idx != 0:
             raise NotImplementedError(
@@ -384,7 +380,7 @@ class RegressionRoutine(LightningModule):
         if self.probabilistic:
             self.test_prob_metrics.reset()
 
-        if self.save_in_csv and self.logger is not None:
+        if self.save_to_csv and self.logger is not None:
             csv_writer(
                 Path(self.logger.log_dir) / self.csv_filename,
                 result_dict,
@@ -395,7 +391,7 @@ def _regression_routine_checks(output_dim: int) -> None:
     """Check the domains of the routine's parameters.
 
     Args:
-        output_dim (int): the dimension of the output of the regression task.
+        output_dim : the dimension of the output of the regression task.
     """
     if output_dim < 1:
         raise ValueError(f"output_dim must be positive, got {output_dim}.")
