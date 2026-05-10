@@ -38,6 +38,7 @@ extensions = [
     "sphinx_codeautolink",
     "sphinx_gallery.gen_gallery",
     # "sphinx_gallery.load_style",
+    "sphinx_autodoc_typehints",
     "sphinx_design",
 ]
 mathjax3_config = {
@@ -84,8 +85,11 @@ sphinx_gallery_conf = {
 autoclass_content = "init"
 
 autosummary_generate = True
+napoleon_google_docstring = True
+napoleon_include_init_with_doc = False
+napoleon_use_param = True
 napoleon_use_ivar = True
-
+napoleon_use_rtype = True
 
 # Disable docstring inheritance
 autodoc_inherit_docstrings = False

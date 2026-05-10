@@ -57,6 +57,7 @@ docs = [
   "sphinx-design",
   "sphinx-codeautolink",
   "sphinx_design",
+  "sphinx_autodoc_typehints",
   "sphinxcontrib-sass",
 ]
 
