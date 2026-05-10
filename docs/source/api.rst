@@ -485,32 +485,20 @@ Classification
     TinyImageNetDataModule
     
 
-Tabular Classification
-^^^^^^^^^^^^^^^^^^^^^^
+UCI Tabular Classification
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. autosummary::
     :toctree: generated/
     :nosignatures:
     :template: class.rst
 
-    TabularClassificationDataModule
-    AdultCensusIncomeDataModule
-    AmazonAccessDataModule
-    APSFailureDataModule
     BankMarketingDataModule
-    CreditApprovalDataModule
     DOTA2GamesDataModule
-    GermanCreditDataModule
-    HiggsBosonDataModule
     HTRU2DataModule
-    KDDChurnDataModule
     OnlineShoppersDataModule
-    PimaDiabetesDataModule
     SpamBaseDataModule
-    TelcoChurnDataModule
-    WineQualityDataModule
-
-
+    
 Regression
 ^^^^^^^^^^
 .. autosummary::
@@ -565,10 +553,10 @@ Classification
     OpenImageO
 
 
-Tabular Classification
-^^^^^^^^^^^^^^^^^^^^^^
+UCI Tabular Classification
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. currentmodule:: torch_uncertainty.datasets.classification.tabular
+.. currentmodule:: torch_uncertainty.datasets.classification.uci
 
 
 .. autosummary::
@@ -576,22 +564,11 @@ Tabular Classification
     :nosignatures:
     :template: class.rst
 
-    TabularClassificationDataset
-    AdultCensusIncome
-    AmazonAccess
-    APSFailure
     BankMarketing
-    CreditApproval
     DOTA2Games
-    GermanCredit
-    HiggsBoson
     HTRU2
-    KDDChurn
     OnlineShoppers
-    PimaDiabetes
     SpamBase
-    TelcoChurn
-    WineQuality
 
 
 Regression
