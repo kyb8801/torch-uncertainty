@@ -110,7 +110,7 @@ class BrierScore(Metric):
             self.add_state("values", default=[], dist_reduce_fx="cat")
         self.add_state("total", default=torch.tensor(0), dist_reduce_fx="sum")
 
-    def update(self, probs: Tensor, target: Tensor) -> None:
+    def update(self, probs: Tensor, target: Tensor) -> None:  # pyrefly: ignore[bad-override]
         """Update the current Brier score with a new tensor of probabilities.
 
         Args:

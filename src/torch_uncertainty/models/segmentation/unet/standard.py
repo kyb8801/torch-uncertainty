@@ -83,6 +83,8 @@ class _Down(nn.Module):
 class _Up(nn.Module):
     """Upscaling then double conv."""
 
+    up: nn.Module
+
     def __init__(self, in_channels: int, out_channels: int, bilinear: bool = True) -> None:
         super().__init__()
 

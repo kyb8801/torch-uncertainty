@@ -9,6 +9,7 @@ from torchmetrics.utilities.data import dim_zero_cat
 class SILog(Metric):
     log_dists: Tensor
     sq_log_dists: Tensor
+    total: Tensor
 
     def __init__(self, sqrt: bool = False, lmbda: float = 1.0, **kwargs: Any) -> None:
         r"""Computes The Scale-Invariant Logarithmic Loss metric.
@@ -75,15 +76,15 @@ class SILog(Metric):
         )
         self.add_state("total", default=torch.tensor(0), dist_reduce_fx="sum")
 
-    def update(self, pred: Tensor, target: Tensor) -> None:
+    def update(self, preds: Tensor, target: Tensor) -> None:  # pyrefly: ignore[bad-override]
         """Update state with predictions and targets.
 
         Args:
-            pred (Tensor): A prediction tensor of shape (batch)
+            preds (Tensor): A prediction tensor of shape (batch)
             target (Tensor): A tensor of ground truth labels of shape (batch)
         """
-        self.log_dists += torch.sum(pred.log() - target.log())
-        self.sq_log_dists += torch.sum((pred.log() - target.log()) ** 2)
+        self.log_dists += torch.sum(preds.log() - target.log())
+        self.sq_log_dists += torch.sum((preds.log() - target.log()) ** 2)
         self.total += target.size(0)
 
     def compute(self) -> Tensor:

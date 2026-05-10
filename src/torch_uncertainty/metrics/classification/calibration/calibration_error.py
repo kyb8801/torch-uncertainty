@@ -144,7 +144,7 @@ def reliability_chart(
     rd_ylabel: str = "Success Rate (%)",
     ch_xlabel: str = "Top-class Confidence (%)",
     ch_ylabel: str = "Density (%)",
-    figsize: tuple[int, int] = (6, 6),
+    figsize: tuple[float, float] = (6.0, 6.0),
     dpi: int = 150,
 ) -> tuple[object, object]:
     """Builds Reliability Diagram
@@ -361,7 +361,7 @@ class CalibrationError:
                 validate_args=validate_args,
                 **kwargs,
             )
-        task = ClassificationTaskNoMultilabel.from_str(task)
+        task_enum = ClassificationTaskNoMultilabel.from_str(task)
         kwargs.update(
             {
                 "n_bins": num_bins,
@@ -370,7 +370,7 @@ class CalibrationError:
                 "validate_args": validate_args,
             }
         )
-        if task == ClassificationTaskNoMultilabel.BINARY:
+        if task_enum == ClassificationTaskNoMultilabel.BINARY:
             return TUBinaryCalibrationError(**kwargs)
         #  task is ClassificationTaskNoMultilabel.MULTICLASS
         if not isinstance(num_classes, int):

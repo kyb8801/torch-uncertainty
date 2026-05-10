@@ -1,5 +1,4 @@
 from collections.abc import Callable
-from typing import Literal
 
 from torch import Tensor, nn
 from torch.nn.functional import relu
@@ -76,7 +75,7 @@ class _WideResNet(nn.Module):
         conv_bias: bool,
         dropout_rate: float,
         groups: int = 1,
-        style: Literal["imagenet", "cifar"] = "imagenet",
+        style: ResNetStyle = ResNetStyle.IMAGENET,
         activation_fn: Callable = relu,
         normalization_layer: type[nn.Module] = nn.BatchNorm2d,
     ) -> None:
@@ -118,6 +117,7 @@ class _WideResNet(nn.Module):
 
         self.bn1 = normalization_layer(num_stages[0])
 
+        self.optional_pool: nn.Module
         if style == ResNetStyle.IMAGENET:
             self.optional_pool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
         else:
@@ -177,7 +177,7 @@ class _WideResNet(nn.Module):
         normalization_layer: type[nn.Module],
     ) -> nn.Module:
         strides = [stride] + [1] * (int(num_blocks) - 1)
-        layers = []
+        layers: list[nn.Module] = []
 
         for stride in strides:
             layers.append(
@@ -214,7 +214,7 @@ def wideresnet28x10(
     conv_bias: bool = True,
     dropout_rate: float = 0.3,
     groups: int = 1,
-    style: ResNetStyle | Literal["imagenet", "cifar"] = ResNetStyle.IMAGENET,
+    style: ResNetStyle = ResNetStyle.IMAGENET,
     activation_fn: Callable = relu,
     normalization_layer: type[nn.Module] = nn.BatchNorm2d,
 ) -> _WideResNet:

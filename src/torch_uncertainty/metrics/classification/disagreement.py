@@ -97,7 +97,7 @@ class Disagreement(Metric):
         max_counts = num_estimators * (num_estimators - 1) / 2
         return 1 - (counts * (counts - 1) / 2).sum(dim=1) / max_counts
 
-    def update(self, probs: Tensor) -> None:
+    def update(self, probs: Tensor) -> None:  # pyrefly: ignore[bad-override]
         """Update state with prediction probabilities and targets.
 
         Args:

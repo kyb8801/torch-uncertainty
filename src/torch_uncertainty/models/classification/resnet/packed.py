@@ -1,4 +1,4 @@
-from typing import Any, Literal
+from typing import Any
 
 import torch.nn.functional as F
 from torch import Tensor, nn
@@ -248,6 +248,7 @@ class _PackedResNet(nn.Module):
 
         self.bn1 = normalization_layer(block_planes * alpha)
 
+        self.optional_pool: nn.Module
         if style == ResNetStyle.IMAGENET:
             self.optional_pool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
         else:
@@ -339,7 +340,7 @@ class _PackedResNet(nn.Module):
         normalization_layer: type[nn.Module],
     ) -> nn.Module:
         strides = [stride] + [1] * (num_blocks - 1)
-        layers = []
+        layers: list[nn.Module] = []
         for stride in strides:
             layers.append(
                 block(
@@ -390,7 +391,7 @@ def packed_resnet(
     width_multiplier: float = 1.0,
     groups: int = 1,
     dropout_rate: float = 0,
-    style: Literal["imagenet", "cifar"] = "imagenet",
+    style: ResNetStyle = ResNetStyle.IMAGENET,
     normalization_layer: type[nn.Module] = nn.BatchNorm2d,
     pretrained: bool = False,
     linear_implementation: str = "conv1d",

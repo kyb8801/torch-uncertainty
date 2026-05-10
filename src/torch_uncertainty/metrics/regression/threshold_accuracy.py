@@ -55,7 +55,7 @@ class ThresholdAccuracy(Metric):
         self.add_state("values", default=torch.tensor(0.0), dist_reduce_fx="sum")
         self.add_state("total", default=torch.tensor(0), dist_reduce_fx="sum")
 
-    def update(self, preds: Tensor, target: Tensor) -> None:
+    def update(self, preds: Tensor, target: Tensor) -> None:  # pyrefly: ignore[bad-override]
         """Update state with predictions and targets."""
         self.values += torch.sum(torch.max(preds / target, target / preds) < self.lmbda**self.power)
         self.total += target.size(0)

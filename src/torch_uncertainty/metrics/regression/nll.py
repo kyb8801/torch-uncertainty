@@ -5,7 +5,7 @@ from torch_uncertainty.metrics import CategoricalNLL
 
 
 class DistributionNLL(CategoricalNLL):
-    def update(
+    def update(  # pyrefly: ignore[bad-override]
         self,
         dist: distributions.Distribution,
         target: Tensor,

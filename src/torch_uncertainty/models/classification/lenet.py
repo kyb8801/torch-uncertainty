@@ -1,5 +1,6 @@
 from collections.abc import Callable
 from functools import partial
+from typing import cast
 
 import torch
 import torch.nn.functional as F
@@ -116,17 +117,20 @@ def lenet(
     groups: int = 1,
     dropout_rate: float = 0.0,
 ) -> _LeNet:
-    return _lenet(
-        stochastic=False,
-        in_channels=in_channels,
-        num_classes=num_classes,
-        linear_layer=nn.Linear,
-        conv2d_layer=nn.Conv2d,
-        layer_args={},
-        activation=activation,
-        norm=norm,
-        groups=groups,
-        dropout_rate=dropout_rate,
+    return cast(
+        "_LeNet",
+        _lenet(
+            stochastic=False,
+            in_channels=in_channels,
+            num_classes=num_classes,
+            linear_layer=nn.Linear,
+            conv2d_layer=nn.Conv2d,
+            layer_args={},
+            activation=activation,
+            norm=norm,
+            groups=groups,
+            dropout_rate=dropout_rate,
+        ),
     )
 
 
@@ -139,7 +143,7 @@ def batchensemble_lenet(
     groups: int = 1,
     dropout_rate: float = 0.0,
     repeat_training_inputs: bool = False,
-) -> _LeNet:
+) -> BatchEnsemble:
     model = lenet(
         in_channels=in_channels,
         num_classes=num_classes,
@@ -172,19 +176,22 @@ def packed_lenet(
         "alpha": alpha,
         "gamma": gamma,
     }
-    return _lenet(
-        stochastic=False,
-        in_channels=in_channels,
-        num_classes=num_classes,
-        linear_layer=PackedLinear,
-        conv2d_layer=PackedConv2d,
-        norm=norm,
-        layer_args=layer_args,
-        first_layer_args={**layer_args, "first": True},
-        last_layer_args={**layer_args, "last": True},
-        activation=activation,
-        groups=groups,
-        dropout_rate=dropout_rate,
+    return cast(
+        "_LeNet",
+        _lenet(
+            stochastic=False,
+            in_channels=in_channels,
+            num_classes=num_classes,
+            linear_layer=PackedLinear,
+            conv2d_layer=PackedConv2d,
+            norm=norm,
+            layer_args=layer_args,
+            first_layer_args={**layer_args, "first": True},
+            last_layer_args={**layer_args, "last": True},
+            activation=activation,
+            groups=groups,
+            dropout_rate=dropout_rate,
+        ),
     )
 
 
@@ -214,16 +221,19 @@ def bayesian_lenet(
     if sigma_init is not None:
         layers_args["sigma_init"] = sigma_init
 
-    return _lenet(
-        stochastic=True,
-        num_samples=num_samples,
-        in_channels=in_channels,
-        num_classes=num_classes,
-        linear_layer=BayesLinear,
-        conv2d_layer=BayesConv2d,
-        norm=norm,
-        layer_args=layers_args,
-        activation=activation,
-        groups=groups,
-        dropout_rate=dropout_rate,
+    return cast(
+        "StochasticModel",
+        _lenet(
+            stochastic=True,
+            num_samples=num_samples,
+            in_channels=in_channels,
+            num_classes=num_classes,
+            linear_layer=BayesLinear,
+            conv2d_layer=BayesConv2d,
+            norm=norm,
+            layer_args=layers_args,
+            activation=activation,
+            groups=groups,
+            dropout_rate=dropout_rate,
+        ),
     )

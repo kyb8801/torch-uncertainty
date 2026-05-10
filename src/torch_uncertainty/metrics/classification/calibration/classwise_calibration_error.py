@@ -106,7 +106,7 @@ class ClasswiseCalibrationError(Metric):
         self.add_state("probs", default=[], dist_reduce_fx="cat")
         self.add_state("targets", default=[], dist_reduce_fx="cat")
 
-    def update(self, probs: Tensor, target: Tensor) -> None:
+    def update(self, probs: Tensor, target: Tensor) -> None:  # pyrefly: ignore[bad-override]
         """Update the state with a new tensor of probabilities.
 
         Args:

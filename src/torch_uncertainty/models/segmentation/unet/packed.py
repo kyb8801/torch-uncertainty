@@ -16,7 +16,7 @@ class _PackedDoubleConv(nn.Module):
         self,
         in_channels: int,
         out_channels: int,
-        alpha: float,
+        alpha: int,
         num_estimators: int,
         gamma: int,
         mid_channels: int | None = None,
@@ -58,7 +58,7 @@ class _PackedDoubleConv(nn.Module):
 
 class _PackedInconv(nn.Module):
     def __init__(
-        self, in_channels: int, out_channels: int, alpha: float, num_estimators: int, gamma: int
+        self, in_channels: int, out_channels: int, alpha: int, num_estimators: int, gamma: int
     ) -> None:
         super().__init__()
         self.conv = _PackedDoubleConv(
@@ -76,7 +76,7 @@ class _PackedInconv(nn.Module):
 
 class _PackedDown(nn.Module):
     def __init__(
-        self, in_channels: int, out_channels: int, alpha: float, num_estimators: int, gamma: int
+        self, in_channels: int, out_channels: int, alpha: int, num_estimators: int, gamma: int
     ) -> None:
         super().__init__()
         self.mpconv = nn.Sequential(
@@ -95,11 +95,13 @@ class _PackedDown(nn.Module):
 
 
 class _PackedUp(nn.Module):
+    up: nn.Module
+
     def __init__(
         self,
         in_channels: int,
         out_channels: int,
-        alpha: float,
+        alpha: int,
         num_estimators: int,
         gamma: int,
         bilinear: bool = True,
@@ -149,7 +151,7 @@ class _PackedUp(nn.Module):
 
 class _PackedOutconv(nn.Module):
     def __init__(
-        self, in_channels: int, out_channels: int, alpha: float, num_estimators: int, gamma: int
+        self, in_channels: int, out_channels: int, alpha: int, num_estimators: int, gamma: int
     ) -> None:
         super().__init__()
         self.conv = PackedConv2d(
@@ -172,7 +174,7 @@ class _PackedUNet(nn.Module):
         in_channels: int,
         num_classes: int,
         num_blocks: list[int],
-        alpha: float = 1,
+        alpha: int = 1,
         num_estimators: int = 1,
         gamma: int = 1,
         bilinear: bool = False,
@@ -241,7 +243,7 @@ def _packed_unet(
     num_classes: int,
     num_blocks: list[int],
     bilinear: bool = False,
-    alpha: float = 1,
+    alpha: int = 1,
     num_estimators: int = 1,
     gamma: int = 1,
     dropout_rate: float = 0.0,
@@ -277,7 +279,7 @@ def packed_small_unet(
     in_channels: int,
     num_classes: int,
     bilinear: bool = False,
-    alpha: float = 1,
+    alpha: int = 1,
     num_estimators: int = 1,
     gamma: int = 1,
     dropout_rate: float = 0.0,
@@ -314,7 +316,7 @@ def packed_unet(
     in_channels: int,
     num_classes: int,
     bilinear: bool = False,
-    alpha: float = 1,
+    alpha: int = 1,
     num_estimators: int = 1,
     gamma: int = 1,
     dropout_rate: float = 0.0,

@@ -1,5 +1,4 @@
 from collections.abc import Callable
-from typing import Literal
 
 from torch import Tensor, nn
 from torch.nn.functional import relu
@@ -192,7 +191,7 @@ class _Bottleneck(nn.Module):
 class _ResNet(nn.Module):
     def __init__(
         self,
-        block: type[_BasicBlock | _Bottleneck],
+        block: type[_BasicBlock] | type[_Bottleneck],
         num_blocks: list[int],
         in_channels: int,
         num_classes: int,
@@ -234,6 +233,7 @@ class _ResNet(nn.Module):
 
         self.bn1 = normalization_layer(block_planes)
 
+        self.optional_pool: nn.Module
         if style == ResNetStyle.IMAGENET:
             self.optional_pool = nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
         else:
@@ -311,7 +311,7 @@ class _ResNet(nn.Module):
         conv_bias: bool,
     ) -> nn.Module:
         strides = [stride] + [1] * (num_blocks - 1)
-        layers = []
+        layers: list[nn.Module] = []
         for stride in strides:
             layers.append(
                 block(
@@ -350,7 +350,7 @@ def resnet(
     dropout_rate: float = 0.0,
     width_multiplier: float = 1.0,
     groups: int = 1,
-    style: ResNetStyle | Literal["imagenet", "cifar"] = ResNetStyle.IMAGENET,
+    style: ResNetStyle = ResNetStyle.IMAGENET,
     activation_fn: Callable = relu,
     normalization_layer: type[nn.Module] = nn.BatchNorm2d,
 ) -> _ResNet:

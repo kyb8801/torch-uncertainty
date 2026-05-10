@@ -1,11 +1,11 @@
 import math
-from typing import Literal
+from typing import Literal, cast
 
 import torch
 from einops import repeat
 from torch import Tensor, nn
 from torch.nn.common_types import _size_1_t, _size_2_t
-from torch.nn.modules.utils import _pair
+from torch.nn.modules.utils import _pair, _single
 
 
 class BatchLinear(nn.Module):
@@ -317,11 +317,11 @@ class BatchConv1d(nn.Module):
 
         self.in_channels = in_channels
         self.out_channels = out_channels
-        self.kernel_size = kernel_size
+        self.kernel_size = _single(kernel_size)
         self.num_estimators = num_estimators
-        self.stride = _pair(stride)
-        self.padding = padding if isinstance(padding, str) else _pair(padding)
-        self.dilation = _pair(dilation)
+        self.stride = _single(stride)
+        self.padding = padding if isinstance(padding, str) else _single(padding)
+        self.dilation = _single(dilation)
 
         self.conv = nn.Conv1d(
             in_channels=in_channels,
@@ -364,10 +364,10 @@ class BatchConv1d(nn.Module):
         return cls(
             in_channels=conv1d.in_channels,
             out_channels=conv1d.out_channels,
-            kernel_size=conv1d.kernel_size,
-            stride=conv1d.stride,
-            padding=conv1d.padding,
-            dilation=conv1d.dilation,
+            kernel_size=cast("_size_1_t", conv1d.kernel_size),
+            stride=cast("_size_1_t", conv1d.stride),
+            padding=cast("str | _size_1_t", conv1d.padding),
+            dilation=cast("_size_1_t", conv1d.dilation),
             groups=conv1d.groups,
             bias=conv1d.bias is not None,
             num_estimators=num_estimators,
@@ -601,10 +601,10 @@ class BatchConv2d(nn.Module):
         return cls(
             in_channels=conv2d.in_channels,
             out_channels=conv2d.out_channels,
-            kernel_size=conv2d.kernel_size,
-            stride=conv2d.stride,
-            padding=conv2d.padding,
-            dilation=conv2d.dilation,
+            kernel_size=cast("_size_2_t", conv2d.kernel_size),
+            stride=cast("_size_2_t", conv2d.stride),
+            padding=cast("str | _size_2_t", conv2d.padding),
+            dilation=cast("_size_2_t", conv2d.dilation),
             groups=conv2d.groups,
             bias=conv2d.bias is not None,
             num_estimators=num_estimators,
@@ -748,14 +748,14 @@ class BatchConvTranspose2d(nn.Module):
         return cls(
             in_channels=conv_transpose2d.in_channels,
             out_channels=conv_transpose2d.out_channels,
-            kernel_size=conv_transpose2d.kernel_size,
+            kernel_size=cast("_size_2_t", conv_transpose2d.kernel_size),
             num_estimators=num_estimators,
-            stride=conv_transpose2d.stride,
-            padding=conv_transpose2d.padding,
-            output_padding=conv_transpose2d.output_padding,
+            stride=cast("_size_2_t", conv_transpose2d.stride),
+            padding=cast("_size_2_t", conv_transpose2d.padding),
+            output_padding=cast("_size_2_t", conv_transpose2d.output_padding),
             groups=conv_transpose2d.groups,
             bias=conv_transpose2d.bias is not None,
-            dilation=conv_transpose2d.dilation,
+            dilation=cast("_size_2_t", conv_transpose2d.dilation),
             padding_mode=conv_transpose2d.padding_mode,
             device=conv_transpose2d.weight.device,
             dtype=conv_transpose2d.weight.dtype,

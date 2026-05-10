@@ -62,9 +62,9 @@ class MeanGTRelativeAbsoluteError(MeanAbsoluteError):
         """
         super().__init__(**kwargs)
 
-    def update(self, pred: Tensor, target: Tensor) -> None:
+    def update(self, preds: Tensor, target: Tensor) -> None:
         """Update state with predictions and targets."""
-        return super().update(pred / target, torch.ones_like(target))
+        return super().update(preds / target, torch.ones_like(target))
 
 
 class MeanGTRelativeSquaredError(MeanSquaredError):
@@ -129,6 +129,6 @@ class MeanGTRelativeSquaredError(MeanSquaredError):
         """
         super().__init__(squared, num_outputs, **kwargs)
 
-    def update(self, pred: Tensor, target: Tensor) -> None:
+    def update(self, preds: Tensor, target: Tensor) -> None:
         """Update state with predictions and targets."""
-        return super().update(pred / torch.sqrt(target), torch.sqrt(target))
+        return super().update(preds / torch.sqrt(target), torch.sqrt(target))

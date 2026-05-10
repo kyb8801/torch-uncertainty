@@ -37,7 +37,7 @@ class SegmentationBinaryAUROC(Metric):
         self.add_state("binary_auroc", default=torch.tensor(0.0), dist_reduce_fx="sum")
         self.add_state("total", default=torch.tensor(0.0), dist_reduce_fx="sum")
 
-    def update(self, preds: Tensor, target: Tensor) -> None:
+    def update(self, preds: Tensor, target: Tensor) -> None:  # pyrefly: ignore[bad-override]
         batch_size = preds.size(0)
         auroc = self.auroc_metric(preds, target)
         self.binary_auroc += auroc * batch_size

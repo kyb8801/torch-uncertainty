@@ -48,7 +48,7 @@ class _MCDropout(nn.Module):
         self.num_estimators = num_estimators
         self.filtered_modules = filtered_modules
 
-    def train(self, mode: bool = True) -> nn.Module:
+    def train(self, mode: bool = True) -> "_MCDropout":
         """Override the default train method to set the training mode of
         each submodule to be the same as the module itself except for the
         selected dropout modules.
@@ -69,7 +69,7 @@ class _MCDropout(nn.Module):
     def forward(
         self,
         x: Tensor,
-    ) -> Tensor:
+    ) -> Tensor | dict[str, Tensor]:
         """Forward pass of the model.
 
         During training, the forward pass is the same as of the core model.
@@ -112,7 +112,7 @@ class _RegMCDropout(_MCDropout):
     def forward(
         self,
         x: Tensor,
-    ) -> Tensor:
+    ) -> Tensor | dict[str, Tensor]:
         """Forward pass of the model.
 
         During training, the forward pass is the same as of the core model.
@@ -192,7 +192,7 @@ def mc_dropout(
             )
 
 
-def _dropout_checks(filtered_modules: list[nn.Module], num_estimators: int) -> None:
+def _dropout_checks(filtered_modules: list[_DropoutNd], num_estimators: int) -> None:
     if not filtered_modules:
         raise ValueError(
             "No dropout module found in the model. "
