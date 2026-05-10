@@ -74,6 +74,7 @@ class UCIRegression(Dataset):
         "power-plant",
         "protein",
         "wine-quality-red",
+        "wine-quality-white",
         "yacht",
     ]
 
@@ -87,6 +88,7 @@ class UCIRegression(Dataset):
         "f5065a616eae05eb4ecae445ecf6e720",
         "37bcb77a8abad274a987439e6a3de632",
         "0ddfa7a9379510fe7ff88b9930e3c332",
+        "0ddfa7a9379510fe7ff88b9930e3c332",  # same zip as wine-quality-red
         "4e6727f462779e2d396e8f7d2ddb79a3",
     ]
     urls = [
@@ -100,6 +102,7 @@ class UCIRegression(Dataset):
         "https://archive.ics.uci.edu/static/public/265/physicochemical+"
         "properties+of+protein+tertiary+structure.zip",
         "https://archive.ics.uci.edu/static/public/186/wine+quality.zip",
+        "https://archive.ics.uci.edu/static/public/186/wine+quality.zip",  # same zip as red
         "https://archive.ics.uci.edu/static/public/243/yacht+hydrodynamics.zip",
     ]
 
@@ -250,11 +253,13 @@ class UCIRegression(Dataset):
             array = pd.read_csv(
                 path / "CASP.csv",
             ).to_numpy()
-        elif self.dataset_name == "wine-quality-red":
-            array = pd.read_csv(
-                path / "winequality-red.csv",
-                sep=";",
-            ).to_numpy()
+        elif self.dataset_name in ("wine-quality-red", "wine-quality-white"):
+            fname = (
+                "winequality-red.csv"
+                if self.dataset_name == "wine-quality-red"
+                else "winequality-white.csv"
+            )
+            array = pd.read_csv(path / fname, sep=";").to_numpy()
         elif self.dataset_name == "yacht":
             array = pd.read_csv(
                 path / "yacht_hydrodynamics.data",
