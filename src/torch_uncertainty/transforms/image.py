@@ -268,12 +268,12 @@ class RandomRescale(Transform):
         Args:
             min_scale (int): Minimum scale for random sampling
             max_scale (int): Maximum scale for random sampling
-            interpolation (InterpolationMode, optional): Desired interpolation enum defined by
+            interpolation (InterpolationMode): Desired interpolation enum defined by
                 :class:`torchvision.transforms.InterpolationMode`. Default is ``InterpolationMode.BILINEAR``.
                 If input is Tensor, only ``InterpolationMode.NEAREST``, ``InterpolationMode.NEAREST_EXACT``,
                 ``InterpolationMode.BILINEAR`` and ``InterpolationMode.BICUBIC`` are supported.
                 The corresponding Pillow integer constants, e.g. ``PIL.Image.BILINEAR`` are accepted as well.
-            antialias (bool, optional): Whether to apply antialiasing.
+            antialias (bool): Whether to apply antialiasing.
                 It only affects **tensors** with bilinear or bicubic modes and it is
                 ignored otherwise: on PIL images, antialiasing is always applied on
                 bilinear or bicubic modes; on other modes (for PIL images and

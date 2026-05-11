@@ -29,10 +29,10 @@ class Scaler(PostProcessing):
 
         Args:
             model (nn.Module): Model to calibrate. Defaults to ``None``.
-            lr (float, optional): Learning rate for the optimizer. Defaults to ``0.1``.
-            max_iter (int, optional): Maximum number of iterations for the optimizer. Defaults to ``100``.
+            lr (float): Learning rate for the optimizer. Defaults to ``0.1``.
+            max_iter (int): Maximum number of iterations for the optimizer. Defaults to ``100``.
             eps (float): Small value for stability. Defaults to ``1e-6``.
-            device (Optional[Literal["cpu", "cuda"]], optional): Device to use for optimization. Defaults to ``None``.
+            device (Optional[Literal["cpu", "cuda"]]): Device to use for optimization. Defaults to ``None``.
 
         References:
             [1] `On calibration of modern neural networks. In ICML 2017
@@ -67,9 +67,9 @@ class Scaler(PostProcessing):
 
         Args:
             dataloader (DataLoader): Dataloader with the logits and target of the calibration data.
-            save_logits (bool, optional): Whether to save the logits and
+            save_logits (bool): Whether to save the logits and
                 labels in memory. Defaults to ``False``.
-            progress (bool, optional): Whether to show a progress bar.
+            progress (bool): Whether to show a progress bar.
                 Defaults to ``True``.
 
         Warning:

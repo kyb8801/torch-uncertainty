@@ -27,13 +27,13 @@ class CIFAR10H(CIFAR10):
             root (str): Root directory of dataset where file
                 ``cifar-10h-probs.npy`` exists or will be saved to if download
                 is set to ``True``.
-            train (bool, optional): For API consistency, not used.
-            transform (callable, optional): A function/transform that takes in
+            train (bool): For API consistency, not used.
+            transform (callable): A function/transform that takes in
                 a PIL image and returns a transformed version. E.g,
                 ``transforms.RandomCrop``. Defaults to ``None``.
-            target_transform (callable, optional): A function/transform that
+            target_transform (callable): A function/transform that
                 takes in the target and transforms it. Defaults to ``None``.
-            download (bool, optional): If ``True``, downloads the dataset from the
+            download (bool): If ``True``, downloads the dataset from the
                 internet and puts it in root directory. If dataset is already
                 downloaded, it is not downloaded again. Defaults to ``False``.
         """

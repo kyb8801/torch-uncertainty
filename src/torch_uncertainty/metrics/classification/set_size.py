@@ -23,7 +23,7 @@ class SetSize(Metric):
         """Set size to compute the efficiency of conformal prediction methods.
 
         Args:
-            reduction (str, optional): Determines how to reduce over the
+            reduction (str): Determines how to reduce over the
                 :math:`B`/batch dimension:
 
                 - ``'mean'`` [default]: Averages score across samples

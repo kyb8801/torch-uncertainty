@@ -36,22 +36,22 @@ class SmoothCalibrationError(Metric):
         bandwidth selection strategy. Computed on the top label.
 
         Args:
-            kernel_type (str, optional): The kernel to use. Choose between:
+            kernel_type (str): The kernel to use. Choose between:
                 - ``'logit'``: Applies a Gaussian kernel in log-odds space. This
                     effectively uses an adaptive bandwidth that is narrower near 1.0,
                     making it ideal for modern overconfident models. (Default)
                 - ``'reflected'``: Applies a Gaussian kernel in probability space
                     with reflections at 0 and 1 to prevent boundary bias.
                 Note that relplot's original implementation has ``'reflected'`` as default.
-            bandwidth (Literal[auto] | float, optional): The kernel bandwidth $h$. If set to
+            bandwidth (Literal[auto] | float): The kernel bandwidth $h$. If set to
                 ``'auto'``, it uses a fixed-point binary search to find a bandwidth
                 consistent with the error level. Defaults to ``'auto'``.
-            eps (float, optional): The tolerance for the binary search when
+            eps (float): The tolerance for the binary search when
                 bandwidth is ``'auto'``. Defaults to ``0.001``.
-            mesh_pts (int, optional): The base number of points for the grid
+            mesh_pts (int): The base number of points for the grid
                 discretization. The actual number may be higher depending on the
                 bandwidth. Defaults to ``200``.
-            refine_steps (int, optional): Number of binary search iterations for
+            refine_steps (int): Number of binary search iterations for
                 the ``'auto'`` bandwidth. Defaults to ``10``.
             **kwargs: Additional arguments for the :class:`torchmetrics.Metric` base.
 

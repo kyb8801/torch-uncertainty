@@ -36,12 +36,12 @@ class LaplaceApprox(PostProcessing):
                 "last_layer".
             hessian_struct (str): structure of the Hessian matrix. Defaults to
                 "kron".
-            pred_type (Literal["glm", "nn"], optional): type of posterior predictive,
+            pred_type (Literal["glm", "nn"]): type of posterior predictive,
                 See the Laplace library for more details. Defaults to "glm".
-            link_approx (Literal["mc", "probit", "bridge", "bridge_norm"], optional):
+            link_approx (Literal["mc", "probit", "bridge", "bridge_norm"]):
                 how to approximate the classification link function for the `'glm'`.
                 See the Laplace library for more details. Defaults to "probit".
-            optimize_prior_precision (bool, optional): whether to optimize the prior
+            optimize_prior_precision (bool): whether to optimize the prior
                 precision. Defaults to True.
 
         References:

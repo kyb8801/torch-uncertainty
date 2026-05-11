@@ -412,9 +412,9 @@ def packed_resnet(
         style (ResNetStyle | Literal["imagenet", "cifar"]): Whether to use the ImageNet or CIFAR
             structure. Defaults to ``ResNetStyle.IMAGENET``.
         normalization_layer (nn.Module): Normalization layer. Defaults to ``nn.BatchNorm2d``.
-        pretrained (bool, optional): Whether to load pretrained weights.
+        pretrained (bool): Whether to load pretrained weights.
             Defaults to ``False``.
-        linear_implementation (str, optional): Implementation of the
+        linear_implementation (str): Implementation of the
             packed linear layer. Defaults to ``"conv1d"``.
 
     Returns:

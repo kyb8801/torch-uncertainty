@@ -15,7 +15,7 @@ def create_train_val_split(
     Args:
         dataset (Dataset): The dataset to be split.
         val_split_rate (float): The amount of the original dataset to use as validation split.
-        val_transforms (Callable | None, optional): The transformations to apply on the validation set.
+        val_transforms (Callable | None): The transformations to apply on the validation set.
             Defaults to ``None``.
 
     Returns:

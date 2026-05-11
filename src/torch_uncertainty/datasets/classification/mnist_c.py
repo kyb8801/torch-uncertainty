@@ -48,15 +48,15 @@ class MNISTC(VisionDataset):
 
         Args:
             root (str | Path): Root directory of the datasets.
-            transform (callable, optional): A function/transform that takes in
+            transform (callable): A function/transform that takes in
                 a PIL image and returns a transformed version. E.g,
                 ``transforms.RandomCrop``. Defaults to None.
-            target_transform (callable, optional): A function/transform that
+            target_transform (callable): A function/transform that
                 takes in the target and transforms it. Defaults to None.
-            split (str, optional): The split to use, either 'train' or 'test'.
+            split (str): The split to use, either 'train' or 'test'.
             subset (str): The subset to use, one of ``all`` or the keys in
                 ``mnistc_subsets``.
-            download (bool, optional): If True, downloads the dataset from the
+            download (bool): If True, downloads the dataset from the
                 internet and puts it in root directory. If dataset is already
                 downloaded, it is not downloaded again. Defaults to False.
 

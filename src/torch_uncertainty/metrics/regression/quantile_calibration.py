@@ -34,10 +34,10 @@ class QuantileCalibrationError(BinaryCalibrationError):
         against the ground truth values.
 
         Args:
-            num_bins (int, optional): Number of bins to use for calibration. Defaults to `15`.
-            norm (str, optional): Norm to use for calibration error computation. Defaults to `"l1"`.
-            ignore_index (int, optional): Index to ignore during calibration. Defaults to `None`.
-            validate_args (bool, optional): Whether to validate the input arguments. Defaults to `True`.
+            num_bins (int): Number of bins to use for calibration. Defaults to `15`.
+            norm (str): Norm to use for calibration error computation. Defaults to `"l1"`.
+            ignore_index (int): Index to ignore during calibration. Defaults to `None`.
+            validate_args (bool): Whether to validate the input arguments. Defaults to `True`.
             kwargs: Additional keyword arguments, see `Advanced metric settings
               <https://torchmetrics.readthedocs.io/en/stable/pages/overview.html#metric-kwargs>`_.
         """
@@ -55,7 +55,7 @@ class QuantileCalibrationError(BinaryCalibrationError):
         Args:
             dist (Distribution): The predicted distribution.
             target (Tensor): The ground truth values.
-            padding_mask (Tensor | None, optional): A mask to ignore certain values. Defaults to `None`.
+            padding_mask (Tensor | None): A mask to ignore certain values. Defaults to `None`.
         """
         reduce_event_dims = False
         if isinstance(dist, Independent):

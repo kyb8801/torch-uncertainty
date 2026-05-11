@@ -82,36 +82,36 @@ class ClassificationRoutine(LightningModule):
             num_classes (int): Number of classes.
             loss (torch.nn.Module): Loss function to optimize the :attr:`model`.
                 Defaults to ``None``.
-            is_ensemble (bool, optional): Indicates whether the model is an
+            is_ensemble (bool): Indicates whether the model is an
                 ensemble at test time or not. Defaults to ``False``.
             num_tta (int): Number of test-time augmentations (TTA). If ``1``: no TTA.
                 Defaults to ``1``.
-            format_batch_fn (torch.nn.Module, optional): Function to format the batch.
+            format_batch_fn (torch.nn.Module): Function to format the batch.
                 Defaults to ``None``.
-            optim_recipe (Callable[[nn.Module], OptimizerLRScheduler] | OptimizerLRScheduler, optional): The optimizer and
+            optim_recipe (Callable[[nn.Module], OptimizerLRScheduler] | OptimizerLRScheduler): The optimizer and
                 optionally the scheduler to use, or a callable that returns them. Defaults to ``None``.
-            mixup_params (dict, optional): Mixup parameters. Can include mixup type,
+            mixup_params (dict): Mixup parameters. Can include mixup type,
                 mixup mode, distance similarity, kernel tau max, kernel tau std,
                 mixup alpha, and cutmix alpha. If None, no mixup augmentations.
                 Defaults to ``None``.
-            eval_ood (bool, optional): Indicates whether to evaluate the OOD
+            eval_ood (bool): Indicates whether to evaluate the OOD
                 detection performance. Defaults to ``False``.
-            eval_shift (bool, optional): Indicates whether to evaluate the Distribution
+            eval_shift (bool): Indicates whether to evaluate the Distribution
                 shift performance. Defaults to ``False``.
-            eval_grouping_loss (bool, optional): Indicates whether to evaluate the
+            eval_grouping_loss (bool): Indicates whether to evaluate the
                 grouping loss or not. Defaults to ``False``.
-            ood_criterion (TUOODCriterion | str, optional): Criterion for the binary OOD detection
+            ood_criterion (TUOODCriterion | str): Criterion for the binary OOD detection
                 task. Defaults to ``msp``, the Maximum Softmax Probability score.
-            post_processing (PostProcessing, optional): Post-processing method
+            post_processing (PostProcessing): Post-processing method
                 to train on the calibration set. No post-processing if None.
                 Defaults to ``None``.
-            num_bins_calibration_error (int, optional): Number of bins to compute calibration
+            num_bins_calibration_error (int): Number of bins to compute calibration
                 error metrics. Defaults to ``15``.
-            log_plots (bool, optional): Indicates whether to log plots from
+            log_plots (bool): Indicates whether to log plots from
                 metrics. Defaults to ``False``.
-            save_in_csv (bool, optional): Save the results in csv. Defaults to
+            save_in_csv (bool): Save the results in csv. Defaults to
                 ``False``.
-            csv_filename (str, optional): Name of the csv file. Defaults to
+            csv_filename (str): Name of the csv file. Defaults to
                 ``"results.csv"``. Note that this is only used if
                 :attr:`save_in_csv` is ``True``.
 
@@ -372,7 +372,7 @@ class ClassificationRoutine(LightningModule):
 
         Args:
             inputs (Tensor): input tensor.
-            save_feats (bool, optional): whether to store the features or
+            save_feats (bool): whether to store the features or
                 not. Defaults to ``False``.
 
         Note:
@@ -665,7 +665,7 @@ def _classification_routine_checks(
         model (nn.Module): the model used to make classification predictions.
         num_classes (int): the number of classes in the dataset.
         is_ensemble (bool): whether the model is an ensemble or a single model.
-        ood_criterion (TUOODCriterion, optional): OOD criterion for the binary OOD detection task.
+        ood_criterion (TUOODCriterion): OOD criterion for the binary OOD detection task.
         eval_grouping_loss (bool): whether to evaluate the grouping loss.
         num_bins_calibration_error (int): the number of bins for the evaluation of the calibration.
         mixup_params (dict | None): the dictionary to setup the mixup augmentation.

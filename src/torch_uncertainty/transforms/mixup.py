@@ -109,9 +109,9 @@ class AbstractMixup(nn.Module, ABC):
         """Abstract Mixup class.
 
         Args:
-            alpha (float, optional): Mixup alpha.
+            alpha (float): Mixup alpha.
             num_classes (int): Number of classes.
-            isobatch (bool, optional): Whether to use a single coefficient for the whole batch
+            isobatch (bool): Whether to use a single coefficient for the whole batch
                 instead of for each pair. Defaults to ``False``.
             **kwargs (Any): Keyword arguments for compatibility.
         """
@@ -209,11 +209,11 @@ class MixupMP(AbstractMixup):
         inputs and targets, all concatenated.
 
         Args:
-            alpha (float, optional): Mixup alpha.
+            alpha (float): Mixup alpha.
             num_classes (int): Number of classes.
             mixup_ratio (float): Ratio of the number of mixup-ed pairs and normal pairs. Defaults
                 to ``1``. This parameter is named "r" in the paper.
-            isobatch (bool, optional): Whether to use a single coefficient for the whole batch
+            isobatch (bool): Whether to use a single coefficient for the whole batch
                 instead of for each pair. Defaults to ``False``.
             **kwargs (Any): Keyword arguments for compatibility.
 

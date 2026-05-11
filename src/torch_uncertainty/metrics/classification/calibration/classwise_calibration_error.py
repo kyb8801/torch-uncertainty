@@ -34,7 +34,7 @@ class ClasswiseCalibrationError(Metric):
 
         Args:
             num_classes (int): Number of classes.
-            num_bins (int, optional): Number of calibration bins. Defaults to ``15``.
+            num_bins (int): Number of calibration bins. Defaults to ``15``.
             norm (Literal["l1", "l2", "max"]): Norm used to compute the ECE (e.g., ``'l1'``,
                 ``'l2'``, ``'max'``). Defaults to ``'l1'``.
             reduction (Literal["mean", "sum", "none"] | None): Determines how to reduce the score across the

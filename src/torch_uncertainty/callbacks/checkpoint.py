@@ -68,7 +68,7 @@ class TUClsCheckpoint(_TUCheckpoint):
         Expected Calibration Error, Brier-Score and Negative Log-Likelihood.
 
         Args:
-            save_last (bool | "link", optional): When ``True``, saves a last.ckpt copy whenever a
+            save_last (bool | "link"): When ``True``, saves a last.ckpt copy whenever a
                 checkpoint file gets saved. Can be set to ``"link"`` on a local filesystem to create a
                 symbolic link. This allows accessing the latest checkpoint in a deterministic
                 manner. Default to ``False``.
@@ -107,7 +107,7 @@ class TUSegCheckpoint(_TUCheckpoint):
         over Union, Expected Calibration Error, Brier-Score and Negative Log-Likelihood.
 
         Args:
-            save_last (bool | "link", optional): When ``True``, saves a last.ckpt copy whenever a
+            save_last (bool | "link"): When ``True``, saves a last.ckpt copy whenever a
                 checkpoint file gets saved. Can be set to ``"link"`` on a local filesystem to create a
                 symbolic link. This allows accessing the latest checkpoint in a deterministic
                 manner. Default to ``False``.
@@ -154,9 +154,9 @@ class TURegCheckpoint(_TUCheckpoint):
         Error, and eventually the Negative Log-Likelihood and Quantile Calibration Error.
 
         Args:
-            probabilistic (bool, optional): If ``True``, also tracks the Negative Log-Likelihood and
+            probabilistic (bool): If ``True``, also tracks the Negative Log-Likelihood and
                 the Quantile Calibration Error. Default to ``False``.
-            save_last (bool | "link", optional): When ``True``, saves a last.ckpt copy whenever a
+            save_last (bool | "link"): When ``True``, saves a last.ckpt copy whenever a
                 checkpoint file gets saved. Can be set to ``"link"`` on a local filesystem to create a
                 symbolic link. This allows accessing the latest checkpoint in a deterministic
                 manner. Default to ``False``.

@@ -322,7 +322,7 @@ class BTSDecoder(nn.Module):
             max_depth (float): The maximum predicted depth.
             feat_out_channels (list[int]): The number of output channels from the backbone.
             num_features (int): The number of features to use in the decoder.
-            dist_family (str | None, optional): The distribution family name. ``None`` means point-wise
+            dist_family (str | None): The distribution family name. ``None`` means point-wise
             prediction. Defaults to ``None``.
         """
         super().__init__()

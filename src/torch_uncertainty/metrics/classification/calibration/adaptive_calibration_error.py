@@ -199,11 +199,11 @@ class AdaptiveCalibrationError:
 
         Args:
             task (str): Specifies the task type, either ``"binary"`` or ``"multiclass"``.
-            num_bins (int, optional): Number of bins to divide the probability space. Defaults to ``10``.
-            norm (str, optional): Specifies the type of norm to use: ``"l1"``, ``"l2"``, or ``"max"``. Defaults to ``"l1"``.
-            num_classes (int, optional): Number of classes for ``"multiclass"`` tasks. Required when task is ``"multiclass"``.
-            ignore_index (int, optional): Index to ignore during calculations. Defaults to ``None``.
-            validate_args (bool, optional): Whether to validate input arguments. Defaults to ``True``.
+            num_bins (int): Number of bins to divide the probability space. Defaults to ``10``.
+            norm (str): Specifies the type of norm to use: ``"l1"``, ``"l2"``, or ``"max"``. Defaults to ``"l1"``.
+            num_classes (int): Number of classes for ``"multiclass"`` tasks. Required when task is ``"multiclass"``.
+            ignore_index (int): Index to ignore during calculations. Defaults to ``None``.
+            validate_args (bool): Whether to validate input arguments. Defaults to ``True``.
             **kwargs (Any): Additional keyword arguments passed to the metric.
 
         Example:

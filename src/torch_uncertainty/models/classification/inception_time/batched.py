@@ -159,7 +159,7 @@ def batched_inception_time(
         num_blocks (int): Number of inception blocks. Default is ``6``.
         dropout (float): Dropout rate. Default is ``0.0``.
         residual (bool): Whether to use residual connections. Default is ``True``.
-        repeat_strategy ("legacy"|"paper", optional): The repeat
+        repeat_strategy ("legacy"|"paper"): The repeat
             strategy to use during training:
 
             - "legacy": Repeat inputs for each estimator during both training

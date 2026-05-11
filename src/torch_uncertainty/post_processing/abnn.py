@@ -42,13 +42,13 @@ class ABNN(PostProcessing):
             num_samples (int): Number of samples per model.
             base_lr (float): Base learning rate.
             device (torch.device): Device to use.
-            max_epochs (int, optional): Number of training epochs. Defaults
+            max_epochs (int): Number of training epochs. Defaults
                 to ``5``.
-            use_original_model (bool, optional): Use original model during
+            use_original_model (bool): Use original model during
                 evaluation. Defaults to ``True``.
-            precision (str, optional): Machine precision for training & eval.
+            precision (str): Machine precision for training & eval.
                 Defaults to ``"32"``.
-            model (nn.Module | None, optional): Model to use. Defaults to ``None``.
+            model (nn.Module | None): Model to use. Defaults to ``None``.
         """
         super().__init__(model)
         _abnn_checks(

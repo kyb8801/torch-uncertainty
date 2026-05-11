@@ -18,9 +18,9 @@ class DECLoss(nn.Module):
                 regularization term. Defaults to None.
             reg_weight (float | None): Fixed weight of the regularization term.
                 Defaults to None.
-            loss_type (str, optional): Specifies the loss type to apply to the
+            loss_type (str): Specifies the loss type to apply to the
                 Dirichlet parameters: ``'mse'`` | ``'log'`` | ``'digamma'``.
-            reduction (str, optional): Specifies the reduction to apply to the
+            reduction (str): Specifies the reduction to apply to the
                 output:``'none'`` | ``'mean'`` | ``'sum'``.
 
         References:
@@ -175,10 +175,10 @@ class ConfidencePenaltyLoss(nn.Module):
         """The Confidence Penalty Loss.
 
         Args:
-            reg_weight (float, optional): The weight of the regularization term.
-            reduction (str, optional): specifies the reduction to apply to the
+            reg_weight (float): The weight of the regularization term.
+            reduction (str): specifies the reduction to apply to the
                 output:``'none'`` | ``'mean'`` | ``'sum'``. Defaults to "mean".
-            eps (float, optional): A small value to avoid numerical instability.
+            eps (float): A small value to avoid numerical instability.
                 Defaults to ``1e-6.``
 
         References:
@@ -233,8 +233,8 @@ class ConflictualLoss(nn.Module):
         r"""The Conflictual Loss.
 
         Args:
-            reg_weight (float, optional): The weight of the regularization term.
-            reduction (str, optional): specifies the reduction to apply to the
+            reg_weight (float): The weight of the regularization term.
+            reduction (str): specifies the reduction to apply to the
                 output:``'none'`` | ``'mean'`` | ``'sum'``.
 
         References:
@@ -286,9 +286,9 @@ class FocalLoss(nn.Module):
         """Focal-Loss for classification tasks.
 
         Args:
-            gamma (float, optional): A constant, as described in the paper.
-            alpha (Tensor, optional): Weights for each class. Defaults to ``None``.
-            reduction (str, optional): ``'mean'``, ``'sum'`` or ``'none'``. Defaults to ``'mean'``.
+            gamma (float): A constant, as described in the paper.
+            alpha (Tensor): Weights for each class. Defaults to ``None``.
+            reduction (str): ``'mean'``, ``'sum'`` or ``'none'``. Defaults to ``'mean'``.
 
         References:
             [1] `Lin, T.-Y., Goyal, P., Girshick, R., He, K., & Dollár, P. (2017). Focal Loss for Dense Object Detection.
@@ -344,15 +344,15 @@ class BCEWithLogitsLSLoss(nn.BCEWithLogitsLoss):
         the BCEWithLogitsLoss.
 
         Args:
-            weight (Tensor, optional): A manual rescaling weight given to the
+            weight (Tensor): A manual rescaling weight given to the
                 loss of each batch element. If given, has to be a Tensor of size
                 "nbatch". Defaults to ``None``.
-            reduction (str, optional): Specifies the reduction to apply to the
+            reduction (str): Specifies the reduction to apply to the
                 output: ``'none'`` | ``'mean'`` | ``'sum``'. ``'none'``: no reduction will be applied,
                 ``'mean'``: the sum of the output will be divided by the number of
                 elements in the output, ``'sum'``: the output will be summed. Defaults
                 to ``'mean'``.
-            label_smoothing (float, optional): The label smoothing factor. Defaults
+            label_smoothing (float): The label smoothing factor. Defaults
                 to ``0.0``.
         """
         super().__init__(weight=weight, reduction=reduction)
