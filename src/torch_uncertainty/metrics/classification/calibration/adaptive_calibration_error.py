@@ -1,5 +1,9 @@
 from typing import Any, Literal
 
+import matplotlib.pyplot as plt
+import matplotlib.ticker as mticker
+import numpy as np
+import seaborn as sns
 import torch
 from torch import Tensor
 from torch.nn.utils.rnn import pad_sequence
@@ -42,6 +46,247 @@ def _equal_binning_bucketize(
         pad_sequence(acc_bin, batch_first=True).sum(1) / count_bin,
         pad_sequence(conf_bin, batch_first=True).sum(1) / count_bin,
         torch.as_tensor(count_bin) / len(confidences),
+    )
+
+
+def _equal_binning_bucketize_with_bounds(
+    confidences: Tensor, accuracies: Tensor, num_bins: int
+) -> tuple[Tensor, Tensor, Tensor, Tensor, Tensor]:
+    """Compute adaptive bins and their confidence bounds.
+
+    Returns:
+        tuple of (acc_bin, conf_bin, prop_bin, bin_lowers, bin_uppers) where
+        bin_lowers/bin_uppers are the min/max confidence in each bin.
+    """
+    confidences_sorted, indices = torch.sort(confidences)
+    accuracies_sorted = accuracies[indices]
+
+    conf_splits = list(confidences_sorted.tensor_split(num_bins))
+    acc_splits = list(accuracies_sorted.tensor_split(num_bins))
+
+    # Drop empty splits (can occur when num_bins > len(confidences))
+    pairs = [(a, c) for a, c in zip(acc_splits, conf_splits) if len(c) > 0]
+    acc_splits = [a for a, _ in pairs]
+    conf_splits = [c for _, c in pairs]
+
+    count_bin = torch.as_tensor(
+        [len(cb) for cb in conf_splits],
+        dtype=confidences.dtype,
+        device=confidences.device,
+    )
+    bin_lowers = torch.stack([cb[0] for cb in conf_splits])
+    bin_uppers = torch.stack([cb[-1] for cb in conf_splits])
+
+    return (
+        pad_sequence(acc_splits, batch_first=True).sum(1) / count_bin,
+        pad_sequence(conf_splits, batch_first=True).sum(1) / count_bin,
+        count_bin / len(confidences),
+        bin_lowers,
+        bin_uppers,
+    )
+
+
+def _adaptive_reliability_diagram_subplot(
+    ax,
+    bin_accuracies: np.ndarray,
+    bin_confidences: np.ndarray,
+    bin_sizes: np.ndarray,
+    bin_lowers: np.ndarray,
+    bin_uppers: np.ndarray,
+    title: str = "Adaptive Reliability Diagram",
+    xlabel: str = "Top-class Confidence (%)",
+    ylabel: str = "Success Rate (%)",
+) -> None:
+    widths = (bin_uppers - bin_lowers) * 100
+    centers = (bin_lowers + bin_uppers) / 2 * 100
+
+    # Normalize alpha by max bin size so equal-count bins appear fully opaque
+    max_size = bin_sizes.max()
+    alphas = 0.2 + 0.8 * (bin_sizes / max_size if max_size > 0 else np.ones_like(bin_sizes))
+
+    colors = np.zeros((len(bin_sizes), 4))
+    colors[:, 0] = 240 / 255.0
+    colors[:, 1] = 60 / 255.0
+    colors[:, 2] = 60 / 255.0
+    colors[:, 3] = alphas
+
+    gap_plt = ax.bar(
+        centers,
+        np.abs(bin_accuracies - bin_confidences) * 100,
+        bottom=np.minimum(bin_accuracies, bin_confidences) * 100,
+        width=widths,
+        edgecolor=colors,
+        color=colors,
+        linewidth=1,
+        label="Gap",
+    )
+
+    acc_plt = ax.bar(
+        centers,
+        0,
+        bottom=bin_accuracies * 100,
+        width=widths,
+        edgecolor="black",
+        color="black",
+        alpha=1.0,
+        linewidth=2,
+        label="Accuracy",
+    )
+
+    ax.set_aspect("equal")
+    ax.plot([0, 100], [0, 100], linestyle="--", color="gray")
+
+    gaps = np.abs(bin_accuracies - bin_confidences)
+    ace = np.sum(gaps * bin_sizes)
+
+    ax.text(
+        0.98,
+        0.02,
+        f"ACE={ace:.02%}",
+        color="black",
+        ha="right",
+        va="bottom",
+        transform=ax.transAxes,
+    )
+
+    ax.set_xlim(0, 100)
+    ax.set_ylim(0, 100)
+    ax.set_title(title)
+    ax.set_xlabel(xlabel)
+    ax.set_ylabel(ylabel)
+    ax.grid(True, alpha=0.3, linestyle="--", zorder=0)
+    ax.legend(handles=[gap_plt, acc_plt])
+
+
+def _adaptive_confidence_histogram_subplot(
+    ax,
+    accuracies: np.ndarray,
+    confidences: np.ndarray,
+    bin_lowers: np.ndarray,
+    bin_uppers: np.ndarray,
+    title: str = "",
+    xlabel: str = "Top-class Confidence (%)",
+    ylabel: str = "Density (%)",
+) -> None:
+    sns.kdeplot(
+        confidences * 100,
+        linewidth=2,
+        ax=ax,
+        fill=True,
+        alpha=0.5,
+    )
+
+    # Draw all unique bin boundaries to reveal the adaptive bin structure
+    all_bounds = np.unique(np.concatenate([bin_lowers, bin_uppers])) * 100
+    for boundary in all_bounds:
+        ax.axvline(x=boundary, color="steelblue", linestyle=":", alpha=0.6, linewidth=1.0)
+
+    ax.set_xlim(0, 100)
+    ax.set_ylim(0, None)
+    ax.set_title(title)
+    ax.set_xlabel(xlabel)
+    ax.set_ylabel(ylabel)
+
+    avg_acc = np.mean(accuracies)
+    avg_conf = np.mean(confidences)
+
+    acc_plt = ax.axvline(x=avg_acc * 100, ls="solid", lw=2, c="black", label="Accuracy")
+    conf_plt = ax.axvline(x=avg_conf * 100, ls="dotted", lw=2, c="#444", label="Avg. confidence")
+    ax.grid(True, alpha=0.3, linestyle="--", zorder=0)
+    ax.legend(handles=[acc_plt, conf_plt], loc="upper left")
+
+
+def adaptive_reliability_chart(
+    accuracies: np.ndarray,
+    confidences: np.ndarray,
+    bin_accuracies: np.ndarray,
+    bin_confidences: np.ndarray,
+    bin_sizes: np.ndarray,
+    bin_lowers: np.ndarray,
+    bin_uppers: np.ndarray,
+    title: str = "Adaptive Reliability Diagram",
+    rd_xlabel: str = "Top-class Confidence (%)",
+    rd_ylabel: str = "Success Rate (%)",
+    ch_xlabel: str = "Top-class Confidence (%)",
+    ch_ylabel: str = "Density (%)",
+    figsize: tuple[float, float] = (6.0, 6.0),
+    dpi: int = 150,
+) -> tuple[object, object]:
+    """Build an Adaptive Reliability Diagram with variable-width bins.
+
+    Unlike the standard reliability diagram, bin widths reflect the actual
+    span of confidence values in each equal-count bin, making clustered
+    predictions visually distinct from spread-out ones.
+    """
+    figsize = (figsize[0], figsize[0] * 1.4)
+
+    fig, ax = plt.subplots(
+        nrows=2,
+        ncols=1,
+        sharex=True,
+        figsize=figsize,
+        dpi=dpi,
+        gridspec_kw={"height_ratios": [4, 1]},
+    )
+
+    plt.tight_layout()
+    plt.subplots_adjust(hspace=0)
+
+    _adaptive_reliability_diagram_subplot(
+        ax[0],
+        bin_accuracies,
+        bin_confidences,
+        bin_sizes,
+        bin_lowers,
+        bin_uppers,
+        title=title,
+        xlabel=rd_xlabel,
+        ylabel=rd_ylabel,
+    )
+
+    _adaptive_confidence_histogram_subplot(
+        ax[1],
+        accuracies,
+        confidences,
+        bin_lowers,
+        bin_uppers,
+        title="",
+        xlabel=ch_xlabel,
+        ylabel=ch_ylabel,
+    )
+    ax[1].yaxis.set_major_formatter(mticker.PercentFormatter(1.0))
+    return fig, ax
+
+
+def _adaptive_custom_plot(
+    self,
+    title: str = "Adaptive Reliability Diagram",
+    rd_xlabel: str = "Top-class Confidence (%)",
+    rd_ylabel: str = "Success Rate (%)",
+    ch_xlabel: str = "Top-class Confidence (%)",
+    ch_ylabel: str = "Density (%)",
+) -> tuple[object, object]:
+    confidences = dim_zero_cat(self.confidences)
+    accuracies = dim_zero_cat(self.accuracies)
+
+    with torch.no_grad():
+        acc_bin, conf_bin, prop_bin, bin_lowers, bin_uppers = _equal_binning_bucketize_with_bounds(
+            confidences, accuracies, self.n_bins
+        )
+
+    return adaptive_reliability_chart(
+        accuracies=accuracies.cpu().numpy(),
+        confidences=confidences.cpu().numpy(),
+        bin_accuracies=acc_bin.cpu().numpy(),
+        bin_confidences=conf_bin.cpu().numpy(),
+        bin_sizes=prop_bin.cpu().numpy(),
+        bin_lowers=bin_lowers.cpu().numpy(),
+        bin_uppers=bin_uppers.cpu().numpy(),
+        title=title,
+        rd_xlabel=rd_xlabel,
+        rd_ylabel=rd_ylabel,
+        ch_xlabel=ch_xlabel,
+        ch_ylabel=ch_ylabel,
     )
 
 
@@ -131,6 +376,16 @@ class BinaryAdaptiveCalibrationError(Metric):
         accuracies = dim_zero_cat(self.accuracies)
         return _ace_compute(confidences, accuracies, self.n_bins, norm=self.norm)
 
+    def plot(
+        self,
+        title: str = "Adaptive Reliability Diagram",
+        rd_xlabel: str = "Top-class Confidence (%)",
+        rd_ylabel: str = "Success Rate (%)",
+        ch_xlabel: str = "Top-class Confidence (%)",
+        ch_ylabel: str = "Density (%)",
+    ) -> tuple[object, object]:
+        return _adaptive_custom_plot(self, title, rd_xlabel, rd_ylabel, ch_xlabel, ch_ylabel)
+
 
 class MulticlassAdaptiveCalibrationError(Metric):
     is_differentiable: bool | None = False
@@ -174,6 +429,16 @@ class MulticlassAdaptiveCalibrationError(Metric):
         confidences = dim_zero_cat(self.confidences)
         accuracies = dim_zero_cat(self.accuracies)
         return _ace_compute(confidences, accuracies, self.n_bins, norm=self.norm)
+
+    def plot(
+        self,
+        title: str = "Adaptive Reliability Diagram",
+        rd_xlabel: str = "Top-class Confidence (%)",
+        rd_ylabel: str = "Success Rate (%)",
+        ch_xlabel: str = "Top-class Confidence (%)",
+        ch_ylabel: str = "Density (%)",
+    ) -> tuple[object, object]:
+        return _adaptive_custom_plot(self, title, rd_xlabel, rd_ylabel, ch_xlabel, ch_ylabel)
 
 
 class AdaptiveCalibrationError:
