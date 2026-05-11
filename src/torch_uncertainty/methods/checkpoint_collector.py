@@ -1,5 +1,4 @@
 import copy
-from typing import cast
 
 import torch
 from torch import Tensor, nn
