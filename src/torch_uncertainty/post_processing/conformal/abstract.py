@@ -44,12 +44,14 @@ class Conformal(PostProcessing):
 
     def set_model(self, model: nn.Module) -> None:
         if self.enable_ts:
+            assert self.model is not None
             self.model.set_model(model=model.eval())
         else:
             self.model = model
 
     def model_forward(self, inputs: Tensor) -> Tensor:
         """Apply the model and return the scores."""
+        assert self.model is not None
         self.model.eval()
         return self.model(inputs.to(self.device)).softmax(-1)
 
@@ -67,6 +69,6 @@ class Conformal(PostProcessing):
 
     @property
     def temperature(self) -> float:
-        if self.enable_ts:
+        if self.enable_ts and (self.model is not None):
             return self.model.temperature[0].item()
         raise RuntimeError("Cannot return temperature when enable_ts is False.")

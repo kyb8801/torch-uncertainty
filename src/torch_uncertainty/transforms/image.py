@@ -242,8 +242,8 @@ class Color(nn.Module):
 class RandomRescale(Transform):
     def __init__(
         self,
-        min_scale: int,
-        max_scale: int,
+        min_scale: float,
+        max_scale: float,
         interpolation: InterpolationMode | int = InterpolationMode.BILINEAR,
         antialias: bool | None = True,
     ) -> None:

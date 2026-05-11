@@ -40,6 +40,10 @@ class TrainableDistribution(nn.Module):
 
 
 class CenteredGaussianMixture(nn.Module):
+    pi: Tensor
+    mus: Tensor
+    sigmas: Tensor
+
     def __init__(
         self,
         sigma_1: float,

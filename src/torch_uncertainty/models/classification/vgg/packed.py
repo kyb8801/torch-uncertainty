@@ -14,7 +14,7 @@ def packed_vgg(
     in_channels: int,
     num_classes: int,
     arch: int,
-    alpha: int,
+    alpha: float,
     num_estimators: int,
     gamma: int,
     norm: type[nn.Module] = nn.Identity,

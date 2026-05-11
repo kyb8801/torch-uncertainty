@@ -1,5 +1,4 @@
 import math
-from typing import Literal
 
 import torch
 import torch.nn.functional as F
@@ -15,6 +14,8 @@ from torchvision.models.resnet import (
 
 from torch_uncertainty.layers.distributions import get_dist_conv_layer
 from torch_uncertainty.models.utils import Backbone
+
+from .utils import BackboneName
 
 resnet_feat_out_channels = [64, 256, 512, 1024, 2048]
 resnet_feat_names = ["relu", "layer1", "layer2", "layer3", "layer4"]
@@ -44,7 +45,8 @@ class AtrousBlock2d(nn.Module):
         dilation: int,
         norm_first: bool = True,
         norm_momentum: float = 0.1,
-        **factory_kwargs,
+        device: torch.device | None = None,
+        dtype: torch.dtype | None = None,
     ) -> None:
         """Atrous block with 1x1 and 3x3 convolutions.
 
@@ -55,13 +57,16 @@ class AtrousBlock2d(nn.Module):
             norm_first (bool): Whether to apply normalization before the 1x1 convolution.
                 Defaults to ``True``.
             norm_momentum (float): Momentum for the normalization layer. Defaults to ``0.1``.
-            factory_kwargs: Additional arguments for the PyTorch layers.
+            device: torch device. Defaults to ``None``.
+            dtype: torch dtype. Defaults to ``None``.
         """
         super().__init__()
 
         self.norm_first = norm_first
         if norm_first:
-            self.first_norm = nn.BatchNorm2d(in_channels, momentum=norm_momentum, **factory_kwargs)
+            self.first_norm = nn.BatchNorm2d(
+                in_channels, momentum=norm_momentum, device=device, dtype=dtype
+            )
 
         self.conv1 = nn.Conv2d(
             in_channels=in_channels,
@@ -70,9 +75,12 @@ class AtrousBlock2d(nn.Module):
             kernel_size=1,
             stride=1,
             padding=0,
-            **factory_kwargs,
+            device=device,
+            dtype=dtype,
         )
-        self.norm = nn.BatchNorm2d(out_channels * 2, momentum=norm_momentum, **factory_kwargs)
+        self.norm = nn.BatchNorm2d(
+            out_channels * 2, momentum=norm_momentum, device=device, dtype=dtype
+        )
         self.conv2 = nn.Conv2d(
             in_channels=out_channels * 2,
             out_channels=out_channels,
@@ -81,7 +89,8 @@ class AtrousBlock2d(nn.Module):
             stride=1,
             padding=(dilation, dilation),
             dilation=dilation,
-            **factory_kwargs,
+            device=device,
+            dtype=dtype,
         )
 
     def forward(self, x: Tensor) -> Tensor:
@@ -98,7 +107,8 @@ class UpConv2d(nn.Module):
         in_channels: int,
         out_channels: int,
         ratio: int = 2,
-        **factory_kwargs: dict,
+        device: torch.device | None = None,
+        dtype: torch.dtype | None = None,
     ) -> None:
         """Upsampling convolution.
 
@@ -106,7 +116,8 @@ class UpConv2d(nn.Module):
             in_channels (int): Number of input channels.
             out_channels (int): Number of output channels.
             ratio (int): Upsampling ratio.
-            factory_kwargs: Additional arguments for the convolution layer.
+            device: torch device. Defaults to ``None``.
+            dtype: torch dtype. Defaults to ``None``.
         """
         super().__init__()
         self.conv = nn.Conv2d(
@@ -116,7 +127,8 @@ class UpConv2d(nn.Module):
             kernel_size=3,
             stride=1,
             padding=1,
-            **factory_kwargs,
+            device=device,
+            dtype=dtype,
         )
         self.ratio = ratio
 
@@ -132,7 +144,8 @@ class Reduction1x1(nn.Module):
         num_out_filters: int,
         max_depth: float,
         is_final: bool = False,
-        **factory_kwargs: dict,
+        device: torch.device | None = None,
+        dtype: torch.dtype | None = None,
     ) -> None:
         super().__init__()
         self.max_depth = max_depth
@@ -152,7 +165,8 @@ class Reduction1x1(nn.Module):
                                 kernel_size=1,
                                 stride=1,
                                 padding=0,
-                                **factory_kwargs,
+                                device=device,
+                                dtype=dtype,
                             ),
                             nn.Sigmoid(),
                         ),
@@ -167,7 +181,8 @@ class Reduction1x1(nn.Module):
                             kernel_size=1,
                             stride=1,
                             padding=0,
-                            **factory_kwargs,
+                            device=device,
+                            dtype=dtype,
                         ),
                     )
                 break
@@ -182,7 +197,8 @@ class Reduction1x1(nn.Module):
                         kernel_size=1,
                         stride=1,
                         padding=0,
-                        **factory_kwargs,
+                        device=device,
+                        dtype=dtype,
                     ),
                     nn.ELU(),
                 ),
@@ -210,6 +226,9 @@ class Reduction1x1(nn.Module):
 
 
 class LocalPlanarGuidance(nn.Module):
+    u: Tensor
+    v: Tensor
+
     def __init__(self, up_ratio: int) -> None:
         super().__init__()
         self.register_buffer("u", torch.arange(up_ratio).reshape([1, 1, up_ratio]))
@@ -241,46 +260,51 @@ class LocalPlanarGuidance(nn.Module):
 
 
 class BTSBackbone(Backbone):  # coverage: ignore
-    def __init__(self, backbone_name: str, pretrained: bool) -> None:
+    def __init__(self, backbone_name: BackboneName | str, pretrained: bool) -> None:
         """BTS backbone.
 
         Args:
         backbone_name (str): Name of the backbone.
         pretrained (bool): Use a pretrained backbone.
         """
-        if backbone_name == "densenet121":
+        feat_names: list[str] = []
+        if isinstance(backbone_name, str):
+            backbone_name = BackboneName(backbone_name)
+
+        if backbone_name == BackboneName.DENSENET121:
             model = tv_models.densenet121(
                 weights=DenseNet121_Weights.DEFAULT if pretrained else None
             ).features
             feat_names = densenet_feat_names
             self.feat_out_channels = [64, 64, 128, 256, 1024]
-        elif backbone_name == "densenet161":
+        elif backbone_name == BackboneName.DENSENET161:
             model = tv_models.densenet161(
                 weights=DenseNet161_Weights.DEFAULT if pretrained else None
             ).features
             feat_names = densenet_feat_names
             self.feat_out_channels = [96, 96, 192, 384, 2208]
-        elif backbone_name == "resnet50":
+        elif backbone_name == BackboneName.RESNET50:
             model = tv_models.resnet50(
                 weights=ResNet50_Weights.IMAGENET1K_V2 if pretrained else None
             )
-        elif backbone_name == "resnet101":
+        elif backbone_name == BackboneName.RESNET101:
             model = tv_models.resnet101(
                 weights=ResNet101_Weights.IMAGENET1K_V2 if pretrained else None
             )
-        elif backbone_name == "resnext50":
+        elif backbone_name == BackboneName.RESNEXT50:
             model = tv_models.resnext50_32x4d(
                 weights=ResNeXt50_32X4D_Weights.IMAGENET1K_V2 if pretrained else None
             )
-        else:  # backbone_name == "resnext101":
+        else:  # backbone_name == BackboneName.RESNEXT101
             model = tv_models.resnext101_32x8d(
                 weights=ResNeXt101_32X8D_Weights.IMAGENET1K_V2 if pretrained else None
             )
-        if "res" in backbone_name:  # remove classification heads from ResNets
+
+        if "res" in backbone_name.value:  # remove classification heads from ResNets
             feat_names = resnet_feat_names
             self.feat_out_channels = resnet_feat_out_channels
-            model.avgpool = nn.Identity()
-            model.fc = nn.Identity()
+            model.avgpool = nn.Identity()  # pyrefly: ignore[bad-assignment]
+            model.fc = nn.Identity()  # pyrefly: ignore[bad-assignment]
         super().__init__(model=model, feat_names=feat_names)
 
 
@@ -519,14 +543,7 @@ class BTSDecoder(nn.Module):
 class _BTS(nn.Module):
     def __init__(
         self,
-        backbone_name: Literal[
-            "densenet121",
-            "densenet161",
-            "resnet50",
-            "resnet101",
-            "resnext50",
-            "resnext101",
-        ],
+        backbone_name: BackboneName | str,
         max_depth: float,
         bts_size: int = 512,
         dist_family: str | None = None,
@@ -563,13 +580,15 @@ class _BTS(nn.Module):
 
 
 def _bts(
-    backbone_name: str,
+    backbone_name: BackboneName | str,
     max_depth: float,
     bts_size: int = 512,
     dist_family: str | None = None,
     pretrained_backbone: bool = True,
 ) -> _BTS:
-    if backbone_name not in bts_backbones:
+    # allow either enum or string input; validate against supported names
+    val = backbone_name.value if isinstance(backbone_name, BackboneName) else backbone_name
+    if val not in bts_backbones:
         raise ValueError(f"Unsupported backbone. Got {backbone_name}.")
     return _BTS(backbone_name, max_depth, bts_size, dist_family, pretrained_backbone)
 

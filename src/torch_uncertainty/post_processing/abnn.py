@@ -96,7 +96,7 @@ class ABNN(PostProcessing):
                 num_classes=self.num_classes,
                 model=mod,
                 loss=nn.CrossEntropyLoss(weight=self.weights[i].to(device=self.device)),
-                optim_recipe=optim_abnn(mod, lr=self.base_lr),
+                optim_recipe=optim_abnn(mod, lr=self.base_lr),  # type: ignore[arg-type]
                 eval_ood=True,
             )
             for i, mod in enumerate(models)
@@ -105,9 +105,9 @@ class ABNN(PostProcessing):
         for baseline in baselines:
             trainer = TUTrainer(
                 max_epochs=self.max_epochs,
-                accelerator=self.device,
+                accelerator=self.device,  # type: ignore[arg-type]
                 enable_progress_bar=False,
-                precision=self.precision,
+                precision=self.precision,  # type: ignore[arg-type]
                 enable_checkpointing=False,
                 logger=None,
                 enable_model_summary=False,
@@ -126,14 +126,11 @@ class ABNN(PostProcessing):
 
         self.final_model = deep_ensembles(final_models)
 
-    def forward(
-        self,
-        x: Tensor,
-    ) -> Tensor:
+    def forward(self, inputs: Tensor) -> Tensor:
         if self.final_model is not None:
-            return self.final_model(x)
+            return self.final_model(inputs)
         if self.model is not None:
-            return self.model(x)
+            return self.model(inputs)
         raise ValueError("Model must be set before calling forward.")
 
 
@@ -175,6 +172,9 @@ def _replace_bn_layers(model: nn.Module, alpha: float) -> None:
         if isinstance(module, nn.BatchNorm2d) and module.track_running_stats:
             num_channels = module.num_features
             new_module = BatchNormAdapter2d(num_channels, alpha=alpha)
+            assert module.running_mean is not None
+            assert module.running_var is not None
+            assert module.num_batches_tracked is not None
             new_module.running_mean = module.running_mean
             new_module.running_var = module.running_var
             new_module.num_batches_tracked = module.num_batches_tracked

@@ -95,6 +95,8 @@ class _PackedDown(nn.Module):
 
 
 class _PackedUp(nn.Module):
+    up: nn.Module
+
     def __init__(
         self,
         in_channels: int,
@@ -172,7 +174,7 @@ class _PackedUNet(nn.Module):
         in_channels: int,
         num_classes: int,
         num_blocks: list[int],
-        alpha: float = 1,
+        alpha: float = 1.0,
         num_estimators: int = 1,
         gamma: int = 1,
         bilinear: bool = False,
@@ -241,7 +243,7 @@ def _packed_unet(
     num_classes: int,
     num_blocks: list[int],
     bilinear: bool = False,
-    alpha: float = 1,
+    alpha: float = 1.0,
     num_estimators: int = 1,
     gamma: int = 1,
     dropout_rate: float = 0.0,
@@ -277,7 +279,7 @@ def packed_small_unet(
     in_channels: int,
     num_classes: int,
     bilinear: bool = False,
-    alpha: float = 1,
+    alpha: float = 1.0,
     num_estimators: int = 1,
     gamma: int = 1,
     dropout_rate: float = 0.0,
@@ -314,7 +316,7 @@ def packed_unet(
     in_channels: int,
     num_classes: int,
     bilinear: bool = False,
-    alpha: float = 1,
+    alpha: float = 1.0,
     num_estimators: int = 1,
     gamma: int = 1,
     dropout_rate: float = 0.0,

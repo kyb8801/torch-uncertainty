@@ -83,7 +83,10 @@ class GaussianKernel:
         """Maps data to a grid, convolves with the Gaussian, and interpolates back."""
         if num_eval_points is None:
             num_eval_points = max(2000, round(20 / self.sigma))
-        num_eval_points = (num_eval_points // 2) + 1
+        # guaranteeing an odd result for the kernel size.
+        num_eval_points = num_eval_points // 2
+        if num_eval_points % 2 == 0:
+            num_eval_points += 1
 
         values = smooth_round_to_grid(f, y, num_eval_points)
         smoothed = self.convolve(values, num_eval_points)

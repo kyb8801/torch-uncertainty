@@ -64,7 +64,7 @@ class _BayesConvNd(Module):
         out_channels: int,
         kernel_size: tuple[int, ...],
         stride: tuple[int, ...],
-        padding: tuple[int, ...],
+        padding: str | tuple[int, ...],
         dilation: tuple[int, ...],
         prior_sigma_1: float,
         prior_sigma_2: float,
@@ -110,7 +110,7 @@ class _BayesConvNd(Module):
         self.groups = groups
         self.padding_mode = padding_mode
 
-        self._reversed_padding_repeated_twice = _reverse_repeat_tuple(self.padding, 2)
+        self._reversed_padding_repeated_twice = _reverse_repeat_tuple(self.padding, 2)  # type: ignore[assignment]
 
         self.weight_mu = Parameter(
             torch.empty(

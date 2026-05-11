@@ -97,7 +97,7 @@ class CheckpointCollector(nn.Module):
             if not self.store_on_cpu
             else copy.deepcopy(self.core_model).cpu()
         )
-        self.num_estimators += 1
+        self.num_estimators = self.num_estimators + 1
 
     def eval_forward(self, x: Tensor) -> Tensor:
         """Forward pass for evaluation.

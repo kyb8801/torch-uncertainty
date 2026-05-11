@@ -199,7 +199,9 @@ class BBQScaler(PostProcessing):
     @torch.no_grad()
     def forward(self, inputs: Tensor) -> Tensor:
         """Apply Bayesian Binning into Quantiles and return calibrated logits."""
-        if self.model is None or not self.trained:
+        if self.model is None:  # coverage: ignore
+            raise RuntimeError("Model has not been set.")
+        if not self.trained or self.num_classes is None:
             logging.warning("Scaler not trained. Returning raw inputs.")
             return self.model(inputs)
 

@@ -27,7 +27,7 @@ class SegmentationFPR95(Metric):
         self.add_state("fpr95", default=torch.tensor(0.0), dist_reduce_fx="sum")
         self.add_state("total", default=torch.tensor(0.0), dist_reduce_fx="sum")
 
-    def update(self, preds: Tensor, target: Tensor) -> None:
+    def update(self, preds: Tensor, target: Tensor) -> None:  # pyrefly: ignore[bad-override]
         batch_size = preds.size(0)
         self.fpr95 += self.fpr95_metric(preds, target) * batch_size
         self.total += batch_size

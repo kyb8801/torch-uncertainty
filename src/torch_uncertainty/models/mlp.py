@@ -1,4 +1,5 @@
 from collections.abc import Callable
+from typing import cast
 
 import torch.nn.functional as F
 from einops import rearrange, repeat
@@ -137,6 +138,8 @@ class _MIMOMLP(_MLP):
         x = rearrange(x, "(m b) ... c -> b ... (m c)", m=self.num_estimators)
         out = super().forward(x)
         if self.probabilistic:
+            if not isinstance(out, dict):
+                raise ValueError("Expected probabilistic output as dict.")
             return {
                 k: rearrange(v, "b ... (m c) -> (m b) ... c", m=self.num_estimators)
                 for k, v in out.items()
@@ -206,16 +209,19 @@ def mlp(
     Returns:
         _MLP: A Multi-Layer-Perceptron model.
     """
-    return _mlp(
-        stochastic=False,
-        in_features=in_features,
-        num_outputs=num_outputs,
-        hidden_dims=hidden_dims,
-        activation=activation,
-        dropout_rate=dropout_rate,
-        dist_family=dist_family,
-        dist_args=dist_args,
-        flatten_start_dim=flatten_start_dim,
+    return cast(
+        "_MLP",
+        _mlp(
+            stochastic=False,
+            in_features=in_features,
+            num_outputs=num_outputs,
+            hidden_dims=hidden_dims,
+            activation=activation,
+            dropout_rate=dropout_rate,
+            dist_family=dist_family,
+            dist_args=dist_args,
+            flatten_start_dim=flatten_start_dim,
+        ),
     )
 
 
@@ -237,18 +243,21 @@ def packed_mlp(
         "alpha": alpha,
         "gamma": gamma,
     }
-    return _mlp(
-        stochastic=False,
-        in_features=in_features,
-        num_outputs=num_outputs,
-        hidden_dims=hidden_dims,
-        layer=PackedLinear,
-        activation=activation,
-        layer_args=layer_args,
-        dropout_rate=dropout_rate,
-        dist_family=dist_family,
-        dist_args=dist_args,
-        flatten_start_dim=flatten_start_dim,
+    return cast(
+        "_MLP",
+        _mlp(
+            stochastic=False,
+            in_features=in_features,
+            num_outputs=num_outputs,
+            hidden_dims=hidden_dims,
+            layer=PackedLinear,
+            activation=activation,
+            layer_args=layer_args,
+            dropout_rate=dropout_rate,
+            dist_family=dist_family,
+            dist_args=dist_args,
+            flatten_start_dim=flatten_start_dim,
+        ),
     )
 
 
@@ -266,18 +275,21 @@ def batched_mlp(
     layer_args = {
         "num_estimators": num_estimators,
     }
-    return _mlp(
-        stochastic=False,
-        in_features=in_features,
-        num_outputs=num_outputs,
-        hidden_dims=hidden_dims,
-        layer=BatchLinear,
-        activation=activation,
-        layer_args=layer_args,
-        dropout_rate=dropout_rate,
-        dist_family=dist_family,
-        dist_args=dist_args,
-        flatten_start_dim=flatten_start_dim,
+    return cast(
+        "_MLP",
+        _mlp(
+            stochastic=False,
+            in_features=in_features,
+            num_outputs=num_outputs,
+            hidden_dims=hidden_dims,
+            layer=BatchLinear,
+            activation=activation,
+            layer_args=layer_args,
+            dropout_rate=dropout_rate,
+            dist_family=dist_family,
+            dist_args=dist_args,
+            flatten_start_dim=flatten_start_dim,
+        ),
     )
 
 
@@ -292,18 +304,21 @@ def bayesian_mlp(
     dist_args: dict | None = None,
     flatten_start_dim: int = -1,
 ) -> StochasticModel:
-    return _mlp(
-        stochastic=True,
-        num_samples=num_samples,
-        in_features=in_features,
-        num_outputs=num_outputs,
-        hidden_dims=hidden_dims,
-        layer=BayesLinear,
-        activation=activation,
-        dropout_rate=dropout_rate,
-        dist_family=dist_family,
-        dist_args=dist_args,
-        flatten_start_dim=flatten_start_dim,
+    return cast(
+        "StochasticModel",
+        _mlp(
+            stochastic=True,
+            num_samples=num_samples,
+            in_features=in_features,
+            num_outputs=num_outputs,
+            hidden_dims=hidden_dims,
+            layer=BayesLinear,
+            activation=activation,
+            dropout_rate=dropout_rate,
+            dist_family=dist_family,
+            dist_args=dist_args,
+            flatten_start_dim=flatten_start_dim,
+        ),
     )
 
 

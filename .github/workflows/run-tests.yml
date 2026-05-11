@@ -26,6 +26,8 @@ jobs:
           - "3.12"
     env:
       PYTHON_VERSION: ${{ matrix.python-version }}
+      RUN_COVERAGE: ${{ matrix.python-version == '3.12' }}
+
     steps:
       - uses: actions/checkout@v5
 
@@ -107,16 +109,26 @@ jobs:
       - name: Test with pytest and compute coverage
         if: steps.mode.outputs.mode == 'full'
         run: |
-          uv run --frozen pytest tests --cov --cov-report xml --cov-report term --durations 10 --junitxml=junit.xml
-
+          if [[ "${RUN_COVERAGE}" == "true" ]]; then
+            uv run --frozen pytest tests \
+              --cov \
+              --cov-report xml \
+              --cov-report term \
+              --durations 10 \
+              --junitxml=junit.xml
+          else
+            uv run --frozen pytest tests \
+              --durations 10
+          fi
+        
       # Store Python version
       - name: Full Python version
         run: |
           echo "PYTHON_VERSION=$(uv run python -c "import platform; print(platform.python_version())")" >> $GITHUB_ENV
 
       - name: Upload coverage to Codecov
-        if: steps.mode.outputs.mode == 'full' && (github.event_name != 'pull_request' || github.base_ref == 'dev')
-        uses: codecov/codecov-action@v4
+        if: steps.mode.outputs.mode == 'full' && env.RUN_COVERAGE == 'true' && (github.event_name != 'pull_request' || github.base_ref == 'dev')
+        uses: codecov/codecov-action@v5
         continue-on-error: true
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
@@ -126,7 +138,7 @@ jobs:
           env_vars: PYTHON_VERSION
 
       - name: Upload test results to Codecov
-        if: steps.mode.outputs.mode == 'full' && (github.event_name != 'pull_request' || github.base_ref == 'dev')
+        if: steps.mode.outputs.mode == 'full' && env.RUN_COVERAGE == 'true' && (github.event_name != 'pull_request' || github.base_ref == 'dev')
         uses: codecov/codecov-action@v5
         continue-on-error: true
         with:

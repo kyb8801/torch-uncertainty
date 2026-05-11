@@ -1,3 +1,5 @@
+from typing import cast
+
 import matplotlib.pyplot as plt
 import torch
 from matplotlib.axes import Axes
@@ -46,7 +48,7 @@ class AUSE(Metric):
         self.add_state("scores", default=[], dist_reduce_fx="cat")
         self.add_state("errors", default=[], dist_reduce_fx="cat")
 
-    def update(self, scores: Tensor, errors: Tensor) -> None:
+    def update(self, scores: Tensor, errors: Tensor) -> None:  # pyrefly: ignore[bad-override]
         """Store the scores and their associated errors for later computation.
 
         Args:
@@ -81,7 +83,7 @@ class AUSE(Metric):
         y = error_rates - optimal_error_rates
         return torch.tensor([_auc_compute(x, y)])
 
-    def plot(
+    def plot(  # pyrefly: ignore[bad-override]
         self,
         ax: _AX_TYPE | None = None,
         plot_oracle: bool = True,
@@ -102,6 +104,7 @@ class AUSE(Metric):
             tuple[[Figure | None], Axes]: Figure object and Axes object
         """
         fig, ax = plt.subplots() if ax is None else (None, ax)
+        ax = cast("Axes", ax)
 
         # Computation of AUSEC
         error_rates, optimal_error_rates = self.partial_compute()

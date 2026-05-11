@@ -1,5 +1,4 @@
 from collections.abc import Callable
-from typing import Literal
 
 import torch
 from einops import rearrange
@@ -26,7 +25,7 @@ class _MIMOWideResNet(_WideResNet):
         conv_bias: bool,
         dropout_rate: float,
         groups: int = 1,
-        style: Literal["imagenet", "cifar"] = "imagenet",
+        style: ResNetStyle = ResNetStyle.IMAGENET,
         activation_fn: Callable = relu,
         normalization_layer: type[nn.Module] = nn.BatchNorm2d,
     ) -> None:
@@ -58,7 +57,7 @@ def mimo_wideresnet28x10(
     conv_bias: bool = True,
     dropout_rate: float = 0.3,
     groups: int = 1,
-    style: ResNetStyle | Literal["imagenet", "cifar"] = ResNetStyle.IMAGENET,
+    style: ResNetStyle = ResNetStyle.IMAGENET,
     activation_fn: Callable = relu,
     normalization_layer: type[nn.Module] = nn.BatchNorm2d,
 ) -> _MIMOWideResNet:

@@ -10,9 +10,9 @@ from .smooth_calibration_kernels import LogitGaussianKernel, ReflectedGaussianKe
 
 
 class SmoothCalibrationError(Metric):
-    is_differentiable: bool = False
-    higher_is_better: bool = False
-    full_state_update: bool = False
+    is_differentiable: bool | None = False
+    higher_is_better: bool | None = False
+    full_state_update: bool | None = False
 
     confidences: list[Tensor]
     accuracies: list[Tensor]
@@ -83,7 +83,7 @@ class SmoothCalibrationError(Metric):
         self.add_state("confidences", default=[], dist_reduce_fx="cat")
         self.add_state("accuracies", default=[], dist_reduce_fx="cat")
 
-    def update(self, preds: Tensor, target: Tensor) -> None:
+    def update(self, preds: Tensor, target: Tensor) -> None:  # pyrefly: ignore[bad-override]
         """Update the state with predictions and targets.
 
         Args:

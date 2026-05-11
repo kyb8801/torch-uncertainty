@@ -296,6 +296,7 @@ class TestBBQScaler:
     def test_main(self) -> None:
         scaler = BBQScaler(model=nn.Identity(), max_bins=10)
         logits = torch.tensor([[1.0, 2.0, 3.0]])
+        scaler.num_classes = 2
 
         assert not scaler.trained
         assert scaler.max_bins == 10

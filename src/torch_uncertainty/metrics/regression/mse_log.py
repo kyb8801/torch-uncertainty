@@ -61,6 +61,6 @@ class MeanSquaredLogError(MeanSquaredError):
         """
         super().__init__(squared, **kwargs)
 
-    def update(self, pred: Tensor, target: Tensor) -> None:
+    def update(self, preds: Tensor, target: Tensor) -> None:
         """Update state with predictions and targets."""
-        return super().update(pred.log(), target.log())
+        return super().update(preds.log(), target.log())

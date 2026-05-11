@@ -74,7 +74,7 @@ class MutualInformation(Metric):
             self.add_state("values", default=[], dist_reduce_fx="cat")
         self.add_state("total", default=torch.tensor(0), dist_reduce_fx="sum")
 
-    def update(self, probs: torch.Tensor) -> None:
+    def update(self, probs: torch.Tensor) -> None:  # pyrefly: ignore[bad-override]
         r"""Update the current mutual information with a new tensor of
         probabilities.
 

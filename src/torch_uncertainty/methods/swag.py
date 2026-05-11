@@ -137,7 +137,7 @@ class SWAG(SWA):
         self.need_bn_update = True
         self.fit = True
 
-    def bn_update(self, loader: DataLoader, device: torch.device) -> None:
+    def bn_update(self, loader: DataLoader, device: torch.device | str | int | None) -> None:
         """Update the bachnorm statistics of the current SWAG samples.
 
         Args:
@@ -188,13 +188,11 @@ class SWAG(SWA):
             mean = self.swag_stats[self.prfx + name_p + "_mean"]
             sq_mean = self.swag_stats[self.prfx + name_p + "_sq_mean"]
 
-            if not diagonal_covariance:
-                cov_mat_sqrt = self.swag_stats[self.prfx + name_p + "_covariance_sqrt"]
-
             var = torch.clamp(sq_mean - mean**2, self.var_clamp)
             var_sample = var.sqrt() * torch.randn_like(var, requires_grad=False)
 
             if not diagonal_covariance:
+                cov_mat_sqrt = self.swag_stats[self.prfx + name_p + "_covariance_sqrt"]
                 cov_sample = cov_mat_sqrt.t() @ torch.randn((cov_mat_sqrt.size(0),))
                 cov_sample /= (self.max_num_models - 1) ** 0.5
                 var_sample += cov_sample.view_as(var_sample)

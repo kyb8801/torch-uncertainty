@@ -29,6 +29,8 @@ class Backbone(nn.Module):
         feature = x
         features = []
         for key, layer in self.model._modules.items():
+            if layer is None:  # coverage: ignore
+                continue
             feature = layer(feature)
             if key in self.feat_names:
                 features.append(feature)

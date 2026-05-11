@@ -32,7 +32,7 @@ class SGLD(Optimizer):
         defaults = {"lr": lr, "noise_factor": noise_factor, "weight_decay": weight_decay}
         super().__init__(params, defaults)
 
-    def step(self, closure: Callable[[], float] | None = None) -> float:
+    def step(self, closure: Callable[[], float] | None = None) -> float | None:
         loss = None
         if closure is not None:
             loss = closure()

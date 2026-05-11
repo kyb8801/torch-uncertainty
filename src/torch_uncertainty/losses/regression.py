@@ -82,10 +82,15 @@ class DERLoss(DistributionNLLLoss):
 
     def forward(
         self,
-        dist: NormalInverseGamma,
+        dist: Distribution,
         targets: Tensor,
+        padding_mask: Tensor | None = None,
     ) -> Tensor:
-        loss_nll = super().forward(dist, targets)
+        if not isinstance(dist, NormalInverseGamma | Independent):  # coverage: ignore
+            raise TypeError(
+                f"DER only works for NormalInverseGamma or Independent[NormalInverseGamma] distributions. Got {type(dist)} instead."
+            )
+        loss_nll = super().forward(dist, targets, padding_mask=padding_mask)
         loss_reg = self._reg(dist, targets)
         loss = loss_nll + self.reg_weight * loss_reg
 

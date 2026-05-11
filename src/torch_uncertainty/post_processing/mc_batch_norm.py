@@ -58,7 +58,7 @@ class MCBatchNorm(PostProcessing):
         if model is not None:
             self._setup_model(model)
 
-    def _setup_model(self, model) -> None:
+    def _setup_model(self, model: nn.Module) -> None:
         _mcbn_checks(model, self.num_estimators, self.mc_batch_size, self.convert)
         self.model = deepcopy(model)  # TODO: Is it necessary?
         self.model = self.model.eval()
@@ -94,6 +94,7 @@ class MCBatchNorm(PostProcessing):
         self.reset_counters()
         self.set_accumulate(True)
         self.eval()
+        assert self.model is not None
         for x, _ in dataloader:
             self.model(x.to(self.device))
             self.raise_counters()
@@ -105,6 +106,7 @@ class MCBatchNorm(PostProcessing):
 
     def _est_forward(self, x: Tensor) -> Tensor:
         """Forward pass of a single estimator."""
+        assert self.model is not None
         logit = self.model(x)
         self.raise_counters()
         return logit
@@ -113,6 +115,7 @@ class MCBatchNorm(PostProcessing):
         self,
         inputs: Tensor,
     ) -> Tensor:
+        assert self.model is not None
         if self.training:
             return self.model(inputs)
         if not self.trained:

@@ -1,4 +1,5 @@
 import inspect
+from abc import ABC, abstractmethod
 
 import torch
 import torch.nn.functional as F
@@ -41,7 +42,7 @@ def get_dist_conv_layer(dist_family: str) -> type[nn.Module]:
     )
 
 
-class _ExpandOutputLinear(nn.Module):
+class _ExpandOutputLinear(nn.Module, ABC):
     """Abstract class for expanding the output of any nn.Module using an `out_features` argument.
 
     Args:
@@ -62,11 +63,15 @@ class _ExpandOutputLinear(nn.Module):
         self.base_layer = base_layer(out_features=num_params * event_dim, **layer_args)
         self.event_dim = event_dim
 
-    def forward(self, x: Tensor) -> Tensor:
+    def base_forward(self, x: Tensor) -> Tensor:
         return self.base_layer(x)
 
+    @abstractmethod
+    def forward(self, x: Tensor) -> dict[str, Tensor]:
+        pass
 
-class _ExpandOutputConvNd(nn.Module):
+
+class _ExpandOutputConvNd(nn.Module, ABC):
     """Abstract class for expanding the output of any nn.Module using an `out_channels` argument.
 
     Args:
@@ -87,8 +92,12 @@ class _ExpandOutputConvNd(nn.Module):
         self.base_layer = base_layer(out_channels=num_params * event_dim, **layer_args)
         self.event_dim = event_dim
 
-    def forward(self, x: Tensor) -> Tensor:
+    def base_forward(self, x: Tensor) -> Tensor:
         return self.base_layer(x)
+
+    @abstractmethod
+    def forward(self, x: Tensor) -> dict[str, Tensor]:
+        pass
 
 
 class _LocScaleLinear(_ExpandOutputLinear):
@@ -117,7 +126,7 @@ class _LocScaleLinear(_ExpandOutputLinear):
         self.min_scale = min_scale
 
     def forward(self, x: Tensor) -> dict[str, Tensor]:
-        x = super().forward(x)
+        x = super().base_forward(x)
         loc = x[..., : self.event_dim]
         scale = torch.clamp(
             F.softplus(x[..., self.event_dim : 2 * self.event_dim]), min=self.min_scale
@@ -151,7 +160,7 @@ class _LocScaleConvNd(_ExpandOutputConvNd):
         self.min_scale = min_scale
 
     def forward(self, x: Tensor) -> dict[str, Tensor]:
-        x = super().forward(x)
+        x = super().base_forward(x)
         loc = x[:, : self.event_dim]
         scale = torch.clamp(
             F.softplus(x[:, self.event_dim : 2 * self.event_dim]), min=self.min_scale
@@ -337,7 +346,7 @@ class GammaLinear(_ExpandOutputLinear):
         self.min_rate = min_rate
 
     def forward(self, x: Tensor) -> dict[str, Tensor]:
-        x = super().forward(x)
+        x = super().base_forward(x)
         concentration = torch.clamp(
             F.softplus(x[..., : self.event_dim]), min=self.min_concentration
         )
@@ -378,7 +387,7 @@ class GammaConvNd(_ExpandOutputConvNd):
         self.min_rate = min_rate
 
     def forward(self, x: Tensor) -> dict[str, Tensor]:
-        x = super().forward(x)
+        x = super().base_forward(x)
         concentration = torch.clamp(F.softplus(x[:, : self.event_dim]), min=self.min_concentration)
         rate = torch.clamp(F.softplus(x[:, self.event_dim : 2 * self.event_dim]), min=self.min_rate)
         return {"concentration": concentration, "rate": rate}
@@ -430,7 +439,7 @@ class StudentTLinear(_ExpandOutputLinear):
         self.fixed_df = fixed_df
 
     def forward(self, x: Tensor) -> dict[str, Tensor]:
-        x = super().forward(x)
+        x = super().base_forward(x)
         loc = x[..., : self.event_dim]
         scale = torch.clamp(
             F.softplus(x[..., self.event_dim : 2 * self.event_dim]), min=self.min_scale
@@ -488,7 +497,7 @@ class StudentTConvNd(_ExpandOutputConvNd):
         self.fixed_df = fixed_df
 
     def forward(self, x: Tensor) -> dict[str, Tensor]:
-        x = super().forward(x)
+        x = super().base_forward(x)
         loc = x[:, : self.event_dim]
         scale = torch.clamp(
             F.softplus(x[:, self.event_dim : 2 * self.event_dim]), min=self.min_scale
@@ -552,7 +561,7 @@ class NormalInverseGammaLinear(_ExpandOutputLinear):
         self.min_beta = min_beta
 
     def forward(self, x: Tensor) -> dict[str, Tensor]:
-        x = super().forward(x)
+        x = super().base_forward(x)
         loc = x[..., : self.event_dim]
         lmbda = torch.clamp(
             F.softplus(x[..., self.event_dim : 2 * self.event_dim]), min=self.min_lmbda
@@ -618,7 +627,7 @@ class NormalInverseGammaConvNd(_ExpandOutputConvNd):
         self.min_beta = min_beta
 
     def forward(self, x: Tensor) -> dict[str, Tensor]:
-        x = super().forward(x)
+        x = super().base_forward(x)
         loc = x[:, : self.event_dim]
         lmbda = torch.clamp(
             F.softplus(x[:, self.event_dim : 2 * self.event_dim]), min=self.min_lmbda

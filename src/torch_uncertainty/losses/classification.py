@@ -14,9 +14,10 @@ class DECLoss(nn.Module):
         """The Deep Evidential Classification loss.
 
         Args:
-            annealing_step (int): Annealing step for the weight of the
-                regularization term.
-            reg_weight (float): Fixed weight of the regularization term.
+            annealing_step (int | None): Annealing step for the weight of the
+                regularization term. Defaults to None.
+            reg_weight (float | None): Fixed weight of the regularization term.
+                Defaults to None.
             loss_type (str, optional): Specifies the loss type to apply to the
                 Dirichlet parameters: ``'mse'`` | ``'log'`` | ``'digamma'``.
             reduction (str, optional): Specifies the reduction to apply to the
@@ -131,17 +132,32 @@ class DECLoss(nn.Module):
             loss_dirichlet = self._digamma_loss(evidence, targets)
 
         if self.reg_weight is None and self.annealing_step is None:
-            annealing_coef = 0
-        elif self.annealing_step is None and self.reg_weight > 0:
-            annealing_coef = self.reg_weight
+            annealing_coef = torch.tensor(0.0, dtype=evidence.dtype, device=evidence.device)
+        elif self.annealing_step is None and self.reg_weight is not None:
+            annealing_coef = torch.tensor(
+                float(self.reg_weight),
+                dtype=evidence.dtype,
+                device=evidence.device,
+            )
         else:
+            if current_epoch is None:  # coverage: ignore
+                raise ValueError(
+                    "current_epoch must be set when annealing_step is used and reg_weight is None."
+                )
+            if self.annealing_step is None:  # coverage: ignore
+                raise ValueError(
+                    "annealing_step must be set when annealing_step is used and reg_weight is None."
+                )
             annealing_coef = torch.min(
-                input=torch.tensor(1.0, dtype=evidence.dtype),
-                other=torch.tensor(current_epoch / self.annealing_step, dtype=evidence.dtype),
+                input=torch.tensor(1.0, dtype=evidence.dtype, device=evidence.device),
+                other=torch.tensor(
+                    float(current_epoch) / float(self.annealing_step),
+                    dtype=evidence.dtype,
+                    device=evidence.device,
+                ),
             )
 
-        loss_reg = self._kldiv_reg(evidence, targets)
-        loss = loss_dirichlet + annealing_coef * loss_reg
+        loss = loss_dirichlet + annealing_coef * self._kldiv_reg(evidence, targets)
         if self.reduction == "mean":
             loss = loss.mean()
         elif self.reduction == "sum":
@@ -347,12 +363,12 @@ class BCEWithLogitsLSLoss(nn.BCEWithLogitsLoss):
             )
         self.label_smoothing = label_smoothing
 
-    def forward(self, inputs: Tensor, targets: Tensor) -> Tensor:
+    def forward(self, input: Tensor, target: Tensor) -> Tensor:  # noqa: A002
         if self.label_smoothing == 0.0:
-            return super().forward(inputs, targets.type_as(inputs))
-        targets = targets.float()
-        targets = targets * (1 - self.label_smoothing) + self.label_smoothing / 2
-        loss = targets * F.logsigmoid(inputs) + (1 - targets) * F.logsigmoid(-inputs)
+            return super().forward(input, target.type_as(input))
+        target = target.float()
+        target = target * (1 - self.label_smoothing) + self.label_smoothing / 2
+        loss = target * F.logsigmoid(input) + (1 - target) * F.logsigmoid(-input)
         if self.weight is not None:
             loss = loss * self.weight
         if self.reduction == "mean":
@@ -380,18 +396,24 @@ class CrossEntropyMaxSupLoss(nn.CrossEntropyLoss):
         Reference:
             MaxSup: Fixing Label-smoothing for improved feature representation. Y. Zhou et al.
         """
-        super().__init__(weight, size_average, reduction=reduction, label_smoothing=label_smoothing)
+        reduction = "none" if reduction is None else reduction
+        super().__init__(
+            weight=weight,
+            size_average=size_average,
+            reduction=reduction,
+            label_smoothing=label_smoothing,
+        )
         self.max_sup = max_sup
 
-    def forward(self, inputs: Tensor, targets: Tensor) -> Tensor:
+    def forward(self, input: Tensor, target: Tensor) -> Tensor:  # noqa: A002
         if self.max_sup == 0.0:
-            return super().forward(inputs, targets)
-        z_top1 = inputs.topk(1, -1)[0]
-        reg = z_top1 - inputs.mean(-1, keepdim=True)
+            return super().forward(input, target)
+        z_top1 = input.topk(1, -1)[0]
+        reg = z_top1 - input.mean(-1, keepdim=True)
         loss = (
             F.cross_entropy(
-                inputs,
-                targets,
+                input,
+                target,
                 label_smoothing=self.label_smoothing,
             )
             + self.max_sup * reg
@@ -447,7 +469,7 @@ class MixupMPLoss(nn.CrossEntropyLoss):
             raise ValueError(f"mixup_ratio must be > 0. Got {mixup_ratio} < 0.")
         self.mixup_ratio = mixup_ratio
 
-    def forward(self, inputs: Tensor, targets: Tensor) -> Tensor:
+    def forward(self, input: Tensor, target: Tensor) -> Tensor:  # noqa: A002
         """The mixup transform should arrange outputs as `[mixup, normal]` or
         `[normal, mixup]` depending on r; this splits them accordingly.
 
@@ -455,15 +477,15 @@ class MixupMPLoss(nn.CrossEntropyLoss):
         that case by manually using F.kl_div if needed.
 
         Args:
-            inputs (Tensor): model logits shape (N_total, num_classes)
-            targets (Tensor): target labels (one-hot or class indices) shape (N_total, ...)
+            input (Tensor): model logits shape (N_total, num_classes)
+            target (Tensor): target labels (one-hot or class indices) shape (N_total, ...)
         """
         # determine how many samples correspond to mixup vs normal
-        mixup_count = round((self.mixup_ratio / (self.mixup_ratio + 1)) * inputs.size(0))
+        mixup_count = round((self.mixup_ratio / (self.mixup_ratio + 1)) * input.size(0))
 
         # slices: assume mixup first, then normal
-        mixup_preds, mixup_targets = inputs[:mixup_count], targets[:mixup_count]
-        norm_preds, norm_targets = inputs[mixup_count:], targets[mixup_count:]
+        mixup_preds, mixup_targets = input[:mixup_count], target[:mixup_count]
+        norm_preds, norm_targets = input[mixup_count:], target[mixup_count:]
 
         # standard cross entropy for normal samples
         loss_norm = super().forward(norm_preds, norm_targets)

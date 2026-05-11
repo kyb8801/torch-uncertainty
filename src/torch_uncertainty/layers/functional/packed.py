@@ -278,7 +278,7 @@ def packed_multi_head_attention_forward(  # noqa: D417
         Implementation of the packed multi-head attention is based on the PyTorch implementation of the
         `torch.nn.MultiheadAttention` module. The implementation is adapted to support packed inputs.
     """
-    is_batched = F._mha_shape_check(query, key, value, key_padding_mask, attn_mask, num_heads)
+    is_batched = F._mha_shape_check(query, key, value, key_padding_mask, attn_mask, num_heads)  # pyright: ignore[reportAttributeAccessIssue]
 
     # For unbatched input, we unsqueeze at the expected batch-dim to pretend that the input
     # is batched, run the computation and before returning squeeze the
@@ -338,7 +338,7 @@ def packed_multi_head_attention_forward(  # noqa: D417
         # embed_dim can be a tensor when JIT tracing
         head_dim = embed_dim.div(num_heads, rounding_mode="trunc")
     else:
-        head_dim = embed_dim // num_heads
+        head_dim = torch.tensor(embed_dim // num_heads)
     assert head_dim * num_heads == embed_dim, (
         f"embed_dim {embed_dim} not divisible by num_heads {num_heads}"
     )
