@@ -16,7 +16,7 @@ class _FilterResponseNormNd(nn.Module):
         Args:
             dimension (int): Dimension of the input tensor.
             num_channels (int): Number of channels.
-            eps (float, optional): Epsilon. Defaults to 1e-6.
+            eps (float): Epsilon. Defaults to 1e-6.
             device (optional): Device. Defaults to None.
             dtype (optional): Data type. Defaults to None.
         """
@@ -51,7 +51,7 @@ class FilterResponseNorm1d(_FilterResponseNormNd):
 
         Args:
             num_channels (int): Number of channels.
-            eps (float, optional): Epsilon. Defaults to 1e-6.
+            eps (float): Epsilon. Defaults to 1e-6.
             device (optional): Device. Defaults to None.
             dtype (optional): Data type. Defaults to None.
         """
@@ -70,7 +70,7 @@ class FilterResponseNorm2d(_FilterResponseNormNd):
 
         Args:
             num_channels (int): Number of channels.
-            eps (float, optional): Epsilon. Defaults to 1e-6.
+            eps (float): Epsilon. Defaults to 1e-6.
             device (optional): Device. Defaults to None.
             dtype (optional): Data type. Defaults to None.
         """
@@ -89,7 +89,7 @@ class FilterResponseNorm3d(_FilterResponseNormNd):
 
         Args:
             num_channels (int): Number of channels.
-            eps (float, optional): Epsilon. Defaults to 1e-6.
+            eps (float): Epsilon. Defaults to 1e-6.
             device (optional): Device. Defaults to None.
             dtype (optional): Data type. Defaults to None.
         """

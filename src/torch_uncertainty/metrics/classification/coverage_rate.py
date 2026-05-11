@@ -23,15 +23,15 @@ class CoverageRate(Metric):
         """Empirical coverage rate metric.
 
         Args:
-            num_classes (int | None, optional): Number of classes. Defaults to ``None``.
-            average (str, optional): Defines the reduction that is applied over labels. Should be
+            num_classes (int | None): Number of classes. Defaults to ``None``.
+            average (str): Defines the reduction that is applied over labels. Should be
                 one of the following:
 
                 - ``'macro'`` (default): Compute the metric for each class separately and find their
                   unweighted mean. This does not take label imbalance into account.
                 - ``'micro'``: Sum statistics across over all labels.
 
-            validate_args (bool, optional): Whether to validate the arguments. Defaults to ``True``.
+            validate_args (bool): Whether to validate the arguments. Defaults to ``True``.
             kwargs: Additional keyword arguments, see `Advanced metric settings
                 <https://torchmetrics.readthedocs.io/en/stable/pages/overview.html#metric-kwargs>`_.
 

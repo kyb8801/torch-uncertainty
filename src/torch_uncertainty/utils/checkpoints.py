@@ -8,7 +8,7 @@ def get_version(root: str | Path, version: int, checkpoint: int | None = None) -
         root (Union[str, Path]): The root of the dataset containing the
             checkpoints.
         version (int): The version of the checkpoint.
-        checkpoint (int, optional): The number of the checkpoint. Defaults
+        checkpoint (int): The number of the checkpoint. Defaults
             to None.
 
     Raises:

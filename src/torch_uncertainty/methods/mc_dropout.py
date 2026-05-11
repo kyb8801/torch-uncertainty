@@ -54,7 +54,7 @@ class _MCDropout(nn.Module):
         selected dropout modules.
 
         Args:
-            mode (bool, optional): whether to set the module to training
+            mode (bool): whether to set the module to training
                 mode. Defaults to True.
         """
         if not isinstance(mode, bool):
@@ -158,9 +158,9 @@ def mc_dropout(
 
     Args:
         core_model (nn.Module): model to wrap
-        num_estimators (int): number of estimators to use last_layer (bool, optional): whether to apply dropout to the last layer only. Defaults to ``False``.
+        num_estimators (int): number of estimators to use last_layer (bool): whether to apply dropout to the last layer only. Defaults to ``False``.
         on_batch (bool): Increase the batch_size to perform MC-Dropout. Otherwise in a for loop to reduce memory footprint. Defaults to ``True``.
-        last_layer (bool, optional): whether to apply dropout to the last layer only. Defaults to ``False``.
+        last_layer (bool): whether to apply dropout to the last layer only. Defaults to ``False``.
         task (Literal[``"classification"``, ``"regression"``, ``"segmentation"``, ``"pixel_regression"``]): The model task. Defaults to ``"classification"``.
         probabilistic (bool): Whether the regression model is probabilistic.
 

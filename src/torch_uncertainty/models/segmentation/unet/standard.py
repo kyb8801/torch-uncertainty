@@ -133,10 +133,10 @@ class _UNet(nn.Module):
             in_channels (int): Number of input channels.
             num_classes (int): Number of output classes.
             num_blocks (list[int]): Number of channels in each layer of the U-Net.
-            bilinear (bool, optional): If ``True``, use bilinear interpolation instead of
+            bilinear (bool): If ``True``, use bilinear interpolation instead of
                 transposed convolutions for upsampling. This can help to reduce the number
                 of parameters and improve the performance of the model. Defaults to ``False``.
-            dropout_rate (float, optional): Dropout rate for the model. Defaults to 0.0.
+            dropout_rate (float): Dropout rate for the model. Defaults to 0.0.
         """
         check_unet_parameters(in_channels, num_classes, num_blocks, bilinear)
         super().__init__()
@@ -194,10 +194,10 @@ def _unet(
         in_channels (int): Number of input channels.
         num_classes (int): Number of output classes.
         num_blocks (list[int]): Number of channels in each layer of the U-Net.
-        bilinear (bool, optional): If ``True``, use bilinear interpolation instead of
+        bilinear (bool): If ``True``, use bilinear interpolation instead of
             transposed convolutions for upsampling. This can help to reduce the number
             of parameters and improve the performance of the model. Defaults to ``False``.
-        dropout_rate (float, optional): Dropout rate for the model. Defaults to 0.0.
+        dropout_rate (float): Dropout rate for the model. Defaults to 0.0.
 
     Returns:
         _UNet: U-Net model.
@@ -222,10 +222,10 @@ def small_unet(
     Args:
         in_channels (int): Number of input channels.
         num_classes (int): Number of output classes.
-        bilinear (bool, optional): If ``True``, use bilinear interpolation instead of
+        bilinear (bool): If ``True``, use bilinear interpolation instead of
             transposed convolutions for upsampling. This can help to reduce the number
             of parameters and improve the performance of the model. Defaults to ``False``.
-        dropout_rate (float, optional): Dropout rate for the model. Defaults to 0.0.
+        dropout_rate (float): Dropout rate for the model. Defaults to 0.0.
 
     Returns:
         _SmallUNet: Small U-Net model.
@@ -251,10 +251,10 @@ def unet(
     Args:
         in_channels (int): Number of input channels.
         num_classes (int): Number of output classes.
-        bilinear (bool, optional): If ``True``, use bilinear interpolation instead of
+        bilinear (bool): If ``True``, use bilinear interpolation instead of
             transposed convolutions for upsampling. This can help to reduce the number
             of parameters and improve the performance of the model. Defaults to ``False``.
-        dropout_rate (float, optional): Dropout rate for the model. Defaults to 0.0.
+        dropout_rate (float): Dropout rate for the model. Defaults to 0.0.
 
     Returns:
         _UNet: U-Net model.

@@ -26,7 +26,7 @@ class Disagreement(Metric):
         estimators.
 
         Args:
-            reduction (str, optional): Determines how to reduce over the :math:`B`/batch dimension:
+            reduction (str): Determines how to reduce over the :math:`B`/batch dimension:
 
                 - ``'mean'`` [default]: Averages score across samples
                 - ``'sum'``: Sum score across samples

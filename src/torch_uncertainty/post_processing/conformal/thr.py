@@ -22,14 +22,14 @@ class ConformalClsTHR(Conformal):
 
         Args:
             alpha (float): The confidence level, meaning we allow :math:`1-\alpha` error.
-            model (nn.Module | None, optional): Model to be calibrated. Defaults to ``None``.
-            ts_init_val (float, optional): Initial value for the temperature.
+            model (nn.Module | None): Model to be calibrated. Defaults to ``None``.
+            ts_init_val (float): Initial value for the temperature.
                 Defaults to ``1.0``.
-            ts_lr (float, optional): Learning rate for the temperature scaling optimizer. Defaults to ``0.1``.
-            ts_max_iter (int, optional): Maximum number of iterations for the temperature scaling
+            ts_lr (float): Learning rate for the temperature scaling optimizer. Defaults to ``0.1``.
+            ts_max_iter (int): Maximum number of iterations for the temperature scaling
                 optimizer. Defaults to ``100``.
             enable_ts (bool): Whether to scale the logits. Defaults to ``True``.
-            device (Literal["cpu", "cuda"] | torch.device | None, optional): device.
+            device (Literal["cpu", "cuda"] | torch.device | None): device.
                 Defaults to ``None``.
 
         Warning:

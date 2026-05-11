@@ -64,7 +64,7 @@ class KITTIDepth(VisionDataset):
                 smaller than or equal to this threshold are set to NaN.
             max_depth (float, default=80.0): Maximum valid depth value (in meters). Depth values
                 greater than this threshold are set to NaN.
-            transforms (Callable, optional): A function/transform that takes an ``(image, target)``
+            transforms (Callable): A function/transform that takes an ``(image, target)``
                 pair and returns the transformed pair.
             download (bool, default=False): If True, downloads and restructures the depth
                 annotations and raw KITTI data if not already present.

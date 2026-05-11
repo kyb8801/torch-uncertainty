@@ -62,7 +62,7 @@ class CIFAR10DataModule(TUDataModule):
             eval_shift (bool): Whether to evaluate on shifted data. Defaults to ``False``.
             val_split (float): Share of samples to use for validation. Defaults
                 to ``0.0``.
-            postprocess_set (str, optional): The post-hoc calibration dataset to
+            postprocess_set (str): The post-hoc calibration dataset to
                 use for the post-processing method. Defaults to ``val``.
             num_workers (int): Number of workers to use for data loading. Defaults
                 to ``1``.

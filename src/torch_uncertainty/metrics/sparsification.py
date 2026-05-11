@@ -93,11 +93,11 @@ class AUSE(Metric):
         ``update``, and the oracle sparsification curve.
 
         Args:
-            ax (Axes | None, optional): An matplotlib axis object. If provided
+            ax (Axes | None): An matplotlib axis object. If provided
                 will add plot to this axis. Defaults to None.
-            plot_oracle (bool, optional): Whether to plot the oracle
+            plot_oracle (bool): Whether to plot the oracle
                 sparsification curve. Defaults to True.
-            plot_value (bool, optional): Whether to plot the AUSE value.
+            plot_value (bool): Whether to plot the AUSE value.
                 Defaults to True.
 
         Returns:

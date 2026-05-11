@@ -119,10 +119,10 @@ class CamVid(VisionDataset):
 
         Args:
             root (str | Path): Root directory of dataset where ``camvid/`` exists or will be saved to if download is set to ``True``.
-            group_classes (bool, optional): Whether to group the 32 classes into 11 superclasses. Defaults to ``True``.
-            split (str, optional): The dataset split, supports ``train``, ``val`` and ``test``. Defaults to ``None``.
-            transforms (callable, optional): A function/transform that takes input sample and its target as entry and returns a transformed version. Defaults to ``None``.
-            download (bool, optional): If ``True``, downloads the dataset from the internet and puts it in root directory. If dataset is already downloaded, it is not downloaded again.
+            group_classes (bool): Whether to group the 32 classes into 11 superclasses. Defaults to ``True``.
+            split (str): The dataset split, supports ``train``, ``val`` and ``test``. Defaults to ``None``.
+            transforms (callable): A function/transform that takes input sample and its target as entry and returns a transformed version. Defaults to ``None``.
+            download (bool): If ``True``, downloads the dataset from the internet and puts it in root directory. If dataset is already downloaded, it is not downloaded again.
                 Defaults to ``False``.
         """
         if split not in ["train", "val", "test", None]:

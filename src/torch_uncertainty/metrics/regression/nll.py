@@ -16,7 +16,7 @@ class DistributionNLL(CategoricalNLL):
         Args:
             dist (torch.distributions.Distribution): Predicted distributions.
             target (Tensor): Ground truth labels.
-            padding_mask (Tensor, optional): The padding mask. Defaults to None.
+            padding_mask (Tensor): The padding mask. Defaults to None.
                 Sets the loss to 0 for padded values.
         """
         nlog_prob = -dist.log_prob(target)

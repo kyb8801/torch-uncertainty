@@ -171,9 +171,9 @@ class LPBNNConv2d(nn.Module):
             out_channels (int): Number of output channels.
             num_estimators (int): Number of models to sample from.
             kernel_size (int or tuple): Size of the convolving kernel.
-            stride (int or tuple, optional): Stride of the convolution. Default: ``1``.
-            padding (int or tuple, optional): Zero-padding added to both sides of the input. Default: ``0``.
-            groups (int, optional): Number of blocked connections from input channels to output channels. Default: ``1``.
+            stride (int or tuple): Stride of the convolution. Default: ``1``.
+            padding (int or tuple): Zero-padding added to both sides of the input. Default: ``0``.
+            groups (int): Number of blocked connections from input channels to output channels. Default: ``1``.
             hidden_size (int): Size of the hidden layer. Defaults to ``32``.
             std_factor (float): Factor to multiply the standard deviation of the latent noise. Defaults to ``1e-2``.
             gamma (bool): If ``True``, adds a learnable gamma to the output. Defaults to ``True``.

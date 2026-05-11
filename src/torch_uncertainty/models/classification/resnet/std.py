@@ -367,9 +367,9 @@ def resnet(
         groups (int): Number of groups in convolutions. Defaults to 1.
         style (ResNetStyle | Literal["imagenet", "cifar"]): Whether to use the ImageNet or CIFAR
             structure. Defaults to ``ResNetStyle.IMAGENET``.
-        activation_fn (Callable, optional): Activation function. Defaults to
+        activation_fn (Callable): Activation function. Defaults to
             ``torch.nn.functional.relu``.
-        normalization_layer (nn.Module, optional): Normalization layer.
+        normalization_layer (nn.Module): Normalization layer.
             Defaults to ``torch.nn.BatchNorm2d``.
 
     Returns:

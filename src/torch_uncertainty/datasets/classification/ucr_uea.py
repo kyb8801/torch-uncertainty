@@ -28,12 +28,12 @@ class UCRUEADataset(Dataset):
 
         Args:
             dataset_name (str): Name of the dataset to load.
-            split (str, optional): Split to use (``"train"``, ``"test"`` or ``"ood"``). Defaults to ``"train"``.
-            transform (Callable | None, optional): Transform to apply to the input data. Defaults
+            split (str): Split to use (``"train"``, ``"test"`` or ``"ood"``). Defaults to ``"train"``.
+            transform (Callable | None): Transform to apply to the input data. Defaults
                 to ``None``.
-            target_transform (Callable | None, optional): Transform to apply to the target data.
+            target_transform (Callable | None): Transform to apply to the target data.
                 Defaults to ``None``.
-            create_ood (bool, optional): Whether to create an out-of-distribution (OOD) dataset based
+            create_ood (bool): Whether to create an out-of-distribution (OOD) dataset based
                 on the last class in the dataset. Defaults to ``False``.
 
         Raises:

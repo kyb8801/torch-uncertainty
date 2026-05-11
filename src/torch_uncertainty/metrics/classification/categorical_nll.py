@@ -34,7 +34,7 @@ class CategoricalNLL(Metric):
         of sample :math:`i`.
 
         Args:
-            reduction (str, optional): Determines how to reduce the computed loss over
+            reduction (str): Determines how to reduce the computed loss over
                 the batch dimension:
 
                 - ``'mean'`` [default]: Averages the loss across samples in the batch.

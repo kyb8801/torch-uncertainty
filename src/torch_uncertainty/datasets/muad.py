@@ -121,21 +121,21 @@ class MUAD(VisionDataset):
         Args:
             root (str | Path): Root directory of dataset where directory ``leftImg8bit`` and ``leftLabel``
                 or ``leftDepth`` are located.
-            split (str, optional): The image split to use, ``train``, ``val``, ``test`` or ``ood``.
-            version (str, optional): The version of the dataset to use, ``small`` or ``full``.
+            split (str): The image split to use, ``train``, ``val``, ``test`` or ``ood``.
+            version (str): The version of the dataset to use, ``small`` or ``full``.
                 Defaults to ``full``.
-            min_depth (float, optional): The maximum depth value to use if target_type is ``depth``.
+            min_depth (float): The maximum depth value to use if target_type is ``depth``.
                 Defaults to ``None``.
-            max_depth (float, optional): The maximum depth value to use if target_type is ``depth``.
+            max_depth (float): The maximum depth value to use if target_type is ``depth``.
                 Defaults to ``None``.
-            target_type (str, optional): The type of target to use, ``semantic`` or ``depth``.
+            target_type (str): The type of target to use, ``semantic`` or ``depth``.
                 Defaults to ``semantic``.
-            transforms (callable, optional): A function/transform that takes in a tuple of PIL
+            transforms (callable): A function/transform that takes in a tuple of PIL
                 images and returns a transformed version. Defaults to ``None``.
-            download (bool, optional): If ``True``, downloads the dataset from the internet and puts
+            download (bool): If ``True``, downloads the dataset from the internet and puts
                 it in root directory. If dataset is already downloaded, it is not downloaded again.
                 Defaults to ``False``.
-            use_train_ids (bool, optional): If ``True``, uses the train ids instead of the original
+            use_train_ids (bool): If ``True``, uses the train ids instead of the original
                 ids. Defaults to ``True``. Note that this is only used for the ``semantic`` target
                 type.
 

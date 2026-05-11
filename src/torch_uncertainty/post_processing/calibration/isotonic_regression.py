@@ -40,7 +40,7 @@ class IsotonicRegressionScaler(PostProcessing):
             model (nn.Module): Model to calibrate. Defaults to ``None``.
             eps (float): Small value for stability when converting probs back to logits.
                 Defaults to ``1e-6``.
-            device (Optional[Literal["cpu", "cuda"]], optional): Device to use for
+            device (Optional[Literal["cpu", "cuda"]]): Device to use for
                 tensor operations. Defaults to ``None``.
 
         References:
@@ -82,7 +82,7 @@ class IsotonicRegressionScaler(PostProcessing):
         Args:
             dataloader (DataLoader): Dataloader providing the calibration data
                 (logits and targets).
-            progress (bool, optional): Whether to show a progress bar during
+            progress (bool): Whether to show a progress bar during
                 data extraction. Defaults to ``True``.
         """
         if self.model is None or isinstance(self.model, nn.Identity):  # coverage: ignore

@@ -42,7 +42,7 @@ class CityscapesDataModule(TUDataModule):
             batch_size (int): Number of samples per batch during training.
             eval_batch_size (int | None) : Number of samples per batch during evaluation (val
                 and test). Set to :attr:`batch_size` if ``None``. Defaults to ``None``.
-            crop_size (sequence or int, optional): Desired input image and
+            crop_size (sequence or int): Desired input image and
                 segmentation mask sizes during training. If :attr:`crop_size` is an
                 int instead of sequence like :math:`(H, W)`, a square crop
                 :math:`(\text{size},\text{size})` is made. If provided a sequence
@@ -50,7 +50,7 @@ class CityscapesDataModule(TUDataModule):
                 :math:`(\text{size[0]},\text{size[1]})`. Has to be provided if
                 :attr:`train_transform` is not provided. Otherwise has no effect.
                 Defaults to ``1024``.
-            eval_size (sequence or int, optional): Desired input image and
+            eval_size (sequence or int): Desired input image and
                 segmentation mask sizes during evaluation. If size is an int,
                 smaller edge of the images will be matched to this number, i.e.,
                 :math:`\text{height}>\text{width}`, then image will be rescaled to
@@ -63,13 +63,13 @@ class CityscapesDataModule(TUDataModule):
                 ``None``. If not provided, a default transform is used.
             basic_augment (bool): Whether to apply base augmentations. Defaults to
                 ``True``. Only used if ``train_transform`` is not provided.
-            val_split (float or None, optional): Share of training samples to use
+            val_split (float or None): Share of training samples to use
                 for validation. Defaults to ``None``.
-            num_workers (int, optional): Number of dataloaders to use. Defaults to
+            num_workers (int): Number of dataloaders to use. Defaults to
                 ``1``.
-            pin_memory (bool, optional): Whether to pin memory. Defaults to
+            pin_memory (bool): Whether to pin memory. Defaults to
                 ``True``.
-            persistent_workers (bool, optional): Whether to use persistent workers.
+            persistent_workers (bool): Whether to use persistent workers.
                 Defaults to ``True``.
 
         Note:

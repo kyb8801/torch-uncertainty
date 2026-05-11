@@ -14,17 +14,17 @@ class DummyClassificationDataset(Dataset):
 
     Args:
         root (string): Root directory containing the dataset (unused).
-        train (bool, optional): If True, creates dataset from training set,
+        train (bool): If True, creates dataset from training set,
             otherwise creates from test set (unused).
-        transform (callable, optional): A function/transform that takes in
+        transform (callable): A function/transform that takes in
             a PIL image and returns a transformed version. E.g,
             ``transforms.RandomCrop``
-        target_transform (callable, optional): A function/transform that
+        target_transform (callable): A function/transform that
             takes in the target and transforms it.
-        num_channels (int, optional): Number of channels in the images.
-        image_size (int, optional): Size of the images.
-        num_classes (int, optional): Number of classes in the dataset.
-        num_images (int, optional): Number of images in the dataset.
+        num_channels (int): Number of channels in the images.
+        image_size (int): Size of the images.
+        num_classes (int): Number of classes in the dataset.
+        num_images (int): Number of images in the dataset.
         kwargs (Any): Other arguments.
     """
 

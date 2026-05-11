@@ -25,10 +25,10 @@ class SGHMC(Optimizer):
                 groups should be named.
             lr (float): Learning rate :math:`\epsilon`. Defaults to ``1e-2``.
             burn_in_steps (int): Number of discarded steps used to update the state. Defaults to ``200``.
-            friction (float, optional): The friction term :math:`C`. Defaults to ``0.05``.
+            friction (float): The friction term :math:`C`. Defaults to ``0.05``.
             noise_factor (float): A factor to reduce the amount of noise and stabilize the training.
                 This parameter was not proposed in the original paper. Defaults to ``1e-2``.
-            weight_decay (float, optional): Weight decay (L2 penalty). Defaults to ``0``.
+            weight_decay (float): Weight decay (L2 penalty). Defaults to ``0``.
 
         Reference:
             - [1] `Stochastic Gradient Hamiltonian Monte Carlo <https://arxiv.org/pdf/1402.4102>`_.

@@ -55,7 +55,7 @@ class MNISTDataModule(TUDataModule):
                 ``"fashion"``; `fashion` stands for FashionMNIST and `notMNIST` for notMNIST.
             val_split (float): Share of samples to use for validation. Defaults to ``0.0``.
             num_tta (int): Number of test-time augmentations (TTA). Defaults to ``1`` (no TTA).
-            postprocess_set (str, optional): The post-hoc calibration dataset to
+            postprocess_set (str): The post-hoc calibration dataset to
                 use for the post-processing method. Defaults to ``val``.
             num_workers (int): Number of workers to use for data loading. Defaults
                 to ``1``.

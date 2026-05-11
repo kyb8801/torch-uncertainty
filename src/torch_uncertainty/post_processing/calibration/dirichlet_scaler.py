@@ -29,18 +29,18 @@ class DirichletScaler(MatrixScaler):
         Args:
             num_classes (int): Number of classes.
             model (nn.Module | None): Model to calibrate. Defaults to ``None``.
-            init_weight_temperature (float, optional): Initial value for the weight matrix. Defaults to ``1``.
-            init_bias_temperature (float | None, optional): Initial value for the bias. The inverse bias will be
+            init_weight_temperature (float): Initial value for the weight matrix. Defaults to ``1``.
+            init_bias_temperature (float | None): Initial value for the bias. The inverse bias will be
                 set to the ``0`` vector if set to ``None``. Defaults to ``None``.
-            lr (float, optional): Learning rate for the optimizer. Defaults to ``0.1``.
-            max_iter (int, optional): Maximum number of iterations for the optimizer. Defaults to ``200``.
-            lambda_reg (float | None, optional): Regularization coefficient applied to the
+            lr (float): Learning rate for the optimizer. Defaults to ``0.1``.
+            max_iter (int): Maximum number of iterations for the optimizer. Defaults to ``200``.
+            lambda_reg (float | None): Regularization coefficient applied to the
                 off-diagonal elements of the weight matrix. Used to mitigate overfitting.
                 Defaults to ``None``.
-            mu_reg (float | None, optional): Regularization coefficient applied to the
+            mu_reg (float | None): Regularization coefficient applied to the
                 bias vector. Defaults to ``None``.
             eps (float): Small value for numerical stability. Defaults to ``1e-8``.
-            device (Optional[Literal["cpu", "cuda"]], optional): Device to use for optimization.
+            device (Optional[Literal["cpu", "cuda"]]): Device to use for optimization.
                 Defaults to ``None``.
 
         References:
@@ -79,9 +79,9 @@ class DirichletScaler(MatrixScaler):
         Args:
             dataloader (DataLoader): Dataloader with the calibration data. If there is no model,
                 the dataloader should include the confidence score directly and not the logits.
-            save_logits (bool, optional): Whether to save the logits and
+            save_logits (bool): Whether to save the logits and
                 labels in memory. Defaults to ``False``.
-            progress (bool, optional): Whether to show a progress bar.
+            progress (bool): Whether to show a progress bar.
                 Defaults to ``True``.
         """
         if self.model is None or isinstance(self.model, nn.Identity):

@@ -203,7 +203,7 @@ def optim_imagenet_resnet50_a3(model: nn.Module, effective_batch_size: int | Non
 
     Args:
         model (nn.Module): The model to be optimized.
-        effective_batch_size (int, optional): The batch size of the model
+        effective_batch_size (int): The batch size of the model
             (taking multiple GPUs into account). Defaults to None.
 
     Returns:
@@ -377,8 +377,8 @@ def get_procedure(
     Args:
         arch_name (str): The name of the architecture.
         ds_name (str): The name of the dataset.
-        method (str, optional): The name of the method. Defaults to "".
-        imagenet_recipe (str, optional): The recipe to use for
+        method (str): The name of the method. Defaults to "".
+        imagenet_recipe (str): The recipe to use for
             ImageNet. Defaults to None.
 
     Returns:

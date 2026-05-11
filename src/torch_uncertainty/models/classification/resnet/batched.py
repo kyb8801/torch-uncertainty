@@ -331,8 +331,8 @@ def batched_resnet(
         groups (int): Number of groups within each estimator.
         style (ResNetStyle | Literal["imagenet", "cifar"]): Whether to use the ImageNet or CIFAR
             structure. Defaults to ``ResNetStyle.IMAGENET``.
-        normalization_layer (nn.Module, optional): Normalization layer.
-        repeat_strategy (Literal["legacy", "paper"], optional): The repeatrepeat_strategy ("legacy"|"paper", optional): The repeat
+        normalization_layer (nn.Module): Normalization layer.
+        repeat_strategy (Literal["legacy", "paper"]): The repeatrepeat_strategy ("legacy"|"paper"): The repeat
             strategy to use during training:
 
             - "legacy": Repeat inputs for each estimator during both training

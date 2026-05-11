@@ -68,7 +68,7 @@ class TinyImageNetDataModule(TUDataModule):
             val_split (float or Path): Share of samples to use for validation
                 or path to a yaml file containing a list of validation images
                 ids. Defaults to ``0.0``.
-            postprocess_set (str, optional): The post-hoc calibration dataset to
+            postprocess_set (str): The post-hoc calibration dataset to
                 use for the post-processing method. Defaults to ``val``.
             train_transform (nn.Module | None): Custom training transform. Defaults
                 to ``None``. If not provided, a default transform is used.

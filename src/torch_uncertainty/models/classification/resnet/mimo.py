@@ -69,13 +69,13 @@ def mimo_resnet(
         num_classes (int): Number of classes to predict.
         arch (int): The architecture of the ResNet.
         num_estimators (int): Number of estimators in the ensemble.
-        conv_bias (bool, optional): Whether to use bias in convolutional layers. Defaults to ``True``.
-        dropout_rate (float, optional): Dropout rate. Defaults to ``0.0``.
-        width_multiplier (float, optional): Width multiplier. Defaults to ``1.0``.
-        groups (int, optional): Number of groups for grouped convolution. Defaults to ``1``.
+        conv_bias (bool): Whether to use bias in convolutional layers. Defaults to ``True``.
+        dropout_rate (float): Dropout rate. Defaults to ``0.0``.
+        width_multiplier (float): Width multiplier. Defaults to ``1.0``.
+        groups (int): Number of groups for grouped convolution. Defaults to ``1``.
         style (ResNetStyle | Literal["imagenet", "cifar"]): Whether to use the ImageNet or CIFAR
             structure. Defaults to ``ResNetStyle.IMAGENET``.
-        normalization_layer (nn.Module, optional): Normalization layer.
+        normalization_layer (nn.Module): Normalization layer.
             Defaults to ``torch.nn.BatchNorm2d``.
 
     Returns:

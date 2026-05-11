@@ -70,12 +70,12 @@ def mimo_wideresnet28x10(
         groups (int): Number of subgroups in the convolutions.
         conv_bias (bool): Whether to use bias in convolutions. Defaults to
             ``True``.
-        dropout_rate (float, optional): Dropout rate. Defaults to ``0.3``.
+        dropout_rate (float): Dropout rate. Defaults to ``0.3``.
         style (ResNetStyle | Literal["imagenet", "cifar"]): Whether to use the ImageNet or CIFAR
             structure. Defaults to ``ResNetStyle.IMAGENET``.
-        activation_fn (Callable, optional): Activation function. Defaults to
+        activation_fn (Callable): Activation function. Defaults to
             ``torch.nn.functional.relu``.
-        normalization_layer (nn.Module, optional): Normalization layer.
+        normalization_layer (nn.Module): Normalization layer.
             Defaults to ``torch.nn.BatchNorm2d``.
 
     Returns:

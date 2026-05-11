@@ -60,15 +60,15 @@ class Cityscapes(TVCityscapes):
 
         Args:
             root (str): Root directory of the Cityscapes dataset.
-            split (str, optional): Dataset split to use, such as "train", "val", or "test".
-            mode (str, optional): Annotation mode, e.g., "fine" or "coarse".
-            target_type (list[str] | str, optional):
+            split (str): Dataset split to use, such as "train", "val", or "test".
+            mode (str): Annotation mode, e.g., "fine" or "coarse".
+            target_type (list[str] | str):
                 One or more target types to load ("instance", "semantic", etc.).
-            transform (Callable[..., Any] | None, optional):
+            transform (Callable[..., Any] | None):
                 Transformation applied to the input image.
-            target_transform (Callable[..., Any] | None, optional):
+            target_transform (Callable[..., Any] | None):
                 Transformation applied to the target.
-            transforms (Callable[..., Any] | None, optional):
+            transforms (Callable[..., Any] | None):
                 Combined transformation for image and target.
 
         """

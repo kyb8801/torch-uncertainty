@@ -27,8 +27,8 @@ class VariationRatio(Metric):
         predicted class labels that are not the chosen (most frequent) class.
 
         Args:
-            probabilistic (bool, optional): Whether to use probabilistic predictions. Defaults to True.
-            reduction (Literal["mean", "sum", "none", None], optional): Determines how to reduce over the batch dimension:
+            probabilistic (bool): Whether to use probabilistic predictions. Defaults to True.
+            reduction (Literal["mean", "sum", "none", None]): Determines how to reduce over the batch dimension:
 
                 - ``'mean'`` [default]: Averages score across samples
                 - ``'sum'``: Sum score across samples
