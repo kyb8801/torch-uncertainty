@@ -391,7 +391,7 @@ def _regression_routine_checks(output_dim: int) -> None:
     """Check the domains of the routine's parameters.
 
     Args:
-        output_dim : the dimension of the output of the regression task.
+        output_dim: the dimension of the output of the regression task.
     """
     if output_dim < 1:
         raise ValueError(f"output_dim must be positive, got {output_dim}.")
