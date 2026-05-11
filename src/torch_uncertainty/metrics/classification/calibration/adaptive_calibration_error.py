@@ -65,7 +65,7 @@ def _equal_binning_bucketize_with_bounds(
     acc_splits = list(accuracies_sorted.tensor_split(num_bins))
 
     # Drop empty splits (can occur when num_bins > len(confidences))
-    pairs = [(a, c) for a, c in zip(acc_splits, conf_splits) if len(c) > 0]
+    pairs = [(a, c) for a, c in zip(acc_splits, conf_splits, strict=True) if len(c) > 0]
     acc_splits = [a for a, _ in pairs]
     conf_splits = [c for _, c in pairs]
 
