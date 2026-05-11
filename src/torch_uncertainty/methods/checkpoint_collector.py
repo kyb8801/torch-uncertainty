@@ -88,12 +88,9 @@ class CheckpointCollector(nn.Module):
         """
         match self.mode:
             case "schedule":
-                self.save_schedule = cast("list[int]", self.save_schedule)
                 if epoch not in self.save_schedule:
                     return
             case "cycle":
-                self.cycle_start = cast("int", self.cycle_start)
-                self.cycle_length = cast("int", self.cycle_length)
                 if epoch < self.cycle_start or (epoch - self.cycle_start) % self.cycle_length != 0:
                     return
         self.saved_models.append(
