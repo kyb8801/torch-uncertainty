@@ -45,7 +45,7 @@ class _BasicBlock(nn.Module):
         in_planes: int,
         planes: int,
         stride: int,
-        alpha: int,
+        alpha: float,
         num_estimators: int,
         gamma: int,
         conv_bias: bool,
@@ -67,7 +67,7 @@ class _BasicBlock(nn.Module):
             padding=1,
             bias=conv_bias,
         )
-        self.bn1 = normalization_layer(planes * alpha)
+        self.bn1 = normalization_layer(int(planes * alpha))
         self.dropout = nn.Dropout2d(p=dropout_rate)
         self.conv2 = PackedConv2d(
             planes,
@@ -81,7 +81,7 @@ class _BasicBlock(nn.Module):
             padding=1,
             bias=conv_bias,
         )
-        self.bn2 = normalization_layer(planes * alpha)
+        self.bn2 = normalization_layer(int(planes * alpha))
 
         self.shortcut = nn.Sequential()
         if stride != 1 or in_planes != self.expansion * planes:
@@ -97,7 +97,7 @@ class _BasicBlock(nn.Module):
                     stride=stride,
                     bias=conv_bias,
                 ),
-                normalization_layer(self.expansion * planes * alpha),
+                normalization_layer(int(self.expansion * planes * alpha)),
             )
 
     def forward(self, x: Tensor) -> Tensor:
@@ -115,7 +115,7 @@ class _Bottleneck(nn.Module):
         in_planes: int,
         planes: int,
         stride: int,
-        alpha: int,
+        alpha: float,
         num_estimators: int,
         gamma: int,
         conv_bias: bool,
@@ -136,7 +136,7 @@ class _Bottleneck(nn.Module):
             groups=groups,
             bias=conv_bias,
         )
-        self.bn1 = normalization_layer(planes * alpha)
+        self.bn1 = normalization_layer(int(planes * alpha))
         self.conv2 = PackedConv2d(
             planes,
             planes,
@@ -149,7 +149,7 @@ class _Bottleneck(nn.Module):
             groups=groups,
             bias=conv_bias,
         )
-        self.bn2 = normalization_layer(planes * alpha)
+        self.bn2 = normalization_layer(int(planes * alpha))
         self.dropout = nn.Dropout2d(p=dropout_rate)
         self.conv3 = PackedConv2d(
             planes,
@@ -161,7 +161,7 @@ class _Bottleneck(nn.Module):
             groups=groups,
             bias=conv_bias,
         )
-        self.bn3 = normalization_layer(self.expansion * planes * alpha)
+        self.bn3 = normalization_layer(int(self.expansion * planes * alpha))
 
         self.shortcut = nn.Sequential()
         if stride != 1 or in_planes != self.expansion * planes:
@@ -177,7 +177,7 @@ class _Bottleneck(nn.Module):
                     stride=stride,
                     bias=conv_bias,
                 ),
-                normalization_layer(self.expansion * planes * alpha),
+                normalization_layer(int(self.expansion * planes * alpha)),
             )
 
     def forward(self, x: Tensor) -> Tensor:
@@ -198,7 +198,7 @@ class _PackedResNet(nn.Module):
         conv_bias: bool,
         num_estimators: int,
         dropout_rate: float,
-        alpha: int = 2,
+        alpha: float = 2.0,
         gamma: int = 1,
         groups: int = 1,
         style: ResNetStyle = ResNetStyle.IMAGENET,
@@ -246,7 +246,7 @@ class _PackedResNet(nn.Module):
                 first=True,
             )
 
-        self.bn1 = normalization_layer(block_planes * alpha)
+        self.bn1 = normalization_layer(int(block_planes * alpha))
 
         self.optional_pool: nn.Module
         if style == ResNetStyle.IMAGENET:
@@ -331,7 +331,7 @@ class _PackedResNet(nn.Module):
         planes: int,
         num_blocks: int,
         stride: int,
-        alpha: int,
+        alpha: float,
         num_estimators: int,
         conv_bias: bool,
         dropout_rate: float,
@@ -385,7 +385,7 @@ def packed_resnet(
     num_classes: int,
     arch: int,
     num_estimators: int,
-    alpha: int,
+    alpha: float,
     gamma: int,
     conv_bias: bool = False,
     width_multiplier: float = 1.0,

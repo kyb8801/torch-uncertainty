@@ -19,7 +19,7 @@ class _WideBasicBlock(nn.Module):
         conv_bias: bool,
         dropout_rate: float,
         stride: int,
-        alpha: int,
+        alpha: float,
         num_estimators: int,
         gamma: int,
         groups: int,
@@ -40,7 +40,7 @@ class _WideBasicBlock(nn.Module):
             bias=conv_bias,
         )
         self.dropout = nn.Dropout2d(p=dropout_rate)
-        self.bn1 = normalization_layer(alpha * planes)
+        self.bn1 = normalization_layer(int(alpha * planes))
         self.conv2 = PackedConv2d(
             planes,
             planes,
@@ -68,7 +68,7 @@ class _WideBasicBlock(nn.Module):
                     bias=conv_bias,
                 ),
             )
-        self.bn2 = normalization_layer(alpha * planes)
+        self.bn2 = normalization_layer(int(alpha * planes))
 
     def forward(self, x: Tensor) -> Tensor:
         out = self.activation_fn(self.bn1(self.dropout(self.conv1(x))))
@@ -87,7 +87,7 @@ class _PackedWideResNet(nn.Module):
         conv_bias: bool,
         dropout_rate: float,
         num_estimators: int,
-        alpha: int = 2,
+        alpha: float = 2.0,
         gamma: int = 1,
         groups: int = 1,
         style: ResNetStyle = ResNetStyle.IMAGENET,
@@ -138,7 +138,7 @@ class _PackedWideResNet(nn.Module):
                 first=True,
             )
 
-        self.bn1 = normalization_layer(num_stages[0] * alpha)
+        self.bn1 = normalization_layer(int(num_stages[0] * alpha))
 
         self.optional_pool: nn.Module
         if style == ResNetStyle.IMAGENET:
@@ -209,7 +209,7 @@ class _PackedWideResNet(nn.Module):
         conv_bias: bool,
         dropout_rate: float,
         stride: int,
-        alpha: int,
+        alpha: float,
         num_estimators: int,
         gamma: int,
         groups: int,
@@ -255,7 +255,7 @@ def packed_wideresnet28x10(
     in_channels: int,
     num_classes: int,
     num_estimators: int,
-    alpha: int,
+    alpha: float,
     gamma: int,
     conv_bias: bool = True,
     dropout_rate: float = 0.3,

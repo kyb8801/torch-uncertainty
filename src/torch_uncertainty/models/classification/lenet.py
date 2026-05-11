@@ -164,7 +164,7 @@ def packed_lenet(
     in_channels: int,
     num_classes: int,
     num_estimators: int = 4,
-    alpha: float = 2,
+    alpha: float = 2.0,
     gamma: float = 1,
     activation: Callable = F.relu,
     norm: type[nn.Module] = nn.Identity,
