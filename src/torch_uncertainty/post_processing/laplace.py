@@ -87,7 +87,9 @@ class LaplaceApprox(PostProcessing):
     def fit(self, dataloader: DataLoader) -> None:
         self.la.fit(train_loader=dataloader)
         if self.optimize_prior_precision:
-            self.la.optimize_prior_precision(method="marglik", pred_type=self.pred_type)
+            self.la.optimize_prior_precision(
+                method="marglik", pred_type=self.pred_type, link_approx=self.link_approx
+            )
 
     def forward(
         self,

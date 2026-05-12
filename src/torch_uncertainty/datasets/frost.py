@@ -1,7 +1,7 @@
 from collections.abc import Callable
 from importlib import util
-from importlib.abc import Traversable
 from importlib.resources import files
+from importlib.resources.abc import Traversable
 from pathlib import Path
 from typing import Any
 

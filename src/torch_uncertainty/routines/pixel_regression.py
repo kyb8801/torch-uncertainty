@@ -1,7 +1,7 @@
 from collections.abc import Callable
 from typing import Literal
 
-import matplotlib.cm as cm
+import matplotlib as mpl
 import torch
 from einops import rearrange
 from lightning.pytorch import LightningModule
@@ -429,7 +429,7 @@ def colorize(
     if vmin == vmax:
         return torch.zeros_like(value)
     value = (value - vmin) / (vmax - vmin)
-    cmapper = cm.get_cmap(cmap)
+    cmapper = mpl.colormaps[cmap]
     value = cmapper(value.numpy(), bytes=True)
     img = value[:, :, :3]
     return torch.as_tensor(img).permute(2, 0, 1).float() / 255.0

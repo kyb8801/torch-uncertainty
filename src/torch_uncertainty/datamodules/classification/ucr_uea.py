@@ -63,8 +63,10 @@ class UCRUEADataModule(TUDataModule):
             full_dataset = self.dataset(split="train", create_ood=True)
 
             if self.val_split is not None:
+                n = len(full_dataset)
+                val_size = max(1, round(n * self.val_split))
                 self.train, self.val = random_split(
-                    full_dataset, [1 - self.val_split, self.val_split], generator=self.gen
+                    full_dataset, [n - val_size, val_size], generator=self.gen
                 )
             else:
                 self.train = full_dataset

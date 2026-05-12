@@ -66,14 +66,17 @@ def create_train_val_split(
 
     Args:
         dataset: The dataset to be split.
-        val_split_rate: The amount of the original dataset to use as validation split.
+        val_split_rate: The amount of the original dataset to use as validation split. 
+            Expected to be non-zero.
         val_transforms: The transformations to apply on the validation set.
             Defaults to ``None``.
 
     Returns:
         tuple[Dataset, Dataset]: The training and the validation splits.
     """
-    train, val = random_split(dataset, [1 - val_split_rate, val_split_rate])
+    n = len(dataset)
+    val_size = max(1, round(n * val_split_rate))
+    train, val = random_split(dataset, [n - val_size, val_size])
     val = copy.deepcopy(val)  # Ensure train.dataset.transform is not modified next line
     val.dataset.transform = val_transforms
     return train, val

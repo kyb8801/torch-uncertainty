@@ -2,14 +2,20 @@ import re
 from copy import deepcopy
 from pathlib import Path
 
+import torch
 from torch import nn
 from torchvision.datasets import VisionDataset
 from torchvision.datasets.folder import default_loader
-from torchvision.transforms import ToPILImage, ToTensor
+from torchvision.transforms import ToPILImage
+from torchvision.transforms.v2 import ToDtype, ToImage
 from tqdm import tqdm, trange
 from tqdm.contrib.logging import logging_redirect_tqdm
 
 from torch_uncertainty.transforms.corruption import corruption_transforms
+
+
+def _to_tensor(img):
+    return ToDtype(torch.float32, scale=True)(ToImage()(img))
 
 
 class CorruptedDataset(VisionDataset):
@@ -75,7 +81,7 @@ class CorruptedDataset(VisionDataset):
 
         if generate and not on_the_fly:
             self.root.mkdir(parents=True, exist_ok=True)
-            self.to_tensor = ToTensor()
+            self.to_tensor = _to_tensor
             self.to_pil = ToPILImage()
             self.samples = []
 

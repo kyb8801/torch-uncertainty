@@ -103,6 +103,7 @@ def _confidence_histogram_subplot(
         ax=ax,
         fill=True,
         alpha=0.5,
+        warn_singular=False,
     )
 
     ax.set_xlim(0, 100)

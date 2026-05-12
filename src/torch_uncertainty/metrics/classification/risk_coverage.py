@@ -1,6 +1,7 @@
 import math
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
+import matplotlib.figure as mpl_figure
 import matplotlib.pyplot as plt
 import numpy as np
 import torch
@@ -9,6 +10,9 @@ from torchmetrics import Metric
 from torchmetrics.utilities.compute import _auc_compute
 from torchmetrics.utilities.data import dim_zero_cat
 from torchmetrics.utilities.plot import _AX_TYPE
+
+if TYPE_CHECKING:
+    from matplotlib.axes import Axes as MplAxes
 
 
 class AURC(Metric):
@@ -136,8 +140,12 @@ class AURC(Metric):
         Returns:
             tuple[Figure | None, Axes]: Figure object and axes object.
         """
-        fig, ax = plt.subplots(figsize=(6, 6)) if ax is None else (None, ax)
-        ax = cast("plt.Axes", ax)
+        if ax is None:
+            fig = mpl_figure.Figure(figsize=(6, 6))
+            ax = fig.add_subplot()
+        else:
+            fig = None
+        ax = cast("MplAxes", ax)
 
         # Computation of AURC
         error_rates = self.partial_compute().cpu().flip(0)
@@ -170,11 +178,11 @@ class AURC(Metric):
                 va="bottom",
                 transform=ax.transAxes,
             )
-        plt.grid(True, linestyle="--", alpha=0.7, zorder=0)
+        ax.grid(True, linestyle="--", alpha=0.7, zorder=0)
         ax.set_xlabel("Coverage (%)", fontsize=16)
         ax.set_ylabel("Risk - Error Rate (%)", fontsize=16)
         ax.set_xlim(0, 100)
-        ax.set_ylim(0, min(100, np.ceil(error_rates.max() * 100)))
+        ax.set_ylim(0, max(1, min(100, np.ceil(error_rates.max() * 100))))
         ax.legend(loc="upper right")
         return fig, ax
 
@@ -266,8 +274,12 @@ class AUGRC(AURC):
         Returns:
             tuple[Figure | None, Axes]: Figure object and axes object.
         """
-        fig, ax = plt.subplots(figsize=(6, 6)) if ax is None else (None, ax)
-        ax = cast("plt.Axes", ax)
+        if ax is None:
+            fig = mpl_figure.Figure(figsize=(6, 6))
+            ax = fig.add_subplot()
+        else:
+            fig = None
+        ax = cast("MplAxes", ax)
 
         # Computation of AUGRC
         error_rates = self.partial_compute().cpu().flip(0)
@@ -300,11 +312,11 @@ class AUGRC(AURC):
                 va="bottom",
                 transform=ax.transAxes,
             )
-        plt.grid(True, linestyle="--", alpha=0.7, zorder=0)
+        ax.grid(True, linestyle="--", alpha=0.7, zorder=0)
         ax.set_xlabel("Coverage (%)", fontsize=16)
         ax.set_ylabel("Generalized Risk (%)", fontsize=16)
         ax.set_xlim(0, 100)
-        ax.set_ylim(0, min(100, np.ceil(error_rates.max() * 100)))
+        ax.set_ylim(0, max(1, min(100, np.ceil(error_rates.max() * 100))))
         ax.legend(loc="upper right")
         return fig, ax
 

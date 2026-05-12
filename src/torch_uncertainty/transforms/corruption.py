@@ -51,8 +51,8 @@ from torchvision.transforms import (
     RandomResizedCrop,
     Resize,
     ToPILImage,
-    ToTensor,
 )
+from torchvision.transforms.v2 import ToDtype, ToImage
 
 if util.find_spec("kornia"):
     from kornia.augmentation import RandomSaltAndPepperNoise
@@ -68,6 +68,11 @@ from torch_uncertainty.datasets import FrostImages
 from .image import Brightness as IBrightness
 from .image import Contrast as IContrast
 from .image import Saturation as ISaturation
+
+
+def _to_tensor(img):
+    return ToDtype(torch.float32, scale=True)(ToImage()(img))
+
 
 __all__ = [
     "Brightness",
@@ -584,7 +589,7 @@ class Frost(TUCorruption):
         super().__init__(severity)
         self.rng = np.random.default_rng(seed)
         self.mix = [(1, 0.4), (0.8, 0.6), (0.7, 0.7), (0.65, 0.7), (0.6, 0.75)][severity - 1]
-        self.frost_ds = FrostImages(transform=ToTensor())
+        self.frost_ds = FrostImages(transform=_to_tensor)
 
     def forward(self, img: Tensor) -> Tensor:
         if self.severity == 0:
@@ -725,7 +730,7 @@ class Pixelate(TUCorruption):
         super().__init__(severity)
         self.quality = [0.6, 0.5, 0.4, 0.3, 0.25][severity - 1]
         self.to_pil = ToPILImage()
-        self.to_tensor = ToTensor()
+        self.to_tensor = _to_tensor
 
     def forward(self, img: Tensor) -> Tensor:
         if self.severity == 0:
@@ -754,7 +759,7 @@ class JPEGCompression(TUCorruption):
             return img
         output = BytesIO()
         ToPILImage()(img).save(output, "JPEG", quality=self.quality)
-        return ToTensor()(Image.open(output))
+        return _to_tensor(Image.open(output))
 
 
 class Elastic(TUCorruption):

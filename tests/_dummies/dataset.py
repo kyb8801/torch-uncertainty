@@ -65,10 +65,10 @@ class DummyClassificationDataset(Dataset):
         else:
             self.data = self.data.transpose((0, 2, 3, 1))  # convert to HWC
 
-        self.targets = torch.randint(low=0, high=num_classes, size=(num_images,))
-        self.targets = torch.arange(start=0, end=num_classes).repeat(
-            num_images // (num_classes) + 1
-        )[:num_images]
+        n_unique = max(2, num_classes)
+        self.targets = torch.arange(start=0, end=n_unique).repeat(num_images // n_unique + 1)[
+            :num_images
+        ]
 
         self.samples = self.data  # for compatibility with TinyImagenet
         self.label_data = self.targets
