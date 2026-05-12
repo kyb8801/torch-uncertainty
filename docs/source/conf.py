@@ -4,6 +4,7 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
 import sys
 from datetime import datetime
+from importlib.metadata import version as get_version
 from pathlib import Path
 
 from sphinx_gallery.sorting import ExplicitOrder, FileNameSortKey
@@ -20,7 +21,7 @@ copyright = (  # noqa: A001
     f"{datetime.now().year!s}, Adrien Lafage and Olivier Laurent"
 )
 author = "Adrien Lafage and Olivier Laurent"
-release = "0.11.0"
+release = get_version("torch_uncertainty")
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
