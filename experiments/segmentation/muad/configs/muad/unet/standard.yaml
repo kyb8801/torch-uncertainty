@@ -2,7 +2,7 @@
 seed_everything: false
 eval_after_fit: true
 trainer:
-  accelerator: gpu
+  accelerator: auto
   precision: bf16-mixed
   max_epochs: 100
   logger:

@@ -2,7 +2,7 @@
 seed_everything: false
 eval_after_fit: true
 trainer:
-  accelerator: gpu
+  accelerator: auto
   devices: 1
   max_epochs: 50
   logger:
