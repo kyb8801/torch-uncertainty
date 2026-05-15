@@ -1,4 +1,5 @@
 import pytest
+import torch
 
 from torch_uncertainty.models.classification import packed_vgg, vgg
 
@@ -7,7 +8,9 @@ class TestVGGs:
     """Testing the VGG std class."""
 
     def test_main(self) -> None:
-        vgg(in_channels=1, num_classes=10, arch=11, style="cifar")
+        model = vgg(in_channels=1, num_classes=10, arch=11, style="cifar")
+        out = model(torch.randn(1, 1, 32, 32))
+        assert out.shape == (1, 10)
         packed_vgg(
             in_channels=2,
             num_classes=10,

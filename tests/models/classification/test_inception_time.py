@@ -49,6 +49,9 @@ class TestMIMOInceptionTime:
         mimo_inception_time(in_channels=1, num_classes=10, num_estimators=2).train()(
             torch.rand((2, 1, 28))
         )
+        mimo_inception_time(in_channels=1, num_classes=10, num_estimators=2).eval()(
+            torch.rand((1, 1, 28))
+        )
 
 
 class TestBayesianInceptionTime:

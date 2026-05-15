@@ -135,6 +135,19 @@ class TestAdaptiveCalibrationError:
         with pytest.raises(TypeError, match=r"is expected to be `int`"):
             AdaptiveCalibrationError(task="multiclass", num_classes=None)
 
+    def test_invalid_norm_in_compute(self) -> None:
+        from torch_uncertainty.metrics.classification.calibration.adaptive_calibration_error import (
+            _ace_compute,
+        )
+
+        with pytest.raises(ValueError, match="Unexpected norm"):
+            _ace_compute(
+                torch.tensor([0.7, 0.3, 0.8, 0.2]),
+                torch.tensor([1.0, 0.0, 1.0, 0.0]),
+                num_bins=2,
+                norm="bad_norm",
+            )
+
 
 @pytest.fixture
 def sce_logit() -> SmoothCalibrationError:
