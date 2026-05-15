@@ -18,11 +18,9 @@ def _equal_binning_bucketize(
     """Compute bins for the adaptive calibration error.
 
     Args:
-        confidences: The confidence (i.e. predicted prob) of the top1
-            prediction.
+        confidences: The confidence (i.e. predicted prob) of the top-1 prediction.
         accuracies: 1.0 if the top-1 prediction was correct, 0.0 otherwise.
-        num_bins: Number of bins to use when computing adaptive calibration
-            error.
+        num_bins: Number of bins to use when computing adaptive calibration error.
 
     Returns:
         tuple with binned accuracy, binned confidence and binned probabilities
@@ -52,19 +50,15 @@ def _ace_compute(
     norm: Literal["l1", "l2", "max"] = "l1",
     debias: bool = False,
 ) -> Tensor:
-    """Compute the adaptive calibration error given the provided number of bins
-        and norm.
+    """Compute the adaptive calibration error given the provided number of bins and norm.
 
     Args:
-        confidences: The confidence (i.e. predicted prob) of the top1
-            prediction.
+        confidences: The confidence (i.e. predicted prob) of the top-1 prediction.
         accuracies: 1.0 if the top-1 prediction was correct, 0.0 otherwise.
-        num_bins: Number of bins to use when computing adaptive calibration
-            error.
-        norm: Norm function to use when computing calibration error. Defaults
-            to "l1".
-        debias: Apply debiasing to L2 norm computation as in
-            `Verified Uncertainty Calibration`. Defaults to False.
+        num_bins: Number of bins to use when computing adaptive calibration error.
+        norm: Norm function to use when computing calibration error. Defaults to ``"l1"``.
+        debias: Apply debiasing to L2 norm computation as in `Verified Uncertainty Calibration`.
+            Defaults to ``False``.
 
     Returns:
         Tensor: Adaptive Calibration error scalar.
@@ -105,7 +99,15 @@ class BinaryAdaptiveCalibrationError(Metric):
         validate_args: bool = True,
         **kwargs: Any,
     ) -> None:
-        r"""Adaptive Top-label Calibration Error for binary tasks."""
+        r"""Adaptive Top-label Calibration Error for binary tasks.
+
+        Args:
+            n_bins: Number of bins to use when computing the calibration error. Defaults to ``10``.
+            norm: Norm function to use when computing calibration error. Defaults to ``"l1"``.
+            ignore_index: Index to ignore during calculations. Defaults to ``None``.
+            validate_args: Whether to validate input arguments. Defaults to ``True``.
+            kwargs: Additional keyword arguments passed to the parent metric.
+        """
         super().__init__(**kwargs)
         if ignore_index is not None:  # coverage: ignore
             raise ValueError("ignore_index is not supported for multiclass tasks.")
@@ -149,7 +151,16 @@ class MulticlassAdaptiveCalibrationError(Metric):
         validate_args: bool = True,
         **kwargs: Any,
     ) -> None:
-        r"""Adaptive Top-label Calibration Error for multiclass tasks."""
+        r"""Adaptive Top-label Calibration Error for multiclass tasks.
+
+        Args:
+            num_classes: Number of classes.
+            n_bins: Number of bins to use when computing the calibration error. Defaults to ``10``.
+            norm: Norm function to use when computing calibration error. Defaults to ``"l1"``.
+            ignore_index: Index to ignore during calculations. Defaults to ``None``.
+            validate_args: Whether to validate input arguments. Defaults to ``True``.
+            kwargs: Additional keyword arguments passed to the parent metric.
+        """
         super().__init__(**kwargs)
         if ignore_index is not None:  # coverage: ignore
             raise ValueError("ignore_index is not supported for multiclass tasks.")
@@ -198,13 +209,14 @@ class AdaptiveCalibrationError:
         concentrated in certain regions of the probability space.
 
         Args:
-            task (str): Specifies the task type, either ``"binary"`` or ``"multiclass"``.
-            num_bins (int): Number of bins to divide the probability space. Defaults to ``10``.
-            norm (str): Specifies the type of norm to use: ``"l1"``, ``"l2"``, or ``"max"``. Defaults to ``"l1"``.
-            num_classes (int): Number of classes for ``"multiclass"`` tasks. Required when task is ``"multiclass"``.
-            ignore_index (int): Index to ignore during calculations. Defaults to ``None``.
-            validate_args (bool): Whether to validate input arguments. Defaults to ``True``.
-            **kwargs (Any): Additional keyword arguments passed to the metric.
+            task: Specifies the task type, either ``"binary"`` or ``"multiclass"``.
+            num_bins: Number of bins to divide the probability space. Defaults to ``10``.
+            norm: Specifies the type of norm to use: ``"l1"``, ``"l2"``, or ``"max"``.
+                Defaults to ``"l1"``.
+            num_classes: Number of classes for ``"multiclass"`` tasks. Required when task is ``"multiclass"``.
+            ignore_index: Index to ignore during calculations. Defaults to ``None``.
+            validate_args: Whether to validate input arguments. Defaults to ``True``.
+            kwargs: Additional keyword arguments passed to the metric.
 
         Example:
 
@@ -218,7 +230,7 @@ class AdaptiveCalibrationError:
                 predicted_probs = torch.tensor([0.95, 0.85, 0.15, 0.05])
                 true_labels = torch.tensor([1, 1, 0, 0])
 
-                metric = CalibrationError(
+                metric = AdaptiveCalibrationError(
                     task="binary",
                     num_bins=5,
                     norm="l1",

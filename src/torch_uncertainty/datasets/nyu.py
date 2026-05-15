@@ -53,12 +53,12 @@ class NYUv2(VisionDataset):
         """NYUv2 depth dataset.
 
         Args:
-            root (Path | str): Root directory where dataset is stored.
-            split (Literal["train", "val"]): Dataset split.
-            transforms (Callable | None): Transform to apply to samples & targets. Defaults to ``None``.
-            min_depth (float): Minimum depth value. Defaults to ``1e-3``.
-            max_depth (float): Maximum depth value. Defaults to ``10``.
-            download (bool): Download dataset if not found. Defaults to ``False``.
+            root: Root directory where dataset is stored.
+            split: Dataset split.
+            transforms: Transform to apply to samples & targets. Defaults to ``None``.
+            min_depth: Minimum depth value. Defaults to ``1e-3``.
+            max_depth: Maximum depth value. Defaults to ``10``.
+            download: Download dataset if not found. Defaults to ``False``.
         """
         if not cv2_installed:  # coverage: ignore
             raise ImportError(
@@ -98,7 +98,7 @@ class NYUv2(VisionDataset):
         """Return image and target at index.
 
         Args:
-            index (int): Index of the sample.
+            index: Index of the sample.
         """
         image = tv_tensors.Image(Image.open(self.samples[index]).convert("RGB"))
         target = Image.fromarray(

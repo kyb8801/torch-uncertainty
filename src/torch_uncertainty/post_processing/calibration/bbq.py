@@ -36,20 +36,18 @@ class BBQScaler(PostProcessing):
         strategy, fitting independent Bayesian ensembles per class.
 
         Args:
-            model (nn.Module | None): Model to calibrate. Defaults to ``None``.
-            max_bins (int): The maximum number of bins to consider. The scaler
+            model: Model to calibrate. Defaults to ``None``.
+            max_bins: The maximum number of bins to consider. The scaler
                 will evaluate all binning schemes from 2 up to ``max_bins``.
                 Defaults to ``15``.
-            prior_weight (float): The equivalent sample size ($N'$) for the
+            prior_weight: The equivalent sample size ($N'$) for the
                 uniform prior distributed across bins to penalize models with
-                too many bins. Defaults to ``2.0``(the value used in the original)
-                paper.
-            model_pruning (float | None): Prune a model if its weight is below :attr:`model_pruning`.
+                too many bins. Defaults to ``2.0``(the value used in the original) paper.
+            model_pruning: Prune a model if its weight is below :attr:`model_pruning`.
                 Do not prune if ``None``. Defaults to ``1e-9``.
-            eps (float): Small value for stability when converting probs back
-                to logits. Defaults to ``1e-6``.
-            device (Literal["cpu", "cuda"]]= | torch.device | None): Device to use
-                for tensor operations. Defaults to ``None``.
+            eps: Small value for stability when converting probs back to logits.
+                Defaults to ``1e-6``.
+            device: Device to use for tensor operations. Defaults to ``None``.
 
         References:
             [1] Obtaining Well Calibrated Probabilities Using Bayesian Binning.
@@ -80,8 +78,8 @@ class BBQScaler(PostProcessing):
         """Fit the BBQ ensembles to the calibration data.
 
         Args:
-            dataloader (DataLoader): Dataloader providing the calibration data.
-            progress (bool): Whether to show a progress bar.
+            dataloader: Dataloader providing the calibration data.
+            progress: Whether to show a progress bar.
                 Defaults to ``True``.
         """
         if self.model is None or isinstance(self.model, nn.Identity):

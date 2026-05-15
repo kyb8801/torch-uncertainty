@@ -27,17 +27,18 @@ class CUB(ImageFolder):
         """The Caltech-UCSD Birds-200-2011 dataset.
 
         Args:
-            root (str): Root directory of the dataset.
-            train (bool): If True, creates dataset from training set, otherwise creates
-                from test set. Defaults to True.
-            transform (callable): A function/transform that takes in an PIL image and
-                returns a transformed version. E.g, transforms.RandomCrop. Defaults to None.
-            target_transform (callable): A function/transform that takes in the target
-                and transforms it. Defaults to None.
-            return_attributes (bool): If True, returns the attributes instead of the images.
-                Defaults to False.
-            download (bool): If True, downloads the dataset from the internet and puts it
+            root: Root directory of the dataset.
+            train: If True, creates dataset from training set, otherwise creates
+                from test set. Defaults to ``True``.
+            transform: A function/transform that takes in an PIL image and
+                returns a transformed version. E.g, transforms.RandomCrop. Defaults to ``None``.
+            target_transform: A function/transform that takes in the target
+                and transforms it. Defaults to ``None``.
+            return_attributes: If ``True``, returns the attributes instead of the images.
+                Defaults to ``False``.
+            download: If ``True``, downloads the dataset from the internet and puts it
                 in root directory. If dataset is already downloaded, it is not downloaded again.
+                Defaults to ``None``
 
         References:
         [1] `Wah, C. and Branson, S. and Welinder, P. and Perona, P. and Belongie, S. Caltech-UCSD Birds 200

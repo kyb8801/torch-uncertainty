@@ -5,11 +5,9 @@ def get_version(root: str | Path, version: int, checkpoint: int | None = None) -
     """Find the path to the checkpoint corresponding to the version.
 
     Args:
-        root (Union[str, Path]): The root of the dataset containing the
-            checkpoints.
-        version (int): The version of the checkpoint.
-        checkpoint (int): The number of the checkpoint. Defaults
-            to None.
+        root: The root of the dataset containing the checkpoints.
+        version: The version of the checkpoint.
+        checkpoint: The number of the checkpoint. Defaults to ``None``.
 
     Raises:
         FileNotFoundError: if the checkpoint cannot be found.

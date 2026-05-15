@@ -25,19 +25,18 @@ class UCRUEADataModule(TUDataModule):
         """Initialize the UCR/UEA dataset.
 
         Args:
-            dataset_name (str): Name of the dataset to load.
-            batch_size (int): The batch size for training and testing.
-            eval_batch_size (int | None): Number of samples per batch during evaluation (val and
+            dataset_name: Name of the dataset to load.
+            batch_size: The batch size for training and testing.
+            eval_batch_size: Number of samples per batch during evaluation (val and
                 test). Set to :attr:`batch_size` if ``None``. Defaults to ``None``.
-            val_split (float | None): Share of validation samples. Defaults to ``0``.
-            eval_ood (bool): Whether to evaluate on out-of-distribution (OOD) data. Defaults to
+            val_split: Share of validation samples. Defaults to ``0``.
+            eval_ood: Whether to evaluate on out-of-distribution (OOD) data. Defaults to
                 ``False``.
-            num_workers (int): How many subprocesses to use for data loading. Defaults
+            num_workers: How many subprocesses to use for data loading. Defaults
                 to ``1``.
-            pin_memory (bool): Whether to pin memory in the GPU. Defaults to ``True``.
-            persistent_workers (bool): Whether to use persistent workers. Defaults to ``True``.
-            split_seed (int): The seed to use for splitting the dataset.
-                Defaults to ``42``.
+            pin_memory: Whether to pin memory in the GPU. Defaults to ``True``.
+            persistent_workers: Whether to use persistent workers. Defaults to ``True``.
+            split_seed: The seed to use for splitting the dataset. Defaults to ``42``.
         """
         super().__init__(
             root=f"~/.tslearn/datasets/UCR_UEA/{dataset_name}",

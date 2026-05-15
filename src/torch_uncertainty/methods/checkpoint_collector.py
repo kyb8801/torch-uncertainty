@@ -21,12 +21,12 @@ class CheckpointCollector(nn.Module):
         as implemented in TorchUncertainty.
 
         Args:
-            core_model (nn.Module): The model to train and ensemble.
-            cycle_start (int): Epoch to start ensembling. Defaults to ``None``.
-            cycle_length (int): Number of epochs between model collections. Defaults to ``None``.
-            save_schedule (list[int] | None): The epochs at which to save the model. Defaults to ``None``.
-            use_final_model (bool): Whether to use the final model as a checkpoint. Defaults to ``True``.
-            store_on_cpu (bool): Whether to put the models on the CPU when unused. Defaults to ``False``.
+            core_model: The model to train and ensemble.
+            cycle_start: Epoch to start ensembling. Defaults to ``None``.
+            cycle_length: Number of epochs between model collections. Defaults to ``None``.
+            save_schedule: The epochs at which to save the model. Defaults to ``None``.
+            use_final_model: Whether to use the final model as a checkpoint. Defaults to ``True``.
+            store_on_cpu: Whether to put the models on the CPU when unused. Defaults to ``False``.
 
         Note:
             The models are saved at the end of the specified epochs.
@@ -83,7 +83,7 @@ class CheckpointCollector(nn.Module):
         """Save the model at the end of the epoch, if included in the schedule.
 
         Args:
-            epoch (int): The current epoch.
+            epoch: The current epoch.
         """
         match self.mode:
             case "schedule":
@@ -105,7 +105,7 @@ class CheckpointCollector(nn.Module):
         This method will return the ensemble prediction if models have already been collected.
 
         Args:
-            x (Tensor): The input tensor.
+            x: The input tensor.
 
         Returns:
             Tensor: The ensemble output.
@@ -137,7 +137,7 @@ class CheckpointCollector(nn.Module):
         current model.
 
         Args:
-            x (Tensor): The input tensor.
+            x: The input tensor.
 
         Returns:
             Tensor: The model or ensemble output.

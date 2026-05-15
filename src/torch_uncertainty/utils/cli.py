@@ -81,51 +81,40 @@ class TULightningCLI(LightningCLI):
         """Custom LightningCLI for torch-uncertainty.
 
         Args:
-            model_class (type[LightningModule] | Callable[..., LightningModule] | None):
-                An optional `LightningModule` class to train or a callable which returns a
+            model_class: An optional `LightningModule` class to train or a callable which returns a
                 ``LightningModule`` instance when called. If ``None``, you can pass a registered model
                 with ``--model=MyModel``. Defaults to ``None``.
-            datamodule_class (type[LightningDataModule] | Callable[..., LightningDataModule] | None):
-                An optional ``LightningDataModule`` class or a callable which returns a ``LightningDataModule``
+            datamodule_class: An optional ``LightningDataModule`` class or a callable which returns a ``LightningDataModule``
                 instance when called. If ``None``, you can pass a registered datamodule with ``--data=MyDataModule``.
                 Defaults to ``None``.
-            save_config_callback (type[SaveConfigCallback] | None): A callback class to
-                save the config. Defaults to ``TUSaveConfigCallback``.
-            save_config_kwargs (dict[str, Any] | None): Parameters that will be used to
-                instantiate the save_config_callback. Defaults to ``None``.
-            trainer_class (type[Trainer] | Callable[..., Trainer]): An optional subclass
-                of the Trainer class or a callable which returns a ``Trainer`` instance when called.
+            save_config_callback: A callback class to save the config. Defaults to ``TUSaveConfigCallback``.
+            save_config_kwargs: Parameters that will be used to instantiate the save_config_callback. Defaults to ``None``.
+            trainer_class: An optional subclass of the Trainer class or a callable which returns a ``Trainer`` instance when called.
                 Defaults to ``TUTrainer``.
-            trainer_defaults (dict[str, Any] | None): Set to override Trainer defaults
-                or add persistent callbacks. The callbacks added through this argument will not
+            trainer_defaults: Set to override Trainer defaults or add persistent callbacks. The callbacks added through this argument will not
                 be configurable from a configuration file and will always be present for this
                 particular CLI. Alternatively, configurable callbacks can be added as explained
                 in the CLI docs. Defaults to ``None``.
-            seed_everything_default (bool | int): Number for the ``seed_everything()``
-                seed value. Set to ``True`` to automatically choose a seed value. Setting it to ``False``
+            seed_everything_default: Number for the ``seed_everything()`` seed value. Set to ``True`` to automatically choose a seed value. Setting it to ``False``
                 will avoid calling seed_everything. Defaults to ``True``.
-            parser_kwargs (dict[str, Any] | dict[str, dict[str, Any]] | None): Additional
-                arguments to instantiate each ``LightningArgumentParser``. Defaults to
-                ``LightningArgumentParser``. Defaults to ``None``.
-            subclass_mode_model (bool): Whether model can be any subclass of the given
-                class. Defaults to ``False``.
-            subclass_mode_data (bool): Whether datamodule can be any subclass of the
+            parser_kwargs: Additional arguments to instantiate each ``LightningArgumentParser``. Defaults to ``None``.
+            subclass_mode_model: Whether model can be any subclass of the given class. Defaults to ``False``.
+            subclass_mode_data: Whether datamodule can be any subclass of the
                 given class. Defaults to ``False``.
-            args (ArgsType): Arguments to parse. If `None` the arguments are taken from
+            args: Arguments to parse. If `None` the arguments are taken from
                 ``sys.argv``. Command line style arguments can be given in a ``list``. Alternatively,
                 structured config options can be given in a ``dict`` or ``jsonargparse.Namespace``.
-                Defaults to `None`.
-            run (bool): Whether subcommands should be added to run a ``Trainer`` method. If
+                Defaults to ``None``.
+            run: Whether subcommands should be added to run a ``Trainer`` method. If
                 set to `False`, the trainer and model classes will be instantiated only. Defaults
                 to ``True``.
-            auto_configure_optimizers (bool): Defaults to ``True``.
-            eval_after_fit_default (bool): Store whether an evaluation should be performed
+            auto_configure_optimizers: Defaults to ``True``.
+            eval_after_fit_default: Store whether an evaluation should be performed
                 after the training. Defaults to ``False``.
             **kwargs: Additional keyword arguments to pass to the parent class added for
-                ``lightning>2.5.0``:
-
-                    - parser_class: The parser class to use. Defaults to `LightningArgumentParser`.
-                      Available in ``lightning>=2.5.1``
+                ``lightning>2.5.0``.
+                - parser_class: The parser class to use. Defaults to ``LightningArgumentParser``.
+                  Available in ``lightning>=2.5.1``.
         """
         self.eval_after_fit_default = eval_after_fit_default
         super().__init__(

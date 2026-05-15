@@ -34,22 +34,19 @@ class UCIClassificationDataset(Dataset, ABC):
         """The UCI classification dataset base class.
 
         Args:
-            root (str | Path): Root directory of the datasets.
-            train (bool): If ``True``, creates dataset from training set,
+            root: Root directory of the datasets.
+            train: If ``True``, creates dataset from training set,
                 otherwise creates from test set.
-            transform (callable): A function/transform that takes in a
+            transform: A function/transform that takes in a
                 numpy array and returns a transformed version. Defaults to ``None``.
-            target_transform (callable): A function/transform that takes
+            target_transform: A function/transform that takes
                 in the target and transforms it. Defaults to ``None``.
-            download (bool): If ``True``, downloads the dataset from the
+            download: If ``True``, downloads the dataset from the
                 internet and puts it in root directory. If dataset is already
                 downloaded, it is not downloaded again. Defaults to ``False``.
-            binary (bool): Whether to use binary classification. Defaults
-                to ``True``.
-            test_split (float): The fraction of the dataset to use as test set.
-                Defaults to ``0.2``.
-            split_seed (int): The random seed for splitting the dataset.
-                Defaults to ``21893027``.
+            binary: Whether to use binary classification. Defaults to ``True``.
+            test_split: The fraction of the dataset to use as test set. Defaults to ``0.2``.
+            split_seed: The random seed for splitting the dataset. Defaults to ``21893027``.
 
         Note:
             The licenses of the datasets may differ from TorchUncertainty's
@@ -127,7 +124,7 @@ class UCIClassificationDataset(Dataset, ABC):
         """Get sample and target for a given index.
 
         Args:
-            index (int): Index
+            index: Index
 
         Returns:
             tuple: (sample, target) where sample is a tensor and target is a tensor

@@ -16,15 +16,20 @@ class FPRx(Metric):
     def __init__(self, recall_level: float, pos_label: int, **kwargs) -> None:
         r"""Compute the False Positive Rate at x% Recall.
 
-        The False Positive Rate at x% Recall (FPR@x) is a metric used in tasks like anomaly detection, out-of-distribution (OOD) detection, and binary classification. It measures the proportion of false positives (normal samples misclassified as anomalies) when the model achieves a specified recall level for the positive class (e.g., anomalies or OOD samples).
+        The False Positive Rate at x% Recall (FPR@x) is used in anomaly
+        detection, out-of-distribution (OOD) detection, and binary
+        classification. It measures the proportion of false positives
+        (normal samples misclassified as anomalies) when the model reaches
+        a specified recall level for the positive class.
 
         Args:
-            recall_level (float): The recall level at which to compute the FPR.
-            pos_label (int): The positive label.
-            kwargs: Additional arguments to pass to the metric class.
+            recall_level: The recall level at which to compute the FPR.
+            pos_label: The positive label.
+            kwargs: Additional keyword arguments for the metric class.
 
         Reference:
-            Improved from https://github.com/hendrycks/anomaly-seg and translated to torch.
+            Improved from `anomaly-seg <https://github.com/hendrycks/anomaly-seg>`_
+            and translated to torch.
 
         Example:
             .. code-block:: python
@@ -44,7 +49,7 @@ class FPRx(Metric):
                 # Compute FPR at 95% recall
                 result = metric.compute()
                 print(f"FPR at 95% Recall: {result.item()}")
-                # output : FPR at 95% Recall: 0.75
+                # output: FPR at 95% Recall: 0.75
         """
         super().__init__(**kwargs)
 
@@ -65,8 +70,8 @@ class FPRx(Metric):
         """Update the metric state.
 
         Args:
-            confidences (Tensor): The confidence scores.
-            target (Tensor): The target labels, 0 if ID, 1 if OOD.
+            confidences: The confidence scores.
+            target: The target labels, 0 if ID, 1 if OOD.
         """
         self.confidences.append(confidences)
         self.targets.append(target)
@@ -134,10 +139,10 @@ class FPR95(FPRx):
         This is a specific case of the more general FPRx metric, where the recall level is fixed at 95%.
 
         Args:
-            pos_label (int): The positive label (e.g., 1 for OOD samples).
-            kwargs: Additional arguments to pass to the FPRx metric class.
+            pos_label: The positive label (e.g., 1 for OOD samples).
+            kwargs: Additional keyword arguments for :class:`FPRx`.
 
         .. seealso::
-            - :class:`FPRx` - The base metric that allows customization of the recall level.
+            - :class:`FPRx`: Base metric that allows customization of the recall level.
         """
         super().__init__(recall_level=0.95, pos_label=pos_label, **kwargs)

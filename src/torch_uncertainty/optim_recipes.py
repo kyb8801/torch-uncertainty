@@ -202,9 +202,9 @@ def optim_imagenet_resnet50_a3(model: nn.Module, effective_batch_size: int | Non
         procedure in timm.
 
     Args:
-        model (nn.Module): The model to be optimized.
-        effective_batch_size (int): The batch size of the model
-            (taking multiple GPUs into account). Defaults to None.
+        model: The model to be optimized.
+        effective_batch_size: The batch size of the model
+            (taking multiple GPUs into account). Defaults to ``None``.
 
     Returns:
         dict: The optimizer and the scheduler for the training.
@@ -329,6 +329,22 @@ def optim_tinyimagenet_resnet50(
 
 
 def batch_ensemble_wrapper(model: nn.Module, optim_recipe: Callable) -> dict:
+    """Wrap an existing optimizer recipe for BatchEnsemble-style models.
+
+    The wrapper calls the provided ``optim_recipe`` to obtain an optimizer
+    and scheduler, inspects defaults (weight decay, lr, momentum) and builds
+    a new optimizer that applies different weight decay to the BatchEnsemble
+    multiplicative parameters while keeping the core parameters regularized.
+
+    Args:
+        model: The model containing BatchEnsemble parameter names (e.g. containing
+            'R' and 'S' layers).
+        optim_recipe: Callable that returns the optimizer procedure for the base model.
+
+    Returns:
+        A dict containing the new ``optimizer`` and the ``lr_scheduler`` returned by
+        the original procedure (with the optimizer replaced).
+    """
     procedure = optim_recipe(model)
     param_optimizer = procedure["optimizer"]
     scheduler = procedure["lr_scheduler"]
@@ -375,11 +391,10 @@ def get_procedure(
     """Get the optimization recipe for a given architecture and dataset.
 
     Args:
-        arch_name (str): The name of the architecture.
-        ds_name (str): The name of the dataset.
-        method (str): The name of the method. Defaults to "".
-        imagenet_recipe (str): The recipe to use for
-            ImageNet. Defaults to None.
+        arch_name: The name of the architecture.
+        ds_name: The name of the dataset.
+        method: The name of the method. Defaults to ``""``.
+        imagenet_recipe: The recipe to use for ImageNet. Defaults to ``None``.
 
     Returns:
         callable: The optimization recipe.
@@ -447,14 +462,14 @@ class WarmupScheduler(SequentialLR):
         """Scheduler with linear warmup.
 
         Args:
-            optimizer (Optimizer): The optimizer to be used.*
-            base_scheduler (type[LRScheduler]): The base scheduler class to use after
+            optimizer: The optimizer to be used.
+            base_scheduler: The base scheduler class to use after
                 the warmup.
-            warmup_start_factor (float): The multiplicative factor to apply to
+            warmup_start_factor: The multiplicative factor to apply to
                 the learning rate at the start of the warmup.
-            warmup_epochs (int): The number of epochs to warmup the learning
+            warmup_epochs: The number of epochs to warmup the learning
                 rate.
-            scheduler_args (dict[str, float]): The arguments to pass to the base
+            scheduler_args: The arguments to pass to the base
                 scheduler.
         """
         warmup_scheduler = LinearLR(
@@ -483,13 +498,13 @@ class CosineAnnealingWarmup(WarmupScheduler):
         """Cosine annealing scheduler with linear warmup.
 
         Args:
-            optimizer (Optimizer): The optimizer to be used.
-            warmup_start_factor (float): The multiplicative factor to apply to
+            optimizer: The optimizer to be used.
+            warmup_start_factor: The multiplicative factor to apply to
                 the learning rate at the start of the warmup.
-            warmup_epochs (int): The number of epochs to warmup the learning
+            warmup_epochs: The number of epochs to warmup the learning
                 rate.
-            max_epochs (int): The total number of epochs including warmup.
-            eta_min (float): The minimum learning rate.
+            max_epochs: The total number of epochs including warmup.
+            eta_min: The minimum learning rate.
         """
         super().__init__(
             optimizer=optimizer,
@@ -520,12 +535,12 @@ class CosineSWALR(SequentialLR):
         example.
 
         Args:
-            optimizer (Optimizer): The optimizer to be used.
-            milestone (int): The epoch to start the SWA.
-            swa_lr (float): The learning rate to use for the SWA model.
-            anneal_epochs (int): The number of epochs to anneal the learning rate.
-            optim_eta_min (float): The minimum learning rate for the first optimizer.
-            anneal_strategy (Literal["cos", "linear"]): The strategy to anneal the learning rate.
+            optimizer: The optimizer to be used.
+            milestone: The epoch to start the SWA.
+            swa_lr: The learning rate to use for the SWA model.
+            anneal_epochs: The number of epochs to anneal the learning rate.
+            optim_eta_min: The minimum learning rate for the first optimizer. Defaults to ``0``.
+            anneal_strategy: The strategy to anneal the learning rate. Defaults to ``"cos"``.
         """
         optim_scheduler = CosineAnnealingLR(
             optimizer=optimizer, T_max=milestone, eta_min=optim_eta_min

@@ -5,7 +5,7 @@ from torchmetrics import MeanAbsoluteError
 
 class Log10(MeanAbsoluteError):
     def __init__(self, **kwargs) -> None:
-        r"""Computes the LOG10 metric.
+        r"""Compute the LOG10 metric.
 
         The Log10 metric computes the mean absolute error in the base-10 logarithmic space.
 
@@ -16,12 +16,13 @@ class Log10(MeanAbsoluteError):
         - :math:`y_i` represents the true target values.
         - :math:`\hat{y_i}` represents the predicted values.
 
-        This metric is useful for scenarios where the data spans multiple orders of magnitude, and evaluating
-        error in log-space provides a more meaningful comparison.
+        This metric is useful when data spans multiple orders of magnitude,
+        where evaluating error in log-space provides a more meaningful
+        comparison.
 
         Inputs:
-        - :attr:`preds`: :math:`(N)`
-        - :attr:`target`: :math:`(N)`
+            - :attr:`preds`: :math:`(N)`
+            - :attr:`target`: :math:`(N)`
 
         Args:
             kwargs: Additional keyword arguments, see `Advanced metric settings <https://torchmetrics.readthedocs.io/en/stable/pages/overview.html#metric-kwargs>`_.

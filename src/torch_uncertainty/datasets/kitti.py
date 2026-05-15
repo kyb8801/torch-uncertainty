@@ -58,18 +58,18 @@ class KITTIDepth(VisionDataset):
                         leftDepth/*.png
 
         Args:
-            root (str or Path): Root directory where the dataset will be stored.
-            split (Literal["train", "val"]): Dataset split to use.
-            min_depth (float, default=0.0): Minimum valid depth value (in meters). Depth values
-                smaller than or equal to this threshold are set to NaN.
-            max_depth (float, default=80.0): Maximum valid depth value (in meters). Depth values
-                greater than this threshold are set to NaN.
-            transforms (Callable): A function/transform that takes an ``(image, target)``
+            root: Root directory where the dataset will be stored.
+            split: Dataset split to use.
+            min_depth: Minimum valid depth value (in meters). Depth values
+                smaller than or equal to this threshold are set to NaN. Defaults to ``0.0``.
+            max_depth: Maximum valid depth value (in meters). Depth values
+                greater than this threshold are set to NaN. Defaults to ``80.0``.
+            transforms: A function/transform that takes an ``(image, target)``
                 pair and returns the transformed pair.
-            download (bool, default=False): If True, downloads and restructures the depth
-                annotations and raw KITTI data if not already present.
-            remove_unused (bool, default=False): If True, removes the extracted raw files after
-                restructuring to save disk space.
+            download: If True, downloads and restructures the depth
+                annotations and raw KITTI data if not already present. Defaults to ``False``.
+            remove_unused: If True, removes the extracted raw files after
+                restructuring to save disk space. Defaults to ``False``.
 
         Returns:
             tuple[tv_tensors.Image, tv_tensors.Mask]:
@@ -135,7 +135,7 @@ class KITTIDepth(VisionDataset):
         """Get the sample at the given index.
 
         Args:
-            index (int): Index
+            index: Index
 
         Returns:
             tuple: (image, target) where target is a depth map.

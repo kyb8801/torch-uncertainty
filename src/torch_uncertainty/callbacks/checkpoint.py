@@ -58,7 +58,11 @@ class _TUCheckpoint(Checkpoint):
 
     @property
     def best_model_path(self) -> str:
-        """Return the path to the best model checkpoint based on the primary metric."""
+        """Return the path to the best model checkpoint based on the primary metric.
+
+        Raises:
+            NotImplementedError: Implementations must provide the best model path.
+        """
         raise NotImplementedError
 
 
@@ -68,10 +72,10 @@ class TUClsCheckpoint(_TUCheckpoint):
         Expected Calibration Error, Brier-Score and Negative Log-Likelihood.
 
         Args:
-            save_last (bool | "link"): When ``True``, saves a last.ckpt copy whenever a
+            save_last: When ``True``, saves a last.ckpt copy whenever a
                 checkpoint file gets saved. Can be set to ``"link"`` on a local filesystem to create a
                 symbolic link. This allows accessing the latest checkpoint in a deterministic
-                manner. Default to ``False``.
+                manner. Defaults to ``False``.
         """
         super().__init__()
         self.callbacks = {
@@ -107,10 +111,10 @@ class TUSegCheckpoint(_TUCheckpoint):
         over Union, Expected Calibration Error, Brier-Score and Negative Log-Likelihood.
 
         Args:
-            save_last (bool | "link"): When ``True``, saves a last.ckpt copy whenever a
+            save_last: When ``True``, saves a last.ckpt copy whenever a
                 checkpoint file gets saved. Can be set to ``"link"`` on a local filesystem to create a
                 symbolic link. This allows accessing the latest checkpoint in a deterministic
-                manner. Default to ``False``.
+                manner. Defaults to ``False``.
         """
         super().__init__()
         self.callbacks = {
@@ -154,12 +158,12 @@ class TURegCheckpoint(_TUCheckpoint):
         Error, and eventually the Negative Log-Likelihood and Quantile Calibration Error.
 
         Args:
-            probabilistic (bool): If ``True``, also tracks the Negative Log-Likelihood and
-                the Quantile Calibration Error. Default to ``False``.
-            save_last (bool | "link"): When ``True``, saves a last.ckpt copy whenever a
+            probabilistic: If ``True``, also tracks the Negative Log-Likelihood and
+                the Quantile Calibration Error. Defaults to ``False``.
+            save_last: When ``True``, saves a last.ckpt copy whenever a
                 checkpoint file gets saved. Can be set to ``"link"`` on a local filesystem to create a
                 symbolic link. This allows accessing the latest checkpoint in a deterministic
-                manner. Default to ``False``.
+                manner. Defaults to ``False``.
         """
         super().__init__()
         self.callbacks = {

@@ -10,8 +10,8 @@ class Backbone(nn.Module):
         :attr:`feat_names`.
 
         Args:
-            model (nn.Module): Base model.
-            feat_names (list[str]): list of the feature names.
+            model: Base model.
+            feat_names: List of the feature names.
         """
         super().__init__()
         self.model = model
@@ -21,7 +21,7 @@ class Backbone(nn.Module):
         """Encoder forward pass.
 
         Args:
-            x (Tensor): Input tensor.
+            x: Input tensor.
 
         Returns:
             list[Tensor]: list of the features.
@@ -41,8 +41,8 @@ def set_bn_momentum(model: nn.Module, momentum: float) -> None:
     """Set the momentum of all batch normalization layers in the model.
 
     Args:
-        model (nn.Module): Model.
-        momentum (float): Momentum of the batch normalization layers.
+        model: Model.
+        momentum: Momentum of the batch normalization layers.
     """
     for m in model.modules():
         if isinstance(m, _BatchNorm):

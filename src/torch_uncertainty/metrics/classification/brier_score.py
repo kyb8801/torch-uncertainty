@@ -30,10 +30,10 @@ class BrierScore(Metric):
         better calibration and prediction quality.
 
         Args:
-            num_classes (int): Number of classes.
-            top_class (bool): If True, computes the Brier score for the
-                top predicted class only. Defaults to ``False``.
-            reduction (str): Determines how to reduce the score across the
+            num_classes: Number of classes.
+            top_class: If True, computes the Brier score for the top predicted class only.
+                Defaults to ``False``.
+            reduction: Determines how to reduce the score across the
                 batch dimension:
 
                 - ``'mean'`` [default]: Averages the score across samples.
@@ -114,10 +114,10 @@ class BrierScore(Metric):
         """Update the current Brier score with a new tensor of probabilities.
 
         Args:
-            probs (Tensor): A probability tensor of shape
+            probs: A probability tensor of shape
                 (batch, num_estimators, num_classes) or
                 (batch, num_classes)
-            target (Tensor): A tensor of ground truth labels of shape
+            target: A tensor of ground truth labels of shape
                 (batch, num_classes) or (batch)
         """
         if target.ndim == 1 and self.num_classes > 1:

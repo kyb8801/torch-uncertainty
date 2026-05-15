@@ -64,42 +64,34 @@ class SegmentationRoutine(LightningModule):
         log_plots: bool = False,
         num_samples_to_plot: int = 3,
         num_bins_calibration_error: int = 15,
-        save_in_csv: bool = False,
+        save_to_csv: bool = False,
         csv_filename: str = "results.csv",
     ) -> None:
         r"""Routine for training & testing on **segmentation** tasks.
 
         Args:
-            model (torch.nn.Module): Model to train.
-            num_classes (int): Number of classes in the segmentation task.
-            loss (torch.nn.Module): Loss function to optimize the :attr:`model`.
+            model: Model to train.
+            num_classes: Number of classes in the segmentation task.
+            loss: Loss function to optimize the :attr:`model`. Defaults to ``None``.
+            optim_recipe: The optimizer and optionally the scheduler to use, or a callable that returns them.
                 Defaults to ``None``.
-            optim_recipe (Callable[[nn.Module], OptimizerLRScheduler] | OptimizerLRScheduler): The optimizer and
-                optionally the scheduler to use, or a callable that returns them. Defaults to ``None``.
-            eval_shift (bool): Indicates whether to evaluate the Distribution
-                shift performance. Defaults to ``False``.
-            format_batch_fn (torch.nn.Module): The function to format the
-                batch. Defaults to ``None``.
-            metric_subsampling_rate (float): The rate of subsampling for the
-                memory consuming metrics. Defaults to ``1e-2``.
-            eval_ood (bool): Indicates whether to evaluate the OOD
-                performance. Defaults to ``False``.
-            ood_criterion (TUOODCriterion): Criterion for the binary OOD detection task.
-                Defaults to ``"msp"`` which amounts to the maximum softmax probability score (MSP).
-            post_processing (PostProcessing): The post-processing
-                technique to use. Defaults to ``None``. Warning: There is no
-                post-processing technique implemented yet for segmentation tasks.
-            log_plots (bool): Indicates whether to log figures in the logger.
+            eval_shift: Indicates whether to evaluate the Distribution shift performance.
                 Defaults to ``False``.
-            num_samples_to_plot (int): Number of segmentation prediction and
-                target to plot in the logger. Note that this is only used if
-                :attr:`log_plots` is set to ``True``. Defaults to ``3``.
-            num_bins_calibration_error (int): Number of bins to compute calibration
-                error metrics. Defaults to ``15``.
-            save_in_csv (bool): Save the results in csv. Defaults to
-                ``False``.
-            csv_filename (str): The name of the csv file to save the results in.
-                Defaults to ``"results.csv"``.
+            format_batch_fn: The function to format the batch. Defaults to ``None``.
+            metric_subsampling_rate: The rate of subsampling for the memory consuming metrics.
+                Defaults to ``1e-2``.
+            eval_ood: Indicates whether to evaluate the OOD performance. Defaults to ``False``.
+            ood_criterion: Criterion for the binary OOD detection task. Defaults to ``"msp"`` which amounts to the
+                maximum softmax probability score (MSP).
+            post_processing: The post-processing technique to use. Defaults to ``None``. Warning: There is no
+                post-processing technique implemented yet for segmentation tasks.
+            log_plots: Indicates whether to log figures in the logger. Defaults to ``False``.
+            num_samples_to_plot: Number of segmentation prediction and target to plot in the logger. Note that this
+                is only used if :attr:`log_plots` is set to ``True``. Defaults to ``3``.
+            num_bins_calibration_error: Number of bins to compute calibration error metrics.
+                Defaults to ``15``.
+            save_to_csv: Save the results in csv. Defaults to ``False``.
+            csv_filename: The name of the csv file to save the results in. Defaults to ``"results.csv"``.
 
         Warning:
             You must define :attr:`optim_recipe` if you do not use the CLI.
@@ -134,7 +126,7 @@ class SegmentationRoutine(LightningModule):
         self.format_batch_fn = format_batch_fn
         self.metric_subsampling_rate = metric_subsampling_rate
         self.log_plots = log_plots
-        self.save_in_csv = save_in_csv
+        self.save_to_csv = save_to_csv
         self.csv_filename = csv_filename
         self.ood_criterion = get_ood_criterion(ood_criterion)
         self.eval_ood = eval_ood
@@ -218,7 +210,7 @@ class SegmentationRoutine(LightningModule):
         """Forward pass of the model.
 
         Args:
-            inputs (Tensor): input tensor.
+            inputs: input tensor.
 
         Returns:
             Tensor: the prediction of the model.
@@ -258,7 +250,7 @@ class SegmentationRoutine(LightningModule):
         """Perform a single training step based on the input tensors.
 
         Args:
-            batch (tuple[Tensor, Tensor]): the training images and their corresponding targets
+            batch: the training images and their corresponding targets
 
         Returns:
             Tensor: the loss corresponding to this training step.
@@ -286,7 +278,7 @@ class SegmentationRoutine(LightningModule):
         Compute the prediction of the model and the value of the metrics on the validation batch.
 
         Args:
-            batch (tuple[Tensor, Tensor]): the validation images and their corresponding targets
+            batch: the validation images and their corresponding targets
         """
         img, targets = batch
         logits = self.forward(img)
@@ -315,9 +307,9 @@ class SegmentationRoutine(LightningModule):
         Compute the prediction of the model and the value of the metrics on the test batch.
 
         Args:
-            batch (tuple[Tensor, Tensor]): the test images and their corresponding targets
-            batch_idx (int): the index of the batch in the test dataloader.
-            dataloader_idx (int): the index of the dataloader. Defaults to ``0``.
+            batch: the test images and their corresponding targets
+            batch_idx : the index of the batch in the test dataloader.
+            dataloader_idx : the index of the dataloader. Defaults to ``0``.
         """
         img, targets = batch
 
@@ -414,7 +406,7 @@ class SegmentationRoutine(LightningModule):
         if self.eval_ood:
             self.test_ood_metrics.reset()
 
-        if self.save_in_csv and self.logger is not None:
+        if self.save_to_csv and self.logger is not None:
             csv_writer(
                 Path(self.logger.log_dir) / self.csv_filename,
                 result_dict,
@@ -466,8 +458,8 @@ class SegmentationRoutine(LightningModule):
         """Select a random sample of the data to compute the loss onto.
 
         Args:
-            pred (Tensor): the prediction tensor.
-            target (Tensor): the target tensor.
+            pred: the prediction tensor.
+            target: the target tensor.
 
         Returns:
             Tuple[Tensor, Tensor]: the subsampled prediction and target tensors.
@@ -486,9 +478,9 @@ def _segmentation_routine_checks(
     """Check the domains of the routine's parameters.
 
     Args:
-        num_classes (int): the number of classes in the dataset.
-        metric_subsampling_rate (float): the rate of subsampling to compute the metrics.
-        num_bins_calibration_error (int): the number of bins for the evaluation of the calibration.
+        num_classes : the number of classes in the dataset.
+        metric_subsampling_rate: the rate of subsampling to compute the metrics.
+        num_bins_calibration_error : the number of bins for the evaluation of the calibration.
     """
     if num_classes < 2:
         raise ValueError(f"num_classes must be at least 2, got {num_classes}.")

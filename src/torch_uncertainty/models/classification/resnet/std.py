@@ -357,20 +357,17 @@ def resnet(
     """ResNet model.
 
     Args:
-        in_channels (int): Number of input channels.
-        num_classes (int): Number of classes to predict.
-        arch (int): The architecture of the ResNet.
-        conv_bias (bool): Whether to use bias in convolutions. Defaults to
-            ``False``.
-        dropout_rate (float): Dropout rate. Defaults to 0.0.
-        width_multiplier (float): Width multiplier. Defaults to 1.0.
-        groups (int): Number of groups in convolutions. Defaults to 1.
-        style (ResNetStyle | Literal["imagenet", "cifar"]): Whether to use the ImageNet or CIFAR
-            structure. Defaults to ``ResNetStyle.IMAGENET``.
-        activation_fn (Callable): Activation function. Defaults to
-            ``torch.nn.functional.relu``.
-        normalization_layer (nn.Module): Normalization layer.
-            Defaults to ``torch.nn.BatchNorm2d``.
+        in_channels: Number of input channels.
+        num_classes: Number of classes to predict.
+        arch: The architecture of the ResNet.
+        conv_bias: Whether to use bias in convolutions. Defaults to ``False``.
+        dropout_rate: Dropout rate. Defaults to ``0.0``.
+        width_multiplier: Width multiplier. Defaults to ``1.0``.
+        groups: Number of groups in convolutions. Defaults to ``1``.
+        style: Whether to use the ImageNet or CIFAR structure.
+            Defaults to ``ResNetStyle.IMAGENET``.
+        activation_fn: Activation function. Defaults to ``torch.nn.functional.relu``.
+        normalization_layer: Normalization layer. Defaults to ``torch.nn.BatchNorm2d``.
 
     Returns:
         _ResNet: The ResNet model.

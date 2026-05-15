@@ -50,9 +50,10 @@ class MeanSquaredErrorInverse(MeanSquaredError):
           squared error
 
         Args:
-            squared: If True returns MSE value, if False returns RMSE value.
+            squared: If ``True``, returns MSE. If ``False``, returns RMSE.
             num_outputs: Number of outputs in multioutput setting.
-            unit: Unit for the computation of the metric. Must be one of 'mm', 'm', 'km'. Defauts to 'km'.
+            unit: Unit for the computation of the metric. Must be one of
+                ``"mm"``, ``"m"``, ``"km"``. Defaults to ``"km"``.
             kwargs: Additional keyword arguments.
         """
         super().__init__(squared, num_outputs, **kwargs)
@@ -87,7 +88,8 @@ class MeanAbsoluteErrorInverse(MeanAbsoluteError):
           mean absolute error over the state
 
         Args:
-            unit: Unit for the computation of the metric. Must be one of 'mm', 'm', 'km'. Defauts to 'km'.
+            unit: Unit for the computation of the metric. Must be one of
+                ``"mm"``, ``"m"``, ``"km"``. Defaults to ``"km"``.
             kwargs: Additional keyword arguments.
         """
         super().__init__(**kwargs)

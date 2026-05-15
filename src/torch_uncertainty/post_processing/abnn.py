@@ -31,24 +31,17 @@ class ABNN(PostProcessing):
         """ABNN post-processing.
 
         Args:
-            num_classes (int): Number of classes of the inner model.
-                random_prior (float): Random prior specializing estimators on
-                certain classes.
-            random_prior (float): Random prior value to specialize
-                estimators on certain classes.
-            alpha (float): Alpha value for ABNN to control the diversity of
-                the predictions.
-            num_models (int): Number of stochastic models.
-            num_samples (int): Number of samples per model.
-            base_lr (float): Base learning rate.
-            device (torch.device): Device to use.
-            max_epochs (int): Number of training epochs. Defaults
-                to ``5``.
-            use_original_model (bool): Use original model during
-                evaluation. Defaults to ``True``.
-            precision (str): Machine precision for training & eval.
-                Defaults to ``"32"``.
-            model (nn.Module | None): Model to use. Defaults to ``None``.
+            num_classes: Number of classes of the inner model.
+            random_prior: Random prior value to specialize estimators on certain classes.
+            alpha: Alpha value for ABNN to control the diversity of the predictions.
+            num_models: Number of stochastic models.
+            num_samples: Number of samples per model.
+            base_lr: Base learning rate.
+            device: Device to use.
+            max_epochs: Number of training epochs. Defaults to ``5``.
+            use_original_model: Use original model during evaluation. Defaults to ``True``.
+            precision: Machine precision for training & eval. Defaults to ``"32"``.
+            model: Model to use. Defaults to ``None``.
         """
         super().__init__(model)
         _abnn_checks(
@@ -163,8 +156,8 @@ def _replace_bn_layers(model: nn.Module, alpha: float) -> None:
     """Recursively replace batch normalization layers with ABNN layers.
 
     Args:
-        model (nn.Module): Model to replace batch normalization layers.
-        alpha (float): Alpha value for ABNN.
+        model: Model to replace batch normalization layers.
+        alpha: Alpha value for ABNN.
     """
     for name, module in model.named_children():
         if len(list(module.children())) > 0:

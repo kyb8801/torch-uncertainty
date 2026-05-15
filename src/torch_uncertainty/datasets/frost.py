@@ -36,11 +36,9 @@ class FrostImages(VisionDataset):
         and each sample consists only of an image.
 
         Args:
-            transform (Callable[..., Any] | None): A function/transform
-                applied to the input image. Default: ``None``.
-            target_transform (Callable[..., Any] | None): A function/transform
-                applied to the target. Since no targets are provided, this argument is
-                kept for API compatibility. Default: ``None``.
+            transform: A function/transform applied to the input image. Defaults to ``None``.
+            target_transform: A function/transform applied to the target. Since no targets are provided, this
+                argument is kept for API compatibility. Defaults to ``None``.
 
         Raises:
             ImportError: If the ``torch-uncertainty-assets`` package with image
@@ -68,7 +66,7 @@ class FrostImages(VisionDataset):
         """Get the samples of the dataset.
 
         Args:
-            index (int): Index
+            index: Index of the image to get.
 
         Returns:
             tuple: (sample, target) where target is class_index of the target class.

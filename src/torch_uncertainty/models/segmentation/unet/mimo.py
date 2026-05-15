@@ -14,6 +14,16 @@ class _MIMOUNet(_UNet):
         bilinear: bool = False,
         dropout_rate: float = 0.0,
     ) -> None:
+        """MIMO U-Net for segmentation.
+
+        Args:
+            in_channels : Number of input channels.
+            num_classes : Number of output classes.
+            num_blocks: Number of channels in each U-Net stage.
+            num_estimators: Number of estimators in the MIMO setup.
+            bilinear: If ``True``, uses bilinear upsampling. Defaults to ``False``.
+            dropout_rate: Dropout rate. Defaults to ``0.0``.
+        """
         super().__init__(
             in_channels=in_channels * num_estimators,
             num_classes=num_classes * num_estimators,
@@ -38,6 +48,19 @@ def _mimo_unet(
     bilinear: bool = False,
     dropout_rate: float = 0.0,
 ) -> _MIMOUNet:
+    """Create a MIMO U-Net model.
+
+    Args:
+        in_channels: Number of input channels.
+        num_classes: Number of output classes.
+        num_blocks: Number of channels in each U-Net stage.
+        num_estimators: Number of estimators in the MIMO setup.
+        bilinear: If ``True``, uses bilinear upsampling. Defaults to ``False``.
+        dropout_rate: Dropout rate. Defaults to ``0.0``.
+
+    Returns:
+        _MIMOUNet: MIMO U-Net model.
+    """
     return _MIMOUNet(
         in_channels, num_classes, num_blocks, num_estimators, bilinear, dropout_rate=dropout_rate
     )
@@ -50,6 +73,18 @@ def mimo_small_unet(
     bilinear: bool = False,
     dropout_rate: float = 0.0,
 ) -> _MIMOUNet:
+    """Create a small MIMO U-Net model.
+
+    Args:
+        in_channels: Number of input channels.
+        num_classes: Number of output classes.
+        num_estimators: Number of estimators.
+        bilinear: If ``True``, uses bilinear upsampling. Defaults to ``False``.
+        dropout_rate: Dropout rate. Defaults to ``0.0``.
+
+    Returns:
+        _MIMOUNet: Small MIMO U-Net model.
+    """
     num_blocks = [32, 64, 128, 256, 512]
     return _mimo_unet(
         in_channels, num_classes, num_blocks, num_estimators, bilinear, dropout_rate=dropout_rate
@@ -63,6 +98,18 @@ def mimo_unet(
     bilinear: bool = False,
     dropout_rate: float = 0.0,
 ) -> _MIMOUNet:
+    """Create a MIMO U-Net model.
+
+    Args:
+        in_channels: Number of input channels.
+        num_classes: Number of output classes.
+        num_estimators: Number of estimators.
+        bilinear: If ``True``, uses bilinear upsampling. Defaults to ``False``.
+        dropout_rate: Dropout rate. Defaults to ``0.0``.
+
+    Returns:
+        _MIMOUNet: MIMO U-Net model.
+    """
     num_blocks = [64, 128, 256, 512, 1024]
     return _mimo_unet(
         in_channels, num_classes, num_blocks, num_estimators, bilinear, dropout_rate=dropout_rate

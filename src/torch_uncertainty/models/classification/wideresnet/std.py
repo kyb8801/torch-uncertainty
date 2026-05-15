@@ -222,19 +222,15 @@ def wideresnet28x10(
     <https://arxiv.org/pdf/1605.07146.pdf>`_.
 
     Args:
-        in_channels (int): Number of input channels
-        num_classes (int): Number of classes to predict.
-        groups (int): Number of groups in convolutions. Defaults to
-            ``1``.
-        conv_bias (bool): Whether to use bias in convolutions. Defaults to
-            ``True``.
-        dropout_rate (float): Dropout rate. Defaults to ``0.3``.
-        style (ResNetStyle | Literal["imagenet", "cifar"]): Whether to use the ImageNet or CIFAR
-            structure. Defaults to ``ResNetStyle.IMAGENET``.
-        activation_fn (Callable): Activation function. Defaults to
-            ``torch.nn.functional.relu``.
-        normalization_layer (nn.Module): Normalization layer.
-            Defaults to ``torch.nn.BatchNorm2d``.
+        in_channels: Number of input channels.
+        num_classes: Number of classes to predict.
+        groups: Number of groups in convolutions. Defaults to ``1``.
+        conv_bias: Whether to use bias in convolutions. Defaults to ``True``.
+        dropout_rate: Dropout rate. Defaults to ``0.3``.
+        style: Whether to use the ImageNet or CIFAR structure.
+            Defaults to ``ResNetStyle.IMAGENET``.
+        activation_fn: Activation function. Defaults to ``torch.nn.functional.relu``.
+        normalization_layer: Normalization layer. Defaults to ``torch.nn.BatchNorm2d``.
 
     Returns:
         _WideResNet: A Wide-ResNet-28x10.

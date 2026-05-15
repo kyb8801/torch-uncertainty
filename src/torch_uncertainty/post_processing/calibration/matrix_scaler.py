@@ -23,15 +23,15 @@ class MatrixScaler(Scaler):
         """Matrix scaling post-processing for calibrated probabilities.
 
         Args:
-            num_classes (int): Number of classes.
-            model (nn.Module | None): Model to calibrate. Defaults to ``None``.
-            init_weight_temperature (float | Tensor ): Initial value for the weights. Defaults to ``1``.
-            init_bias_temperature (float | Tensor | None): Initial value for the bias. The inverse bias will be
+            num_classes: Number of classes.
+            model: Model to calibrate. Defaults to ``None``.
+            init_weight_temperature: Initial value for the weights. Defaults to ``1``.
+            init_bias_temperature: Initial value for the bias. The inverse bias will be
                 set to the ``0`` vector if set to ``None``. Defaults to ``None``.
-            lr (float): Learning rate for the optimizer. Defaults to ``0.1``.
-            max_iter (int): Maximum number of iterations for the optimizer. Defaults to ``100``.
-            eps (float): Small value for stability. Defaults to ``1e-8``.
-            device (Optional[Literal["cpu", "cuda"]]): Device to use for optimization. Defaults to ``None``.
+            lr: Learning rate for the optimizer. Defaults to ``0.1``.
+            max_iter: Maximum number of iterations for the optimizer. Defaults to ``100``.
+            eps: Small value for stability. Defaults to ``1e-8``.
+            device: Device to use for optimization. Defaults to ``None``.
 
         References:
             [1] `On calibration of modern neural networks. In ICML 2017
@@ -51,8 +51,8 @@ class MatrixScaler(Scaler):
         """Set the temperature matrix to a given value.
 
         Args:
-            val_weight (float | Tensor): Weight temperature value.
-            val_bias (float | Tensor): Bias temperature value.
+            val_weight: Weight temperature value.
+            val_bias: Bias temperature value.
         """
         eye = torch.eye(self.num_classes, device=self.device)
         self.inv_temperature_weight = nn.Parameter(

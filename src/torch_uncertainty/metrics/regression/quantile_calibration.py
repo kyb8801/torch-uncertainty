@@ -27,17 +27,17 @@ class QuantileCalibrationError(BinaryCalibrationError):
         ignore_index=None,
         validate_args=True,
         **kwargs,
-    ):
+    ) -> None:
         """Quantile Calibration Error for regression tasks.
 
         This metric computes the calibration error of quantile predictions
         against the ground truth values.
 
         Args:
-            num_bins (int): Number of bins to use for calibration. Defaults to `15`.
-            norm (str): Norm to use for calibration error computation. Defaults to `"l1"`.
-            ignore_index (int): Index to ignore during calibration. Defaults to `None`.
-            validate_args (bool): Whether to validate the input arguments. Defaults to `True`.
+            num_bins: Number of bins to use for calibration. Defaults to ``15``.
+            norm: Norm to use for calibration error computation. Defaults to ``"l1"``.
+            ignore_index: Index to ignore during calibration. Defaults to ``None``.
+            validate_args: Whether to validate the input arguments. Defaults to ``True``.
             kwargs: Additional keyword arguments, see `Advanced metric settings
               <https://torchmetrics.readthedocs.io/en/stable/pages/overview.html#metric-kwargs>`_.
         """
@@ -53,9 +53,9 @@ class QuantileCalibrationError(BinaryCalibrationError):
         """Update the metric with new predictions and targets.
 
         Args:
-            dist (Distribution): The predicted distribution.
-            target (Tensor): The ground truth values.
-            padding_mask (Tensor | None): A mask to ignore certain values. Defaults to `None`.
+            dist: The predicted distribution.
+            target: The ground truth values.
+            padding_mask: A mask to ignore certain values. Defaults to ``None``.
         """
         reduce_event_dims = False
         if isinstance(dist, Independent):
@@ -106,7 +106,7 @@ class QuantileCalibrationError(BinaryCalibrationError):
             Tensor: The quantile calibration error.
 
         Warning:
-            If the distribution does not support the `icdf()` method, this will return `nan` values.
+            If the distribution does not support ``icdf()``, this returns ``nan`` values.
         """
         if self.not_implemented_error:
             return torch.tensor(float("nan"))
@@ -116,7 +116,7 @@ class QuantileCalibrationError(BinaryCalibrationError):
         """Plot the quantile calibration reliability diagram.
 
         Raises:
-            NotImplementedError: If the distribution does not support the `icdf()` method.
+            NotImplementedError: If the distribution does not support ``icdf()``.
         """
         if self.not_implemented_error:
             raise NotImplementedError(

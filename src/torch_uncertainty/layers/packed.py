@@ -15,9 +15,9 @@ def check_packed_parameters_consistency(alpha: float, gamma: int, num_estimators
     """Check the consistency of the parameters of the Packed-Ensembles layers.
 
     Args:
-        alpha (float): The width multiplier of the layer.
-        gamma (int): The number of groups in the ensemble.
-        num_estimators (int): The number of estimators in the ensemble.
+        alpha: The width multiplier of the layer.
+        gamma: The number of groups in the ensemble.
+        num_estimators: The number of estimators in the ensemble.
     """
     if alpha is None:
         raise ValueError("You must specify the value of the arg. `alpha`")
@@ -59,26 +59,26 @@ class PackedLinear(nn.Module):
         estimators (:attr:`num_estimators`).
 
         Args:
-            in_features (int): Number of input features of the linear layer.
-            out_features (int): Number of channels produced by the linear layer.
-            alpha (float): The width multiplier of the linear layer.
-            num_estimators (int): The number of estimators grouped in the layer.
-            gamma (int): Defaults to ``1``.
-            bias (bool): If ``True``, adds a learnable bias to the
+            in_features: Number of input features of the linear layer.
+            out_features: Number of channels produced by the linear layer.
+            alpha: The width multiplier of the linear layer.
+            num_estimators: The number of estimators grouped in the layer.
+            gamma: Defaults to ``1``.
+            bias: If ``True``, adds a learnable bias to the
                 output. Defaults to ``True``.
-            first (bool): Whether this is the first layer of the
+            first: Whether this is the first layer of the
                 network. Defaults to ``False``.
-            last (bool): Whether this is the last layer of the network.
+            last: Whether this is the last layer of the network.
                 Defaults to ``False``.
-            implementation (str): The implementation to use. Available implementations:
+            implementation: The implementation to use. Available implementations:
 
                 - ``"conv1d"``: The conv1d implementation of the linear layer.
                 - ``"sparse"``: The sparse implementation of the linear layer.
                 - ``"full"``: The full implementation of the linear layer.
                 - ``"einsum"`` (default): The einsum implementation of the linear layer.
-            device (torch.device): The device to use for the layer's
+            device: The device to use for the layer's
                 parameters. Defaults to ``None``.
-            dtype (torch.dtype): The dtype to use for the layer's
+            dtype: The dtype to use for the layer's
                 parameters. Defaults to ``None``.
 
         Shape:
@@ -215,25 +215,25 @@ class PackedConv1d(nn.Module):
         r"""Packed-Ensembles-style Conv1d layer.
 
         Args:
-            in_channels (int): Number of channels in the input image.
-            out_channels (int): Number of channels produced by the convolution.
-            kernel_size (int or tuple): Size of the convolving kernel.
-            alpha (int): The channel multiplier of the convolutional layer.
-            num_estimators (int): Number of estimators in the ensemble.
-            gamma (int): Defaults to ``1``.
-            stride (int or tuple): Stride of the convolution. Defaults to ``1``.
+            in_channels: Number of channels in the input image.
+            out_channels: Number of channels produced by the convolution.
+            kernel_size: Size of the convolving kernel.
+            alpha: The channel multiplier of the convolutional layer.
+            num_estimators: Number of estimators in the ensemble.
+            gamma: Defaults to ``1``.
+            stride: Stride of the convolution. Defaults to ``1``.
             padding (int, tuple or str): Padding added to both sides of the input. Defaults to ``0``.
-            dilation (int or tuple): Spacing between kernel elements. Defaults to ``1``.
-            groups (int): Number of blocked connexions from input
+            dilation: Spacing between kernel elements. Defaults to ``1``.
+            groups: Number of blocked connexions from input
             channels to output channels for each estimator. Defaults to ``1``.
-            minimum_channels_per_group (int): Smallest possible number of channels per group.
-            bias (bool): If ``True``, adds a learnable bias to the output. Defaults to ``True``.
-            padding_mode (str): ``'zeros'``, ``'reflect'``,``'replicate'`` or ``'circular'``. Defaults to ``'zeros'``.
-            first (bool): Whether this is the first layer of the network. Defaults to ``False``.
-            last (bool): Whether this is the last layer of the network. Defaults to ``False``.
-            device (torch.device): The device to use for the layer's
+            minimum_channels_per_group: Smallest possible number of channels per group.
+            bias: If ``True``, adds a learnable bias to the output. Defaults to ``True``.
+            padding_mode: ``'zeros'``, ``'reflect'``,``'replicate'`` or ``'circular'``. Defaults to ``'zeros'``.
+            first: Whether this is the first layer of the network. Defaults to ``False``.
+            last: Whether this is the last layer of the network. Defaults to ``False``.
+            device: The device to use for the layer's
             parameters. Defaults to ``None``.
-            dtype (torch.dtype): The dtype to use for the layer's
+            dtype: The dtype to use for the layer's
             parameters. Defaults to ``None``.
 
         Shape:
@@ -353,25 +353,25 @@ class PackedConv2d(nn.Module):
         r"""Packed-Ensembles-style Conv2d layer.
 
         Args:
-            in_channels (int): Number of channels in the input image.
-            out_channels (int): Number of channels produced by the convolution.
-            kernel_size (int or tuple): Size of the convolving kernel.
-            alpha (int): The channel multiplier of the convolutional layer.
-            num_estimators (int): Number of estimators in the ensemble.
-            gamma (int): Defaults to ``1``.
-            stride (int or tuple): Stride of the convolution. Defaults to ``1``.
+            in_channels: Number of channels in the input image.
+            out_channels: Number of channels produced by the convolution.
+            kernel_size: Size of the convolving kernel.
+            alpha: The channel multiplier of the convolutional layer.
+            num_estimators: Number of estimators in the ensemble.
+            gamma: Defaults to ``1``.
+            stride: Stride of the convolution. Defaults to ``1``.
             padding (int, tuple or str): Padding added to all four sides of the input. Defaults to ``0``.
-            dilation (int or tuple): Spacing between kernel elements. Defaults to ``1``.
-            groups (int): Number of blocked connexions from input channels to output channels for each
+            dilation: Spacing between kernel elements. Defaults to ``1``.
+            groups: Number of blocked connexions from input channels to output channels for each
                 estimator. Defaults to ``1``.
-            minimum_channels_per_group (int): Smallest possible number of channels per group.
-            bias (bool): If ``True``, adds a learnable bias to the output. Defaults to ``True``.
-            padding_mode (str): ``'zeros'``, ``'reflect'``,``'replicate'`` or ``'circular'``. Defaults
+            minimum_channels_per_group: Smallest possible number of channels per group.
+            bias: If ``True``, adds a learnable bias to the output. Defaults to ``True``.
+            padding_mode: ``'zeros'``, ``'reflect'``,``'replicate'`` or ``'circular'``. Defaults
                 to ``'zeros'``.
-            first (bool): Whether this is the first layer of the network. Defaults to ``False``.
-            last (bool): Whether this is the last layer of the network. Defaults to ``False``.
-            device (torch.device): The device to use for the layer's parameters. Defaults to ``None``.
-            dtype (torch.dtype): The dtype to use for the layer's parameters. Defaults to ``None``.
+            first: Whether this is the first layer of the network. Defaults to ``False``.
+            last: Whether this is the last layer of the network. Defaults to ``False``.
+            device: The device to use for the layer's parameters. Defaults to ``None``.
+            dtype: The dtype to use for the layer's parameters. Defaults to ``None``.
 
         Shape:
             - Input:
@@ -491,24 +491,24 @@ class PackedConv3d(nn.Module):
         r"""Packed-Ensembles-style Conv3d layer.
 
         Args:
-            in_channels (int): Number of channels in the input image.
-            out_channels (int): Number of channels produced by the convolution.
-            kernel_size (int or tuple): Size of the convolving kernel.
-            alpha (int): The channel multiplier of the convolutional layer.
-            num_estimators (int): Number of estimators in the ensemble.
-            gamma (int): Defaults to ``1``.
-            stride (int or tuple): Stride of the convolution. Defaults to ``1``.
+            in_channels: Number of channels in the input image.
+            out_channels: Number of channels produced by the convolution.
+            kernel_size: Size of the convolving kernel.
+            alpha: The channel multiplier of the convolutional layer.
+            num_estimators: Number of estimators in the ensemble.
+            gamma: Defaults to ``1``.
+            stride: Stride of the convolution. Defaults to ``1``.
             padding (int, tuple or str): Padding added to all six sides of the input. Defaults to ``0``.
-            dilation (int or tuple): Spacing between kernel elements. Defaults to ``1``.
-            groups (int): Number of blocked connexions from input
+            dilation: Spacing between kernel elements. Defaults to ``1``.
+            groups: Number of blocked connexions from input
             channels to output channels for each estimator. Defaults to ``1``.
-            minimum_channels_per_group (int): Smallest possible number of channels per group.
-            bias (bool): If ``True``, adds a learnable bias to the output. Defaults to ``True``.
-            padding_mode (str): ``'zeros'``, ``'reflect'``,``'replicate'`` or ``'circular'``. Defaults to ``'zeros'``.
-            first (bool): Whether this is the first layer of the network. Defaults to ``False``.
-            last (bool): Whether this is the last layer of the network. Defaults to ``False``.
-            device (torch.device): The device to use for the layer's parameters. Defaults to ``None``.
-            dtype (torch.dtype): The dtype to use for the layer's parameters. Defaults to ``None``.
+            minimum_channels_per_group: Smallest possible number of channels per group.
+            bias: If ``True``, adds a learnable bias to the output. Defaults to ``True``.
+            padding_mode: ``'zeros'``, ``'reflect'``,``'replicate'`` or ``'circular'``. Defaults to ``'zeros'``.
+            first: Whether this is the first layer of the network. Defaults to ``False``.
+            last: Whether this is the last layer of the network. Defaults to ``False``.
+            device: The device to use for the layer's parameters. Defaults to ``None``.
+            dtype: The dtype to use for the layer's parameters. Defaults to ``None``.
 
         Shape:
             - Input:
@@ -629,23 +629,23 @@ class PackedConvTranspose2d(nn.Module):
         r"""Packed-Ensembles-style ConvTranspose2d layer with debug flags.
 
         Args:
-            in_channels (int): Number of channels in the input.
-            out_channels (int): Number of channels produced by the transposed convolution.
-            kernel_size (int or tuple): Size of the convolving kernel.
-            alpha (int): The channel multiplier for the layer.
-            num_estimators (int): Number of estimators in the ensemble.
-            gamma (int): Defaults to ``1``.
-            stride (int or tuple): Stride of the convolution. Defaults to ``1``.
-            padding (int or tuple): Zero-padding added to both sides of the input. Defaults to ``0``.
-            output_padding (int or tuple): Additional size added to one side of the output shape. Defaults to ``0``.
-            dilation (int or tuple): Spacing between kernel elements. Defaults to ``1``.
-            groups (int): Number of blocked connections from input channels to output channels. Defaults to ``1``.
-            minimum_channels_per_group (int): Smallest possible number of channels per group.
-            bias (bool): If ``True``, adds a learnable bias to the output. Defaults to ``True``.
-            first (bool): Whether this is the first layer of the network. Defaults to ``False``.
-            last (bool): Whether this is the last layer of the network. Defaults to ``False``.
-            device (torch.device): The device to use for the layer's parameters. Defaults to ``None``.
-            dtype (torch.dtype): The dtype to use for the layer's parameters. Defaults to ``None``.
+            in_channels: Number of channels in the input.
+            out_channels: Number of channels produced by the transposed convolution.
+            kernel_size: Size of the convolving kernel.
+            alpha: The channel multiplier for the layer.
+            num_estimators: Number of estimators in the ensemble.
+            gamma: Defaults to ``1``.
+            stride: Stride of the convolution. Defaults to ``1``.
+            padding: Zero-padding added to both sides of the input. Defaults to ``0``.
+            output_padding: Additional size added to one side of the output shape. Defaults to ``0``.
+            dilation: Spacing between kernel elements. Defaults to ``1``.
+            groups: Number of blocked connections from input channels to output channels. Defaults to ``1``.
+            minimum_channels_per_group: Smallest possible number of channels per group.
+            bias: If ``True``, adds a learnable bias to the output. Defaults to ``True``.
+            first: Whether this is the first layer of the network. Defaults to ``False``.
+            last: Whether this is the last layer of the network. Defaults to ``False``.
+            device: The device to use for the layer's parameters. Defaults to ``None``.
+            dtype: The dtype to use for the layer's parameters. Defaults to ``None``.
         """
         check_packed_parameters_consistency(alpha, gamma, num_estimators)
         factory_kwargs = {"device": device, "dtype": dtype}
@@ -732,15 +732,15 @@ class PackedLayerNorm(nn.GroupNorm):
         r"""Packed-Ensembles-style LayerNorm layer.
 
         Args:
-            embed_dim (int): the number of features in the input tensor.
-            num_estimators (int): the number of estimators in the ensemble.
-            alpha (float): the width multiplier of the layer.
-            eps (float): a value added to the denominator for numerical stability. Defaults to 1e-5.
-            affine (bool): a boolean value that when set to ``True``, this module has learnable per_channel affine parameters initialized to ones (for weights) and zeros (for biases). Defaults to ``True``.
-            first (bool): Whether this layer processes the raw inputs of the model. Defaults to ``False``.
-            last (bool): Whether this layer processes the final outputs of the model. Defaults to ``False``.
-            device (torch.device): The device to use for the layer's parameters. Defaults to ``None``.
-            dtype (torch.dtype): The dtype to use for the layer's parameters. Defaults to ``None``.
+            embed_dim: the number of features in the input tensor.
+            num_estimators: the number of estimators in the ensemble.
+            alpha: the width multiplier of the layer.
+            eps: a value added to the denominator for numerical stability. Defaults to 1e-5.
+            affine: a boolean value that when set to ``True``, this module has learnable per_channel affine parameters initialized to ones (for weights) and zeros (for biases). Defaults to ``True``.
+            first: Whether this layer processes the raw inputs of the model. Defaults to ``False``.
+            last: Whether this layer processes the final outputs of the model. Defaults to ``False``.
+            device: The device to use for the layer's parameters. Defaults to ``None``.
+            dtype: The dtype to use for the layer's parameters. Defaults to ``None``.
 
         Shape:
             - Input: :math:`(N, *)` where :math:`*` means any number of additional dimensions.
@@ -803,33 +803,25 @@ class PackedMultiheadAttention(nn.Module):
         r"""Packed-Ensembles-style MultiheadAttention layer.
 
         Args:
-            embed_dim (int): Size of the embedding dimension.
-            num_heads (int): Number of parallel attention heads.
-            alpha (float): The width multiplier of the embedding dimension.
-            num_estimators (int): The number of estimators packed in the layer.
-            gamma (int): Defaults to ``1``.
-            dropout (float): Dropout probability on ``attn_output_weights``. Defaults to ``0.0``
-                (no dropout).
-            bias (bool): If specified, adds bias to input / output projection layers.
-                Defaults to ``True``.
-            add_bias_kv (bool): If specified, adds bias to the key and value sequences at
+            embed_dim: Size of the embedding dimension.
+            num_heads: Number of parallel attention heads.
+            alpha: The width multiplier of the embedding dimension.
+            num_estimators: The number of estimators packed in the layer.
+            gamma: Defaults to ``1``.
+            dropout: Dropout probability on ``attn_output_weights``. Defaults to ``0.0``(no dropout).
+            bias: If specified, adds bias to input / output projection layers. Defaults to ``True``.
+            add_bias_kv: If specified, adds bias to the key and value sequences at
                 ``dim=0``. Defaults to ``False``.
-            add_zero_attn (bool): If specified, adds a new batch of zeros to the key and
+            add_zero_attn: If specified, adds a new batch of zeros to the key and
                 value sequences at ``dim=1``. Defaults to ``False``.
-            kdim (int | None): Total number of features for keys. Defaults to ``None``
-                (uses ``kdim=embed_dim``).
-            vdim (int | None): Total number of features for values. Defaults to ``None``
-                (uses ``vdim=embed_dim``).
-            batch_first (bool): If ``True``, then the input and output tensors are provided
+            kdim: Total number of features for keys. Defaults to ``None`` (uses ``kdim=embed_dim``).
+            vdim: Total number of features for values. Defaults to ``None`` (uses ``vdim=embed_dim``).
+            batch_first: If ``True``, then the input and output tensors are provided
                 as (batch, seq, feature). Defaults to ``False`` (seq, batch, feature).
-            first (bool): Whether this is the first layer of the network. Defaults to
-                ``False``.
-            last (bool): Whether this is the last layer of the network. Defaults to
-                ``False``.
-            device (torch.device): The device to use for the layer's parameters. Defaults
-                to ``None``.
-            dtype (torch.dtype): The dtype to use for the layer's parameters. Defaults to
-                ``None``.
+            first: Whether this is the first layer of the network. Defaults to ``False``.
+            last: Whether this is the last layer of the network. Defaults to ``False``.
+            device: The device to use for the layer's parameters. Defaults to ``None``.
+            dtype: The dtype to use for the layer's parameters. Defaults to ``None``.
 
         Reference:
             - `Attention Is All You Need <https://arxiv.org/abs/1706.03762>`_: Original Multihead Attention formulation.
@@ -976,30 +968,30 @@ class PackedMultiheadAttention(nn.Module):
         r"""Computes attention outputs given query, key, and value tensors.
 
         Args:
-            query (Tensor): Query embeddings of shape :math:`(L, E_q)` for unbatched input,
+            query: Query embeddings of shape :math:`(L, E_q)` for unbatched input,
                 :math:`(L, B, E_q)` when ``batch_first=False`` or :math:`(B, L, E_q)` when
                 ``batch_first=True``, where :math:`L` is the target sequence length, :math:`B` is
                 the batch size, and :math:`E_q` is the query embedding dimension ``embed_dim``.
-            key (Tensor): Key embeddings of shape :math:`(S, E_k)` for unbatched input,
+            key: Key embeddings of shape :math:`(S, E_k)` for unbatched input,
                 :math:`(S, B, E_k)` when ``batch_first=False`` or :math:`(B, S, E_k)` when
                 ``batch_first=True``, where :math:`S` is the source sequence length, :math:`B` is
                 the batch size and :math:`E_k` is the key embedding dimension ``kdim``.
-            value (Tensor): Value embeddings of shape :math:`(S, E_v)` for unbatched input,
+            value: Value embeddings of shape :math:`(S, E_v)` for unbatched input,
                 :math:`(S, B, E_v)` when ``batch_first=False`` or :math:`(B, S, E_v)` when
                 ``batch_first=True``, where :math:`S` is the source sequence length, :math:`B` is
                 the batch size and :math:`E_v` is the value embedding dimension ``vdim``.
-            key_padding_mask (Tensor | None): If specified, a mask of shape
+            key_padding_mask: If specified, a mask of shape
                 :math:`(B, S)` indicating which elements within ``key`` to ignore for the purpose
                 of attention (i.e. treat as "padding"). For unbatched `query`, shape should be
                 :math:`(S)`. Binary and float masks are supported. For a binary mask, a ``True``
                 value indicates that the corresponding ``key`` value will be ignored for the
                 purpose of attention. For a float mask, it will be directly added to the
                 corresponding ``key`` value. Defaults to ``None``.
-            need_weights (bool): If specified, returns ``attn_output_weights`` in
+            need_weights: If specified, returns ``attn_output_weights`` in
                 addition to ``attn_outputs``. Set ``need_weights=False`` to use the optimized
                 ``scale_dot_product_attention`` and achieve the best performance for MHA.
                 Defaults to ``False``.
-            attn_mask (Tensor | None): If specified, a 2D or 3D mask preventing attention
+            attn_mask: If specified, a 2D or 3D mask preventing attention
                 to certain positions. Must be of shape :math:`(L,S)` or
                 :math:`(B \times \text{num_heads}, L, S)`, where :math:`B` is the batch size, :math:`L`
                 is the target sequence length, and :math:`S` is the source sequence length. A 2D mask
@@ -1009,11 +1001,11 @@ class PackedMultiheadAttention(nn.Module):
                 For a float mask, the mask values will be added to the attention weight. If both
                 ``attn_mask`` and ``key_padding_mask`` are provided, their types should match.
                 Defaults to ``None``.
-            average_attn_weights (bool): If ``True``, indicates that the returned
+            average_attn_weights: If ``True``, indicates that the returned
                 ``attn_weights`` should be averaged across heads. Otherwise, ``attn_weights`` are
                 provided separately per head. Note that this flag only has an effect when
                 ``need_weights=True``. Defaults to ``True``.
-            is_causal (bool): If specified, applies a causal mask as ``attn_mask``.
+            is_causal: If specified, applies a causal mask as ``attn_mask``.
                 Defaults to ``False``.
 
         Warning:
@@ -1022,7 +1014,7 @@ class PackedMultiheadAttention(nn.Module):
 
         Returns:
             tuple[Tensor, None]:
-                - *attn_output* (Tensor): The output tensor of shape :math:`(L, E_q)`, :math:`(L, B, E_q)`
+                - *attn_output*: The output tensor of shape :math:`(L, E_q)`, :math:`(L, B, E_q)`
                   or :math:`(B, L, E_q)` where :math:`L` is the target sequence length, :math:`B` is
                   the batch size, and :math:`E_q` is the embedding dimension ``embed_dim``.
                 - *attn_output_weights* (None): Always ``None`` as we do not support
@@ -1149,33 +1141,33 @@ class PackedTransformerEncoderLayer(nn.Module):
         feedforward network).
 
         Args:
-            d_model (int): the number of expected features in the input.
-            nhead (int): the number of heads in the multiheadattention models.
-            alpha (float): the width multiplier of the layer.
-            num_estimators (int): the number of estimators packed in the layer.
-            gamma (int): Defaults to ``1``.
-            dim_feedforward (int): the dimension of the feedforward network model. Defaults
+            d_model: the number of expected features in the input.
+            nhead: the number of heads in the multiheadattention models.
+            alpha: the width multiplier of the layer.
+            num_estimators: the number of estimators packed in the layer.
+            gamma: Defaults to ``1``.
+            dim_feedforward: the dimension of the feedforward network model. Defaults
                 to ``2048``.
-            dropout (float): the dropout value. Defaults to ``0.1``.
+            dropout: the dropout value. Defaults to ``0.1``.
             activation (Callable[[Tensor], Tensor]): the activation function of the
                 intermediate layer, that is a unary callable. Defaults to ``F.relu``.
-            layer_norm_eps (float): the eps value in layer normalization components. Defaults
+            layer_norm_eps: the eps value in layer normalization components. Defaults
                 to ``1e-5``.
-            bias (bool): If ``False``, ``Linear`` and ``LayerNorm`` layers will not learn an
+            bias: If ``False``, ``Linear`` and ``LayerNorm`` layers will not learn an
                 additive bias. Defaults to ``True``.
-            batch_first (bool): If ``True``, then the input and output tensors are provided
+            batch_first: If ``True``, then the input and output tensors are provided
                 as :math:`(\text{batch}, \text{seq}, \text{d_model})`. Defaults to ``False``
                 :math:`(\text{seq}, \text{batch}, \text{d_model})`.
-            norm_first (bool): If ``True``, the layer norm is done prior to attention and
+            norm_first: If ``True``, the layer norm is done prior to attention and
                 feedforward operations, respectively. Otherwise, it is done after. Defaults to
                 ``False``.
-            first (bool): Whether this is the first layer of the network. Defaults to
+            first: Whether this is the first layer of the network. Defaults to
                 ``False``.
-            last (bool): Whether this is the last layer of the network. Defaults to
+            last: Whether this is the last layer of the network. Defaults to
                 ``False``.
-            device (torch.device): The device to use for the layer's parameters. Defaults
+            device: The device to use for the layer's parameters. Defaults
                 to ``None``.
-            dtype (torch.dtype): The dtype to use for the layer's parameters. Defaults to
+            dtype: The dtype to use for the layer's parameters. Defaults to
                 ``None``.
 
         Reference:
@@ -1263,12 +1255,12 @@ class PackedTransformerEncoderLayer(nn.Module):
         r"""Pass the input through the encoder layer.
 
         Args:
-            src (Tensor): The sequence to the encoder layer. Shape: :math:`(B, L, E)` or
+            src: The sequence to the encoder layer. Shape: :math:`(B, L, E)` or
                 :math:`(L, B, E)`.
-            src_mask (Tensor | None): The mask for the ``src`` sequence. Defaults to ``None``.
-            src_key_padding_mask (Tensor | None): The mask for the ``src`` keys per
+            src_mask: The mask for the ``src`` sequence. Defaults to ``None``.
+            src_key_padding_mask: The mask for the ``src`` keys per
                 batch. Defaults to ``None``.
-            is_causal (bool): If specified, applies a causal mask as ``src_mask``.
+            is_causal: If specified, applies a causal mask as ``src_mask``.
                 Defaults to ``False``. Warning: ``is_causal`` provides a hint the ``src_mask`` is
                 a causal mask. Providing incorrect hints can result in incorrect execution,
                 including forward and backward compatibility.
@@ -1360,33 +1352,33 @@ class PackedTransformerDecoderLayer(nn.Module):
         attention, and feedforward network).
 
         Args:
-            d_model (int): the number of expected features in the input.
-            nhead (int): the number of heads in the multiheadattention models.
-            alpha (float): the width multiplier of the layer.
-            num_estimators (int): the number of estimators packed in the layer.
-            gamma (int): Defaults to ``1``.
-            dim_feedforward (int): the dimension of the feedforward network model. Defaults
+            d_model: the number of expected features in the input.
+            nhead: the number of heads in the multiheadattention models.
+            alpha: the width multiplier of the layer.
+            num_estimators: the number of estimators packed in the layer.
+            gamma: Defaults to ``1``.
+            dim_feedforward: the dimension of the feedforward network model. Defaults
                 to ``2048``.
-            dropout (float): the dropout value. Defaults to ``0.1``.
+            dropout: the dropout value. Defaults to ``0.1``.
             activation (Callable[[Tensor], Tensor]): the activation function of the
                 intermediate layer, that is a unary callable. Defaults to ``F.relu``.
-            layer_norm_eps (float): the eps value in layer normalization components. Defaults
+            layer_norm_eps: the eps value in layer normalization components. Defaults
                 to ``1e-5``.
-            bias (bool): If ``False``, ``Linear`` and ``LayerNorm`` layers will not learn an
+            bias: If ``False``, ``Linear`` and ``LayerNorm`` layers will not learn an
                 additive bias. Defaults to ``True``.
-            batch_first (bool): If ``True``, then the input and output tensors are provided
+            batch_first: If ``True``, then the input and output tensors are provided
                 as :math:`(\text{batch}, \text{seq}, \text{d_model})`. Defaults to ``False``
                 :math:`(\text{seq}, \text{batch}, \text{d_model})`.
-            norm_first (bool): If ``True``, the layer norm is done prior to attention and
+            norm_first: If ``True``, the layer norm is done prior to attention and
                 feedforward operations, respectively. Otherwise, it is done after. Defaults to
                 ``False``.
-            first (bool): Whether this is the first layer of the network. Defaults to
+            first: Whether this is the first layer of the network. Defaults to
                 ``False``.
-            last (bool): Whether this is the last layer of the network. Defaults to
+            last: Whether this is the last layer of the network. Defaults to
                 ``False``.
-            device (torch.device): The device to use for the layer's parameters. Defaults
+            device: The device to use for the layer's parameters. Defaults
                 to ``None``.
-            dtype (torch.dtype): The dtype to use for the layer's parameters. Defaults to
+            dtype: The dtype to use for the layer's parameters. Defaults to
                 ``None``.
 
         Reference:
@@ -1499,23 +1491,18 @@ class PackedTransformerDecoderLayer(nn.Module):
         r"""Pass the input (and mask) through the decoder layer.
 
         Args:
-            tgt (Tensor): The sequence to the decoder layer. Shape: :math:`(B, L, E)` or
-                :math:`(L, B, E)`.
-            memory (Tensor): The sequence from the last layer of the encoder. Shape:
+            tgt: The sequence to the decoder layer. Shape: :math:`(B, L, E)` or :math:`(L, B, E)`.
+            memory: The sequence from the last layer of the encoder. Shape:
                 :math:`(B, S, E)` or :math:`(S, B, E)`.
-            tgt_mask (Tensor | None): The mask for the ``tgt`` sequence. Defaults to
-                ``None``.
-            memory_mask (Tensor | None): The mask for the ``memory`` sequence. Defaults
-                to ``None``.
-            tgt_key_padding_mask (Tensor | None): The mask for the ``tgt`` keys per
-                batch. Defaults to ``None``.
-            memory_key_padding_mask (Tensor | None): The mask for the ``memory`` keys per
-                batch. Defaults to ``None``.
-            tgt_is_causal (bool): If specified, applies a causal mask as ``tgt_mask``.
+            tgt_mask: The mask for the ``tgt`` sequence. Defaults to ``None``.
+            memory_mask: The mask for the ``memory`` sequence. Defaults to ``None``.
+            tgt_key_padding_mask: The mask for the ``tgt`` keys per batch. Defaults to ``None``.
+            memory_key_padding_mask: The mask for the ``memory`` keys per batch. Defaults to ``None``.
+            tgt_is_causal: If specified, applies a causal mask as ``tgt_mask``.
                 Defaults to ``False``. Warning: ``tgt_is_causal`` provides a hint the ``tgt_mask``
                 is a causal mask. Providing incorrect hints can result in incorrect execution,
                 including forward and backward compatibility.
-            memory_is_causal (bool): If specified, applies a causal mask as ``memory_mask``.
+            memory_is_causal: If specified, applies a causal mask as ``memory_mask``.
                 Defaults to ``False``. Warning: ``memory_is_causal`` provides a hint the ``memory_mask``
                 is a causal mask. Providing incorrect hints can result in incorrect execution,
                 including forward and backward compatibility.

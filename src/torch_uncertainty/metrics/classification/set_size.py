@@ -23,8 +23,7 @@ class SetSize(Metric):
         """Set size to compute the efficiency of conformal prediction methods.
 
         Args:
-            reduction (str): Determines how to reduce over the
-                :math:`B`/batch dimension:
+            reduction: Determines how to reduce over the :math:`B`/batch dimension:
 
                 - ``'mean'`` [default]: Averages score across samples
                 - ``'sum'``: Sum score across samples
@@ -54,9 +53,9 @@ class SetSize(Metric):
         """Update the metric state with predictions and targets.
 
         Args:
-            preds (torch.Tensor): predicted sets tensor of shape (B, C), where B is the batch size
-                and C is the number of classes.
-            targets (torch.Tensor): For API consistency
+            preds: Predicted sets tensor of shape ``(B, C)``, where ``B`` is the
+                batch size and ``C`` is the number of classes.
+            targets: Unused. Kept for API consistency. Defaults to ``None``.
         """
         batch_size = preds.size(0)
         pred_sizes = preds.bool().sum(-1)
@@ -69,10 +68,10 @@ class SetSize(Metric):
             self.total += batch_size
 
     def compute(self) -> Tensor:
-        """Compute the mean set size.
+        """Compute the set size.
 
         Returns:
-            Tensor: The coverage rate.
+            Tensor: The set size according to the selected reduction.
         """
         values = dim_zero_cat(self.sizes)
         if self.reduction == "sum":

@@ -3,21 +3,21 @@ from torch.utils.data import Dataset
 
 
 class AggregatedDataset(Dataset):
-    def __init__(self, dataset: Dataset, n_dataloaders: int) -> None:
+    def __init__(self, dataset: Dataset, num_dataloaders: int) -> None:
         """A class to help aggregating datasets.
 
         Virtually interlace multiple copies of a dataset to train ensembles with
         different batch orders.
 
         Args:
-            dataset (Dataset): The dataset to be interlaced.
-            n_dataloaders (int): The number of dataloaders to be used for training.
+            dataset: The dataset to be interlaced.
+            num_dataloaders: The number of dataloaders to be used for training.
         """
         super().__init__()
         self.dataset = dataset
-        self.n_dataloaders = n_dataloaders
+        self.num_dataloaders = num_dataloaders
         self.dataset_size = len(dataset)
-        self.offset = self.dataset_size // self.n_dataloaders
+        self.offset = self.dataset_size // self.num_dataloaders
 
     def __getitem__(self, idx: int) -> tuple[torch.Tensor, torch.Tensor]:
         """Get the samples and targets of the dataset.
@@ -28,7 +28,7 @@ class AggregatedDataset(Dataset):
         inputs, targets = zip(
             *[
                 self.dataset[(idx + i * self.offset) % self.dataset_size]
-                for i in range(self.n_dataloaders)
+                for i in range(self.num_dataloaders)
             ],
             strict=True,
         )

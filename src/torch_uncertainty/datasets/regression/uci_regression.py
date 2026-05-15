@@ -116,22 +116,20 @@ class UCIRegression(Dataset):
         """The UCI regression datasets.
 
         Args:
-            root (str): Root directory of the datasets.
-            transform (callable): A function/transform that takes in a
+            root: Root directory of the datasets.
+            transform: A function/transform that takes in a
                 numpy array and returns a transformed version. Defaults to ``None``.
-            target_transform (callable): A function/transform that takes
+            target_transform: A function/transform that takes
                 in the target and transforms it. Defaults to ``None``.
-            dataset_name (str): The name of the dataset. One of
+            dataset_name: The name of the dataset. One of
                 ``boston-housing``, ``concrete``, ``energy``, ``kin8nm``,
                 ``naval-propulsion-plant``, ``power-plant``, ``protein``,
                 ``wine-quality-red``, and ``yacht``. Defaults to ``energy``.
-            download (bool): If ``True``, downloads the dataset from the
+            download: If ``True``, downloads the dataset from the
                 internet and puts it in root directory. If dataset is already
                 downloaded, it is not downloaded again. Defaults to ``False``.
-            seed (int): The random seed for shuffling the dataset.
-                Defaults to ``42``.
-            shuffle (bool): If ``True``, shuffles the dataset.
-                Defaults to ``True``.
+            seed: The random seed for shuffling the dataset. Defaults to ``42``.
+            shuffle: If ``True``, shuffles the dataset. Defaults to ``True``.
 
         Note:
             You may want to avoid using the boston-housing dataset because of

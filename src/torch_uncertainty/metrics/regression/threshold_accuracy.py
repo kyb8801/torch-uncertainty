@@ -9,7 +9,7 @@ class ThresholdAccuracy(Metric):
     total: Tensor
 
     def __init__(self, power: int, lmbda: float = 1.25, **kwargs) -> None:
-        r"""Computes the Threshold Accuracy metric, also referred to as d1, d2, or d3.
+        r"""Compute the Threshold Accuracy metric, also referred to as d1, d2, or d3.
 
         This metric evaluates the percentage of predictions that fall within a
         specified threshold of their corresponding target values. The threshold

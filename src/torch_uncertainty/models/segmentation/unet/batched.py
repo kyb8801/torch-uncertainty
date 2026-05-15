@@ -19,10 +19,10 @@ class _DoubleConv(nn.Module):
         """Initialize the DoubleConv module: (Conv2d => BN => ReLU) * 2.
 
         Args:
-            in_channels (int): Number of input channels.
-            out_channels (int): Number of output channels.
-            num_estimators (int): Number of estimators.
-            mid_channels (int | None): Number of intermediate channels.
+            in_channels: Number of input channels.
+            out_channels: Number of output channels.
+            num_estimators: Number of estimators.
+            mid_channels: Number of intermediate channels.
                 If ``None``, defaults to :attr:`out_channels`. Defaults to ``None``.
         """
         super().__init__()
@@ -46,9 +46,9 @@ class _Down(nn.Module):
         """Initialize the Down module: (Conv2d => BN => ReLU) * 2 + MaxPool2d.
 
         Args:
-            in_channels (int): Number of input channels.
-            out_channels (int): Number of output channels.
-            num_estimators (int): Number of estimators.
+            in_channels: Number of input channels.
+            out_channels: Number of output channels.
+            num_estimators: Number of estimators.
         """
         super().__init__()
         self.mpconv = nn.Sequential(
@@ -111,16 +111,16 @@ class _BatchedUNet(nn.Module):
         bilinear: bool = False,
         dropout_rate: float = 0.0,
     ) -> None:
-        """Batched U-Net model using Batch layers for uncertainty estimation.
+        """Batched U-Net model using BatchEnsemble layers for uncertainty estimation.
 
         Args:
-            in_channels (int): Number of input channels.
-            num_classes (int): Number of output classes.
-            num_blocks (list[int]): Number of channels in each layer of the U-Net.
-            num_estimators (int): Number of estimators.
-            bilinear (bool): If ``True``, use bilinear interpolation instead of
+            in_channels: Number of input channels.
+            num_classes: Number of output classes.
+            num_blocks: Number of channels in each layer of the U-Net.
+            num_estimators: Number of estimators.
+            bilinear: If ``True``, use bilinear interpolation instead of
                 transposed convolutions for upsampling. Defaults to ``False``.
-            dropout_rate (float): Dropout rate. Defaults to ``0.0``.
+            dropout_rate: Dropout rate. Defaults to ``0.0``.
 
         """
         check_unet_parameters(in_channels, num_classes, num_blocks, bilinear)
@@ -187,13 +187,13 @@ def _batched_unet(
     """Create a Batched U-Net model.
 
     Args:
-        in_channels (int): Number of input channels.
-        num_classes (int): Number of output classes.
-        num_blocks (list[int]): Number of channels in each layer of the U-Net.
-        num_estimators (int): Number of estimators.
-        bilinear (bool): If ``True``, use bilinear interpolation instead of
+        in_channels: Number of input channels.
+        num_classes: Number of output classes.
+        num_blocks: Number of channels in each layer of the U-Net.
+        num_estimators: Number of estimators.
+        bilinear: If ``True``, use bilinear interpolation instead of
             transposed convolutions for upsampling. Defaults to ``False``.
-        dropout_rate (float): Dropout rate. Defaults to ``0.0``.
+        dropout_rate: Dropout rate. Defaults to ``0.0``.
 
     Returns:
         _BatchedUNet: Batched U-Net model.
@@ -218,12 +218,12 @@ def batched_small_unet(
     """Create a Small Batched U-Net model (channels divided by 2).
 
     Args:
-        in_channels (int): Number of input channels.
-        num_classes (int): Number of output classes.
-        num_estimators (int): Number of estimators.
-        bilinear (bool): If ``True``, use bilinear interpolation instead of
+        in_channels: Number of input channels.
+        num_classes: Number of output classes.
+        num_estimators: Number of estimators.
+        bilinear: If ``True``, use bilinear interpolation instead of
             transposed convolutions for upsampling. Defaults to ``False``.
-        dropout_rate (float): Dropout rate. Defaults to ``0.0``.
+        dropout_rate: Dropout rate. Defaults to ``0.0``.
 
     Returns:
         _BatchedUNet: Small Batched U-Net model.
@@ -249,12 +249,12 @@ def batched_unet(
     """Create a Batched U-Net model.
 
     Args:
-        in_channels (int): Number of input channels.
-        num_classes (int): Number of output classes.
-        num_estimators (int): Number of estimators.
-        bilinear (bool): If ``True``, use bilinear interpolation instead of
+        in_channels: Number of input channels.
+        num_classes: Number of output classes.
+        num_estimators: Number of estimators.
+        bilinear: If ``True``, use bilinear interpolation instead of
             transposed convolutions for upsampling. Defaults to ``False``.
-        dropout_rate (float): Dropout rate. Defaults to ``0.0``.
+        dropout_rate: Dropout rate. Defaults to ``0.0``.
 
     Returns:
         _BatchedUNet: Batched U-Net model.

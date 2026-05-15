@@ -49,13 +49,12 @@ class PixMix(nn.Module):
         """PixMix augmentation class.
 
         Args:
-            mixing_set (MixingSet): Dataset to be mixed with.
-            mixing_iterations (int): Number of mixing iterations.
-            augmentation_severity (float): Severity of augmentation.
-            mixing_severity (float): Severity of mixing.
-            all_ops (bool): Whether to use augmentations included in ImageNet-C.
-                Defaults to True.
-            seed (int): Seed for random number generator. Defaults to 12345.
+            mixing_set: Dataset to be mixed with.
+            mixing_iterations: Number of mixing iterations.
+            augmentation_severity: Severity of augmentation.
+            mixing_severity: Severity of mixing.
+            all_ops: Whether to use augmentations included in ImageNet-C. Defaults to ``True``.
+            seed: Seed for random number generator. Defaults to ``12345``.
 
         Note:
             Default arguments are set to follow original guidelines.

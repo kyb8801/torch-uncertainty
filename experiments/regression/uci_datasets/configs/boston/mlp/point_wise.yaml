@@ -32,7 +32,7 @@ routine:
         - 50
   output_dim: 1
   loss: MSELoss
-  save_in_csv: true
+  save_to_csv: true
 data:
   root: ./data
   batch_size: 128

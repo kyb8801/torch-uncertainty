@@ -147,8 +147,9 @@ def reliability_chart(
     figsize: tuple[float, float] = (6.0, 6.0),
     dpi: int = 150,
 ) -> tuple[object, object]:
-    """Builds Reliability Diagram
-    `Source <https://github.com/hollance/reliability-diagrams>`_.
+    """Build a reliability diagram.
+
+    Source: `reliability-diagrams <https://github.com/hollance/reliability-diagrams>`_.
     """
     figsize = (figsize[0], figsize[0] * 1.4)
 
@@ -192,6 +193,7 @@ def custom_plot(
     ch_xlabel: str = "Top-class Confidence (%)",
     ch_ylabel: str = "Density (%)",
 ) -> tuple[object, object]:
+    """Plot a reliability chart from stored confidence and accuracy states."""
     confidences = dim_zero_cat(self.confidences)
     accuracies = dim_zero_cat(self.accuracies)
 
@@ -295,19 +297,19 @@ class CalibrationError:
             - :math:`c_i` is the mean predicted confidence in bin :math:`i`.
             - :math:`b_i` is the fraction of total samples falling into bin :math:`i`.
 
-        Bins are constructed either uniformly in the range :math:`[0, 1]` or adaptively
-        (if `adaptive=True`).
+        Bins are constructed either uniformly in the range :math:`[0, 1]` or
+        adaptively (if ``adaptive=True``).
 
         Args:
-            task (str): Specifies the task type, either ``"binary"`` or ``"multiclass"``.
-            adaptive (bool): Whether to use adaptive binning. Defaults to ``False``.
-            num_bins (int): Number of bins to divide the probability space. Defaults to ``10``.
-            norm (str): Specifies the type of norm to use: ``"l1"``, ``"l2"``, or ``"max"``.
+            task: Specifies the task type, either ``"binary"`` or ``"multiclass"``.
+            adaptive: Whether to use adaptive binning. Defaults to ``False``.
+            num_bins : Number of bins to divide the probability space. Defaults to ``10``.
+            norm: Specifies the type of norm to use: ``"l1"``, ``"l2"``, or ``"max"``.
                 Defaults to ``"l1"``.
-            num_classes (int): Number of classes for ``"multiclass"`` tasks. Required when task
-                is ``"multiclass"``.
-            ignore_index (int): Index to ignore during calculations. Defaults to ``None``.
-            validate_args (bool): Whether to validate input arguments. Defaults to ``True``.
+            num_classes: Number of classes for ``"multiclass"`` tasks.
+                Required when task is ``"multiclass"``. Defaults to ``None``.
+            ignore_index: Index to ignore during calculations. Defaults to ``None``.
+            validate_args: Whether to validate input arguments. Defaults to ``True``.
             **kwargs: Additional keyword arguments for the metric.
 
         Example:
@@ -334,12 +336,12 @@ class CalibrationError:
             # Output: Calibration Error: 0.199
 
         Note:
-            Bins are either uniformly distributed in :math:`[0, 1]` or adaptively sized
-            (if `adaptive=True`).
+            Bins are either uniformly distributed in :math:`[0, 1]` or
+            adaptively sized (if ``adaptive=True``).
 
         Warning:
-            If `task="multiclass"`, `num_classes` must be an integer; otherwise, a :class:`TypeError`
-            is raised.
+            If ``task="multiclass"``, ``num_classes`` must be an integer;
+            otherwise, a :class:`TypeError` is raised.
 
         References:
             [1] `Naeini et al. Obtaining well calibrated probabilities using Bayesian binning. In AAAI, 2015
@@ -347,7 +349,8 @@ class CalibrationError:
 
         .. seealso::
             See `CalibrationError <https://torchmetrics.readthedocs.io/en/stable/classification/calibration_error.html>`_
-            for details. Our version of the metric is a wrapper around the original metric providing an improved plotting functionality.
+            for details. This implementation wraps the original metric and
+            provides improved plotting functionality.
         """
         if kwargs.get("n_bins") is not None:
             raise ValueError("`n_bins` does not exist in TorchUncertainty, use `num_bins`.")

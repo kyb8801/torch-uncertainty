@@ -37,7 +37,7 @@ routine:
   loss: torch_uncertainty.losses.DistributionNLLLoss
   dist_family: cauchy
   dist_estimate: mode
-  save_in_csv: true
+  save_to_csv: true
 data:
   root: ./data
   batch_size: 128

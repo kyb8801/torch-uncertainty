@@ -33,11 +33,11 @@ class ClasswiseCalibrationError(Metric):
         lower score indicates better calibration quality.
 
         Args:
-            num_classes (int): Number of classes.
-            num_bins (int): Number of calibration bins. Defaults to ``15``.
-            norm (Literal["l1", "l2", "max"]): Norm used to compute the ECE (e.g., ``'l1'``,
-                ``'l2'``, ``'max'``). Defaults to ``'l1'``.
-            reduction (Literal["mean", "sum", "none"] | None): Determines how to reduce the score across the
+            num_classes: Number of classes.
+            num_bins: Number of calibration bins. Defaults to ``15``.
+            norm: Norm used to compute the ECE (e.g., ``'l1'``, ``'l2'``, ``'max'``).
+                Defaults to ``'l1'``.
+            reduction: Determines how to reduce the score across the
                 classes:
 
                 - ``'mean'`` [default]: Averages the ECE across classes.
@@ -110,8 +110,8 @@ class ClasswiseCalibrationError(Metric):
         """Update the state with a new tensor of probabilities.
 
         Args:
-            probs (Tensor): A probability tensor of shape (batch, num_classes).
-            target (Tensor): A tensor of ground truth labels of shape
+            probs: A probability tensor of shape (batch, num_classes).
+            target: A tensor of ground truth labels of shape
                 (batch, num_classes) or (batch).
         """
         if target.ndim == 1 and self.num_classes > 1:

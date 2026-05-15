@@ -29,6 +29,7 @@ class _LeNet(nn.Module):
         first_layer_args: dict | None = None,
         last_layer_args: dict | None = None,
     ) -> None:
+        """Build a LeNet-style feature extractor and classifier head."""
         super().__init__()
         self.activation = activation
 
@@ -91,6 +92,7 @@ def _lenet(
     first_layer_args: dict | None = None,
     last_layer_args: dict | None = None,
 ) -> _LeNet | StochasticModel:
+    """Construct a LeNet variant, optionally wrapped for stochastic inference."""
     model = _LeNet(
         in_channels=in_channels,
         num_classes=num_classes,
@@ -117,6 +119,7 @@ def lenet(
     groups: int = 1,
     dropout_rate: float = 0.0,
 ) -> _LeNet:
+    """Build the standard deterministic LeNet variant."""
     return cast(
         "_LeNet",
         _lenet(
@@ -144,6 +147,7 @@ def batchensemble_lenet(
     dropout_rate: float = 0.0,
     repeat_training_inputs: bool = False,
 ) -> BatchEnsemble:
+    """Build a LeNet wrapped with BatchEnsemble layers."""
     model = lenet(
         in_channels=in_channels,
         num_classes=num_classes,
@@ -171,6 +175,7 @@ def packed_lenet(
     groups: int = 1,
     dropout_rate: float = 0.0,
 ) -> _LeNet:
+    """Build a LeNet variant using Packed-Ensembles layers."""
     layer_args = {
         "num_estimators": num_estimators,
         "alpha": alpha,
@@ -209,6 +214,7 @@ def bayesian_lenet(
     groups: int = 1,
     dropout_rate: float = 0.0,
 ) -> StochasticModel:
+    """Build a Bayesian LeNet wrapped in a stochastic model."""
     layers_args = {}
     if prior_sigma_1 is not None:
         layers_args["prior_sigma_1"] = prior_sigma_1

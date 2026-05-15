@@ -321,18 +321,18 @@ def batched_resnet(
     """BatchEnsemble of ResNet.
 
     Args:
-        in_channels (int): Number of input channels.
-        num_classes (int): Number of classes to predict.
-        arch (int): The architecture of the ResNet.
-        num_estimators (int): Number of estimators in the ensemble.
-        conv_bias (bool): Whether to use bias in convolutions. Defaults to ``True``.
-        dropout_rate (float): Dropout rate. Defaults to ``0``.
-        width_multiplier (float): Width multiplier. Defaults to ``1.0``.
-        groups (int): Number of groups within each estimator.
-        style (ResNetStyle | Literal["imagenet", "cifar"]): Whether to use the ImageNet or CIFAR
-            structure. Defaults to ``ResNetStyle.IMAGENET``.
-        normalization_layer (nn.Module): Normalization layer.
-        repeat_strategy (Literal["legacy", "paper"]): The repeatrepeat_strategy ("legacy"|"paper"): The repeat
+        in_channels: Number of input channels.
+        num_classes: Number of classes to predict.
+        arch: The architecture of the ResNet.
+        num_estimators: Number of estimators in the ensemble.
+        conv_bias: Whether to use bias in convolutions. Defaults to ``True``.
+        dropout_rate: Dropout rate. Defaults to ``0``.
+        width_multiplier: Width multiplier. Defaults to ``1.0``.
+        groups: Number of groups within each estimator.
+        style: Whether to use the ImageNet or CIFAR structure.
+            Defaults to ``ResNetStyle.IMAGENET``.
+        normalization_layer: Normalization layer. Defaults to ``nn.BatchNorm2d``.
+        repeat_strategy: The repeatrepeat_strategy ("legacy"|"paper"): The repeat
             strategy to use during training:
 
             - "legacy": Repeat inputs for each estimator during both training

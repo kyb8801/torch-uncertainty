@@ -11,13 +11,11 @@ class OODCriterionInputType(Enum):
     """Enum representing the type of input expected by the OOD (Out-of-Distribution) criteria.
 
     Attributes:
-        LOGIT (int): The input of the OOD Criterion is in the form of logits (pre-softmax values).
-        PROB (int): The input is in the form of probabilities (post-softmax values), also called
-            likelihoods.
-        ESTIMATOR_PROB (int): The input is in the form of estimated probabilities from an ensemble
+        LOGIT: The input of the OOD criterion is in the form of logits (pre-softmax values).
+        PROB: The input is in the form of probabilities (post-softmax values).
+        ESTIMATOR_PROB: The input is in the form of estimated probabilities from an ensemble
             or another probabilistic model.
-        POST_PROCESSING (int): The input is the prediction score given by the post-processing
-            method.
+        POST_PROCESSING: The input is the prediction score given by the post-processing method.
     """
 
     LOGIT = 1
@@ -38,8 +36,8 @@ class TUOODCriterion(nn.Module, ABC):
         criteria. Subclasses must implement the `forward` method.
 
         Attributes:
-            input_type (OODCriterionInputType): Type of input expected by the criterion.
-            ensemble_only (bool): Whether the criterion requires ensemble outputs.
+            input_type: Type of input expected by the criterion.
+            ensemble_only: Whether the criterion requires ensemble outputs.
         """
         super().__init__()
 
@@ -48,7 +46,7 @@ class TUOODCriterion(nn.Module, ABC):
         """Forward pass for the OOD criterion.
 
         Args:
-            inputs (Tensor): The input tensor representing model outputs.
+            inputs: The input tensor representing model outputs.
 
         Returns:
             Tensor: OOD score computed according to the criterion.
@@ -66,7 +64,7 @@ class MaxLogitCriterion(TUOODCriterion):
         the output dimensions. Lower maximum logits indicate greater uncertainty.
 
         Attributes:
-            input_type (OODCriterionInputType): Expected input type is logits.
+            input_type: Expected input type is logits.
         """
         super().__init__()
 
@@ -74,7 +72,7 @@ class MaxLogitCriterion(TUOODCriterion):
         """Compute the negative of the maximum logit value.
 
         Args:
-            inputs (Tensor): Tensor of logits with shape (batch_size, num_classes).
+            inputs: Tensor of logits with shape (batch_size, num_classes).
 
         Returns:
             Tensor: Negative of the maximum logit value for each sample.
@@ -98,7 +96,7 @@ class EnergyCriterion(TUOODCriterion):
         where :math:`\mathbf{z} = [z_1, z_2, \dots, z_C]` is the logit vector.
 
         Attributes:
-            input_type (OODCriterionInputType): Expected input type is logits.
+            input_type: Expected input type is logits.
         """
         super().__init__()
 
@@ -106,7 +104,7 @@ class EnergyCriterion(TUOODCriterion):
         """Compute the negative energy score.
 
         Args:
-            inputs (Tensor): Tensor of logits with shape (batch_size, num_classes).
+            inputs: Tensor of logits with shape (batch_size, num_classes).
 
         Returns:
             Tensor: Negative energy score for each sample.
@@ -121,7 +119,7 @@ class MaxSoftmaxCriterion(TUOODCriterion):
         r"""OOD criterion based on maximum softmax probability.
 
         This criterion computes the negative of the highest softmax probability.
-        Lower maximum probabilities indicate greater uncertainty. Probabilities are also called*
+        Lower maximum probabilities indicate greater uncertainty. Probabilities are also called
         likelihoods in a more formal context.
 
         .. math::
@@ -130,7 +128,7 @@ class MaxSoftmaxCriterion(TUOODCriterion):
         where :math:`\mathbf{p} = [p_1, p_2, \dots, p_C]` is the probability vector.
 
         Attributes:
-            input_type (OODCriterionInputType): Expected input type is probabilities.
+            input_type: Expected input type is probabilities.
         """
         super().__init__()
 
@@ -138,7 +136,7 @@ class MaxSoftmaxCriterion(TUOODCriterion):
         """Compute the negative of the maximum softmax probability.
 
         Args:
-            inputs (Tensor): Tensor of probabilities with shape (batch_size, num_classes).
+            inputs: Tensor of probabilities with shape (batch_size, num_classes).
 
         Returns:
             Tensor: Negative of the highest softmax probability for each sample.
@@ -165,7 +163,7 @@ class EntropyCriterion(TUOODCriterion):
         where :math:`\mathbf{p} = [p_1, p_2, \dots, p_C]` is the probability vector.
 
         Attributes:
-            input_type (OODCriterionInputType): Expected input type is estimated probabilities.
+            input_type: Expected input type is estimated probabilities.
         """
         super().__init__()
 
@@ -173,7 +171,7 @@ class EntropyCriterion(TUOODCriterion):
         """Compute the entropy of the predicted probability distribution.
 
         Args:
-            inputs (Tensor): Tensor of estimated probabilities with shape (batch_size, num_classes).
+            inputs: Tensor of estimated probabilities with shape (batch_size, num_classes).
 
         Returns:
             Tensor: Mean entropy value for each sample.
@@ -197,8 +195,8 @@ class MutualInformationCriterion(TUOODCriterion):
             I(y, \theta) = H\Big(\frac{1}{K}\sum_{k=1}^{K} \mathbf{p}^{(k)}\Big) - \frac{1}{K}\sum_{k=1}^{K} H(\mathbf{p}^{(k)})
 
         Attributes:
-            ensemble_only (bool): Requires ensemble predictions.
-            input_type (OODCriterionInputType): Expected input type is estimated probabilities.
+            ensemble_only: Requires ensemble predictions.
+            input_type: Expected input type is estimated probabilities.
         """
         super().__init__()
         self.mi_metric = MutualInformation(reduction="none")
@@ -207,7 +205,7 @@ class MutualInformationCriterion(TUOODCriterion):
         """Compute mutual information from ensemble predictions.
 
         Args:
-            inputs (Tensor): Tensor of ensemble probabilities with shape
+            inputs: Tensor of ensemble probabilities with shape
                 (ensemble_size, batch_size, num_classes).
 
         Returns:
@@ -233,8 +231,8 @@ class VariationRatioCriterion(TUOODCriterion):
             \text{VR} = 1 - \frac{n_{\text{mode}}}{K}
 
         Attributes:
-            ensemble_only (bool): Requires ensemble predictions.
-            input_type (OODCriterionInputType): Expected input type is estimated probabilities.
+            ensemble_only: Requires ensemble predictions.
+            input_type: Expected input type is estimated probabilities.
         """
         super().__init__()
         self.vr_metric = VariationRatio(reduction="none", probabilistic=False)
@@ -243,7 +241,7 @@ class VariationRatioCriterion(TUOODCriterion):
         """Compute variation ratio from ensemble predictions.
 
         Args:
-            inputs (Tensor): Tensor of ensemble probabilities with shape
+            inputs: Tensor of ensemble probabilities with shape
                 (ensemble_size, batch_size, num_classes).
 
         Returns:
@@ -256,7 +254,7 @@ def get_ood_criterion(ood_criterion: type[TUOODCriterion] | TUOODCriterion | str
     """Get an OOD criterion instance based on a string identifier or class type.
 
     Args:
-        ood_criterion (str, type or TUOODCriterion): A string identifier for a predefined OOD criterion
+        ood_criterion: A string identifier for a predefined OOD criterion
             or a subclass of `TUOODCriterion`.
 
     Returns:

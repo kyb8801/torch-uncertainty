@@ -26,12 +26,10 @@ class Fractals(ImageFolder):
         """Dataset used for PixMix augmentations.
 
         Args:
-            root (str | Path): Root directory of dataset.
-            transform (Callable[..., Any] | None): Transform to apply to the input samples.
-                Defaults to ``None``.
-            target_transform (Callable[..., Any] | None): Transform to apply to the target labels.
-                Defaults to ``None``.
-            download (bool): If ``True``, downloads the dataset if not present. Defaults to ``False``.
+            root: Root directory of dataset.
+            transform: Transform to apply to the input samples. Defaults to ``None``.
+            target_transform: Transform to apply to the target labels. Defaults to ``None``.
+            download: If ``True``, downloads the dataset if not present. Defaults to ``False``.
 
         Note:
             There is no information on the license of the dataset. It may not
@@ -73,6 +71,6 @@ class Fractals(ImageFolder):
         """Get the samples and targets of the dataset.
 
         Args:
-            index (int): The index of the sample to get.
+            index: The index of the sample to get.
         """
         return super().__getitem__(index)[0]
