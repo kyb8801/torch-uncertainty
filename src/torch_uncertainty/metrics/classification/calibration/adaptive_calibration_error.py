@@ -86,6 +86,50 @@ def _equal_binning_bucketize_with_bounds(
     )
 
 
+def _ace_compute(
+    confidences: Tensor,
+    accuracies: Tensor,
+    num_bins: int,
+    norm: Literal["l1", "l2", "max"] = "l1",
+    debias: bool = False,
+) -> Tensor:
+    """Compute the adaptive calibration error given the provided number of bins
+        and norm.
+
+    Args:
+        confidences: The confidence (i.e. predicted prob) of the top1
+            prediction.
+        accuracies: 1.0 if the top-1 prediction was correct, 0.0 otherwise.
+        num_bins: Number of bins to use when computing adaptive calibration
+            error.
+        norm: Norm function to use when computing calibration error. Defaults
+            to "l1".
+        debias: Apply debiasing to L2 norm computation as in
+            `Verified Uncertainty Calibration`. Defaults to False.
+
+    Returns:
+        Tensor: Adaptive Calibration error scalar.
+    """
+    with torch.no_grad():
+        acc_bin, conf_bin, prop_bin = _equal_binning_bucketize(confidences, accuracies, num_bins)
+
+    if norm == "l1":
+        return torch.sum(torch.abs(acc_bin - conf_bin) * prop_bin)
+    if norm == "l2":
+        ace = torch.sum(torch.pow(acc_bin - conf_bin, 2) * prop_bin)
+        if debias:  # coverage: ignore
+            debias_bins = (acc_bin * (acc_bin - 1) * prop_bin) / (
+                prop_bin * accuracies.size()[0] - 1
+            )
+            ace += torch.sum(
+                torch.nan_to_num(debias_bins)
+            )  # replace nans with zeros if nothing appeared in a bin
+        return torch.sqrt(ace) if ace > 0 else torch.tensor(0)
+    if norm == "max":
+        return torch.max(torch.abs(acc_bin - conf_bin))
+    raise ValueError(f"Unexpected norm. Got {norm}.")
+
+
 def _adaptive_reliability_diagram_subplot(
     ax,
     bin_accuracies: np.ndarray,
@@ -93,6 +137,8 @@ def _adaptive_reliability_diagram_subplot(
     bin_sizes: np.ndarray,
     bin_lowers: np.ndarray,
     bin_uppers: np.ndarray,
+    norm: str | None,
+    ace_value: float | None,
     title: str = "Adaptive Reliability Diagram",
     xlabel: str = "Top-class Confidence (%)",
     ylabel: str = "Success Rate (%)",
@@ -136,18 +182,16 @@ def _adaptive_reliability_diagram_subplot(
     ax.set_aspect("equal")
     ax.plot([0, 100], [0, 100], linestyle="--", color="gray")
 
-    gaps = np.abs(bin_accuracies - bin_confidences)
-    ace = np.sum(gaps * bin_sizes)
-
-    ax.text(
-        0.98,
-        0.02,
-        f"ACE={ace:.02%}",
-        color="black",
-        ha="right",
-        va="bottom",
-        transform=ax.transAxes,
-    )
+    if norm is not None and ace_value is not None:
+        ax.text(
+            0.98,
+            0.02,
+            f"ACE (norm: {norm}) = {ace_value:.02%}",
+            color="black",
+            ha="right",
+            va="bottom",
+            transform=ax.transAxes,
+        )
 
     ax.set_xlim(0, 100)
     ax.set_ylim(0, 100)
@@ -204,6 +248,8 @@ def adaptive_reliability_chart(
     bin_sizes: np.ndarray,
     bin_lowers: np.ndarray,
     bin_uppers: np.ndarray,
+    norm: str | None = None,
+    ace_value: float | None = None,
     title: str = "Adaptive Reliability Diagram",
     rd_xlabel: str = "Top-class Confidence (%)",
     rd_ylabel: str = "Success Rate (%)",
@@ -239,6 +285,8 @@ def adaptive_reliability_chart(
         bin_sizes,
         bin_lowers,
         bin_uppers,
+        norm=norm,
+        ace_value=ace_value,
         title=title,
         xlabel=rd_xlabel,
         ylabel=rd_ylabel,
@@ -269,6 +317,7 @@ def _adaptive_custom_plot(
     confidences = dim_zero_cat(self.confidences)
     accuracies = dim_zero_cat(self.accuracies)
 
+    ace_value = _ace_compute(confidences, accuracies, num_bins=self.n_bins, norm=self.norm).item()
     with torch.no_grad():
         acc_bin, conf_bin, prop_bin, bin_lowers, bin_uppers = _equal_binning_bucketize_with_bounds(
             confidences, accuracies, self.n_bins
@@ -287,51 +336,9 @@ def _adaptive_custom_plot(
         rd_ylabel=rd_ylabel,
         ch_xlabel=ch_xlabel,
         ch_ylabel=ch_ylabel,
+        ace_value=ace_value,
+        norm=self.norm,
     )
-
-
-def _ace_compute(
-    confidences: Tensor,
-    accuracies: Tensor,
-    num_bins: int,
-    norm: Literal["l1", "l2", "max"] = "l1",
-    debias: bool = False,
-) -> Tensor:
-    """Compute the adaptive calibration error given the provided number of bins
-        and norm.
-
-    Args:
-        confidences: The confidence (i.e. predicted prob) of the top1
-            prediction.
-        accuracies: 1.0 if the top-1 prediction was correct, 0.0 otherwise.
-        num_bins: Number of bins to use when computing adaptive calibration
-            error.
-        norm: Norm function to use when computing calibration error. Defaults
-            to "l1".
-        debias: Apply debiasing to L2 norm computation as in
-            `Verified Uncertainty Calibration`. Defaults to False.
-
-    Returns:
-        Tensor: Adaptive Calibration error scalar.
-    """
-    with torch.no_grad():
-        acc_bin, conf_bin, prop_bin = _equal_binning_bucketize(confidences, accuracies, num_bins)
-
-    if norm == "l1":
-        return torch.sum(torch.abs(acc_bin - conf_bin) * prop_bin)
-    if norm == "max":
-        return torch.max(torch.abs(acc_bin - conf_bin))
-    if norm == "l2":
-        ace = torch.sum(torch.pow(acc_bin - conf_bin, 2) * prop_bin)
-        if debias:  # coverage: ignore
-            debias_bins = (acc_bin * (acc_bin - 1) * prop_bin) / (
-                prop_bin * accuracies.size()[0] - 1
-            )
-            ace += torch.sum(
-                torch.nan_to_num(debias_bins)
-            )  # replace nans with zeros if nothing appeared in a bin
-        return torch.sqrt(ace) if ace > 0 else torch.tensor(0)
-    raise ValueError(f"Unexpected norm. Got {norm}.")
 
 
 class BinaryAdaptiveCalibrationError(Metric):
