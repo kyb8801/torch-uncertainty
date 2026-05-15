@@ -36,7 +36,7 @@ class CreditApproval(TabularClassificationDataset):
         data = data.iloc[:, :-1]
         # Impute missing values
         for col in data.columns:
-            if data[col].dtype == object:
+            if not pd.api.types.is_numeric_dtype(data[col]):
                 data[col] = data[col].fillna(data[col].mode()[0])
             else:
                 data[col] = data[col].fillna(data[col].mean())

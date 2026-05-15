@@ -49,7 +49,7 @@ class APSFailure(TabularClassificationDataset):
             na_values=["na"],
             comment=None,
             header=0,
-            skiprows=lambda i: i < 20 and i > 0,
+            skiprows=20,
         )
         self.targets = torch.as_tensor(
             (data["class"] == "pos").astype(int).values, dtype=torch.long

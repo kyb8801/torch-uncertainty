@@ -10,7 +10,9 @@ class KDDChurn(TabularClassificationDataset):
 
     Predicts telecommunications customer churn from 190 numeric and 40
     categorical features. Missing values are imputed with the column mean
-    (numeric) or the mode (categorical). Downloaded from OpenML as an ARFF.
+    (numeric); categorical columns use label encoding because several have
+    thousands of unique values, making one-hot encoding impractical.
+    Downloaded from OpenML as an ARFF.
 
     Reference:
         G. Lemaitre et al., *Challenges in Representation Learning: A Report
@@ -40,14 +42,12 @@ class KDDChurn(TabularClassificationDataset):
             (df[target_col].astype(float) > 0).astype(int).values, dtype=torch.long
         )
         df = df.drop(columns=[target_col])
-        # Impute missing values
+        # Impute and label-encode: one-hot encoding is impractical here because
+        # several categorical columns have thousands of unique values (>70k total).
         for col in df.columns:
-            if df[col].dtype == object:
-                mode = df[col].mode()
-                df[col] = df[col].fillna(mode[0] if len(mode) else "unknown")
+            if not pd.api.types.is_numeric_dtype(df[col]):
+                df[col] = df[col].fillna("__missing__").astype("category").cat.codes.astype(float)
             else:
                 df[col] = df[col].fillna(df[col].mean())
-        cat_cols = df.select_dtypes(include="object").columns
-        df = pd.get_dummies(df, columns=cat_cols).astype(float)
-        self.data = torch.as_tensor(df.values, dtype=torch.float32)
+        self.data = torch.as_tensor(df.values.astype(float), dtype=torch.float32)
         self.num_features = self.data.shape[1]

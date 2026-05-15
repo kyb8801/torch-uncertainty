@@ -34,8 +34,13 @@ class TelcoChurn(TabularClassificationDataset):
         # Drop non-predictive identifier
         df = df.drop(columns=["phone_number"], errors="ignore")
         target_col = "class"
-        target_vals = df[target_col].str.strip().str.lower()
-        self.targets = torch.as_tensor((target_vals == "true").astype(int).values, dtype=torch.long)
+        target_vals = df[target_col]
+        if pd.api.types.is_numeric_dtype(target_vals):
+            self.targets = torch.as_tensor(target_vals.astype(int).values, dtype=torch.long)
+        else:
+            self.targets = torch.as_tensor(
+                (target_vals.str.strip().str.lower() == "true").astype(int).values, dtype=torch.long
+            )
         df = df.drop(columns=[target_col])
         cat_cols = df.select_dtypes(include="object").columns
         df = pd.get_dummies(df, columns=cat_cols).astype(float)

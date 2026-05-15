@@ -20,8 +20,8 @@ class AmazonAccess(TabularClassificationDataset):
         license. Check before use.
     """
 
-    # OpenML dataset ~41135 — verify the file_id at openml.org if download fails
-    url = "https://api.openml.org/data/v1/download/21820967"
+    # OpenML dataset 4135 — file_id from https://www.openml.org/api/v1/json/data/4135
+    url = "https://api.openml.org/data/v1/download/1681098"
     dataset_name = "amazon_access"
     filename = "amazon_employee_access.arff"
     is_archive = False
@@ -37,7 +37,7 @@ class AmazonAccess(TabularClassificationDataset):
     def _make_dataset(self) -> None:
         df = _load_arff(self.root / self.dataset_name / self.filename)
         target_col = "target" if "target" in df.columns else df.columns[-1]
-        self.targets = torch.as_tensor(df[target_col].astype(int).values, dtype=torch.long)
+        self.targets = torch.tensor(df[target_col].astype(int).values.copy(), dtype=torch.long)
         df = df.drop(columns=[target_col])
         cat_cols = df.select_dtypes(include="object").columns
         df = pd.get_dummies(df, columns=cat_cols).astype(float)
