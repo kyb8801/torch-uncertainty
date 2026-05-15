@@ -66,7 +66,7 @@ def create_train_val_split(
 
     Args:
         dataset: The dataset to be split.
-        val_split_rate: The amount of the original dataset to use as validation split. 
+        val_split_rate: The amount of the original dataset to use as validation split.
             Expected to be non-zero.
         val_transforms: The transformations to apply on the validation set.
             Defaults to ``None``.
@@ -74,6 +74,10 @@ def create_train_val_split(
     Returns:
         tuple[Dataset, Dataset]: The training and the validation splits.
     """
+    if val_split_rate <= 0:
+        raise ValueError(
+            f"val_split_rate is expected to be strictly greater than zero. Got {val_split_rate} <=0 ."
+        )
     n = len(dataset)
     val_size = max(1, round(n * val_split_rate))
     train, val = random_split(dataset, [n - val_size, val_size])
