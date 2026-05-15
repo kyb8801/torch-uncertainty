@@ -25,8 +25,8 @@ def packed_linear(
             - "sparse": uses a sparse weight tensor directly to apply the linear transformation.
             - "einsum": uses `torch.einsum` to apply the packed linear transformation.
             - "conv1d": uses `torch.nn.functional.conv1d` to apply the packed linear transformation.
-        rearrange (bool): _description_. Defaults to ``True``.
-        bias (Tensor | None): _description_. Defaults to ``None``.
+        rearrange: Whether to rearrange the inputs for the ``"conv1d"`` implementation. Defaults to ``True``.
+        bias: The projection bias. Defaults to ``None``.
 
     Returns:
         Tensor: Output tensor after applying the packed linear transform.

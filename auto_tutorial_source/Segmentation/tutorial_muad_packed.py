@@ -135,7 +135,7 @@ model = packed_small_unet(
 # %%
 # 4. Compute class weights to mitigate class inbalance
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-def enet_weighing(dataloader, num_classes, c=1.02):
+def enet_weighting(dataloader, num_classes, c=1.02):
     """Computes class weights as described in the ENet paper.
 
         w_class = 1 / (ln(c + p_class)),
