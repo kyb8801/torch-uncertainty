@@ -149,7 +149,7 @@ def enet_weighting(dataloader, num_classes, c=1.02):
         https://arxiv.org/abs/1606.02147
 
     Args:
-        dataloader (``data.Dataloader``): A data loader to iterate over the dataset.
+        dataloader: A data loader to iterate over the dataset.
         num_classes: The number of classes.
         c: An additional hyper-parameter which restricts
             the interval of values for the weights. Defaults to `1.02`.
