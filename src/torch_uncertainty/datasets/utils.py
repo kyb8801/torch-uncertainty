@@ -79,7 +79,7 @@ def create_train_val_split(
             f"val_split_rate is expected to be strictly greater than zero. Got {val_split_rate} <=0 ."
         )
     n = len(dataset)
-    val_size = max(1, round(n * val_split_rate))
+    val_size = round(n * val_split_rate)
     train, val = random_split(dataset, [n - val_size, val_size])
     val = copy.deepcopy(val)  # Ensure train.dataset.transform is not modified next line
     val.dataset.transform = val_transforms
