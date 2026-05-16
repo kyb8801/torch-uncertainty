@@ -12,6 +12,10 @@ class TestCoverageRate:
         pred = torch.tensor([0.2, 0.2, 0.0, 0.2, 0.2]).unsqueeze(0)
         assert metric(pred) == 4
 
+        metric = SetSize(reduction="sum")
+        pred = torch.tensor([[0.2, 0.2, 0.2, 0.0, 0.2], [0.2, 0.0, 0.0, 0.0, 0.2]])
+        assert metric(pred) == 6
+
         metric = SetSize(reduction=None)
         pred = torch.tensor([[0.2, 0.2, 0.2, 0.0, 0.2], [0.2, 0.0, 0.0, 0.0, 0.2]]).repeat(2, 1)
         assert all(metric(pred) == torch.tensor([4, 2, 4, 2]))

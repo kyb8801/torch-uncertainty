@@ -11,8 +11,10 @@ class TestUCRUEADataModule:
             batch_size=128,
         )
         dm.dataset = DummyClassificationDataset
+        dm.prepare_data()
         dm.setup()
         dm.setup("test")
+        dm.setup("fit")
         dm.train_dataloader()
         dm.val_dataloader()
         dm.test_dataloader()
@@ -25,3 +27,12 @@ class TestUCRUEADataModule:
         dm.dataset = DummyClassificationDataset
         dm.setup()
         dm.setup("test")
+
+        dm = UCRUEADataModule(
+            dataset_name="test",
+            batch_size=128,
+            eval_ood=True,
+        )
+        dm.dataset = DummyClassificationDataset
+        dm.setup("test")
+        dm.test_dataloader()

@@ -106,3 +106,5 @@ class TestMIMOResnet:
         model = mimo_resnet(1, 10, 50, 2, style="cifar")
         model.train()
         model(torch.rand((2, 1, 28, 28)))
+        model.eval()
+        model(torch.rand((1, 1, 28, 28)))
