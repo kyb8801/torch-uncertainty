@@ -39,5 +39,16 @@ from .frost import FrostImages
 from .kitti import KITTIDepth
 from .muad import MUAD
 from .nyu import NYUv2
-from .regression import UCIRegression
+from .regression import (
+    BostonHousing,
+    Concrete,
+    EnergyEfficiency,
+    EnergyPrediction,
+    Kin8NM,
+    NavalPropulsionPlant,
+    PowerPlant,
+    Protein,
+    TabularRegressionDataset,
+    Yacht,
+)
 from .segmentation import CamVid, Cityscapes

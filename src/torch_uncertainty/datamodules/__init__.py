@@ -25,4 +25,16 @@ from .classification import (
     WineQualityDataModule,
 )
 from .segmentation import CamVidDataModule, CityscapesDataModule, MUADDataModule
-from .uci_regression import UCIRegressionDataModule
+from .tabular_regression import (
+    BostonHousingDataModule,
+    ConcreteDataModule,
+    EnergyEfficiencyDataModule,
+    EnergyPredictionDataModule,
+    Kin8NMDataModule,
+    NavalPropulsionPlantDataModule,
+    PowerPlantDataModule,
+    ProteinDataModule,
+    TabularRegressionDataModule,
+    WineQualityRegressionDataModule,
+    YachtDataModule,
+)

@@ -51,12 +51,12 @@ class APSFailure(TabularClassificationDataset):
             header=0,
             skiprows=20,
         )
-        self.targets = torch.as_tensor(
-            (data["class"] == "pos").astype(int).values, dtype=torch.long
+        self.targets = torch.tensor(
+            (data["class"] == "pos").astype(int).to_numpy(), dtype=torch.long
         )
         data = data.drop(columns=["class"])
         # Impute missing values with column mean
         data = data.apply(pd.to_numeric, errors="coerce")
         data = data.fillna(data.mean())
-        self.data = torch.as_tensor(data.values, dtype=torch.float32)
+        self.data = torch.tensor(data.to_numpy(dtype=float), dtype=torch.float32)
         self.num_features = self.data.shape[1]
