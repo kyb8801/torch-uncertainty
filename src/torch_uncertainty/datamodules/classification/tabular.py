@@ -55,7 +55,7 @@ class TabularClassificationDataModule(TUDataModule):
         Args:
             root: Root directory of the datasets.
             batch_size: Number of samples per batch during training.
-            eval_batch_size: Number of samples per batch during evaluation. Defaults to 
+            eval_batch_size: Number of samples per batch during evaluation. Defaults to
                 :attr:`batch_size`.
             val_split: Share of the training samples to use as validation set. Defaults to ``0``.
             test_split: Share of the full dataset to hold out as test set (used when the dataset
