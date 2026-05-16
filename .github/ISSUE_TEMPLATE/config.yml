@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Discord
+    url: https://discord.gg/HMCawt5MJu
+    about: Ask questions and discuss the project on Discord.
+  - name: Documentation
+    url: https://torch-uncertainty.github.io
+    about: Check the documentation before opening an issue.
