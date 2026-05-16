@@ -55,21 +55,15 @@ class TabularClassificationDataModule(TUDataModule):
         Args:
             root: Root directory of the datasets.
             batch_size: Number of samples per batch during training.
-            eval_batch_size: Number of samples per batch during
-                evaluation. Defaults to :attr:`batch_size`.
-            val_split: Share of the training samples to use
-                as validation set. Defaults to ``0``.
-            test_split: Share of the full dataset to hold out
-                as test set (used when the dataset has no predefined split).
-                Defaults to ``0.2``.
-            num_workers: Number of data-loading subprocesses.
-                Defaults to ``1``.
-            pin_memory: Whether to pin memory. Defaults to
-                ``True``.
-            persistent_workers: Whether to keep workers alive
-                between epochs. Defaults to ``True``.
-            binary: If ``True``, returns scalar targets.
-                Defaults to ``True``.
+            eval_batch_size: Number of samples per batch during evaluation. Defaults to 
+                :attr:`batch_size`.
+            val_split: Share of the training samples to use as validation set. Defaults to ``0``.
+            test_split: Share of the full dataset to hold out as test set (used when the dataset
+                has no predefined split). Defaults to ``0.2``.
+            num_workers: Number of data-loading subprocesses. Defaults to ``1``.
+            pin_memory: Whether to pin memory. Defaults to ``True``.
+            persistent_workers: Whether to keep workers alive between epochs. Defaults to ``True``.
+            binary: If ``True``, returns scalar targets. Defaults to ``True``.
         """
         super().__init__(
             root=root,
@@ -95,8 +89,7 @@ class TabularClassificationDataModule(TUDataModule):
         """Create train, val, and test splits.
 
         Args:
-            stage: ``"fit"``, ``"test"``, or ``None``
-                (both). Defaults to ``None``.
+            stage: ``"fit"``, ``"test"``, or ``None``. Defaults to ``None``.
         """
         if stage == "fit" or stage is None:
             full = self.dataset_class(
@@ -237,24 +230,15 @@ class WineQualityDataModule(TabularClassificationDataModule):
         Args:
             root: Root directory of the datasets.
             batch_size: Number of samples per training batch.
-            eval_batch_size: Samples per evaluation batch.
-                Defaults to :attr:`batch_size`.
-            val_split: Share of training samples used for
-                validation. Defaults to ``0``.
-            test_split: Share of the full dataset held out
-                as test set. Defaults to ``0.2``.
-            num_workers: Data-loading subprocesses. Defaults
-                to ``1``.
-            pin_memory: Whether to pin memory. Defaults to
-                ``True``.
-            persistent_workers: Whether to keep workers alive
-                between epochs. Defaults to ``True``.
-            binary: If ``True``, binarises quality scores.
-                Defaults to ``True``.
-            variant: ``"red"`` or ``"white"``. Defaults to
-                ``"red"``.
-            threshold: Quality threshold for binary mode.
-                Defaults to ``6``.
+            eval_batch_size: Samples per evaluation batch. Defaults to :attr:`batch_size`.
+            val_split: Share of training samples used for validation. Defaults to ``0``.
+            test_split: Share of the full dataset held out as test set. Defaults to ``0.2``.
+            num_workers: Data-loading subprocesses. Defaults to ``1``.
+            pin_memory: Whether to pin memory. Defaults to ``True``.
+            persistent_workers: Whether to keep workers alive between epochs. Defaults to ``True``.
+            binary: If ``True``, binarises quality scores. Defaults to ``True``.
+            variant: ``"red"`` or ``"white"``. Defaults to ``"red"``.
+            threshold: Quality threshold for binary mode. Defaults to ``6``.
         """
         super().__init__(
             root=root,
