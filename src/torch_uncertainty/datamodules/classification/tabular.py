@@ -53,22 +53,22 @@ class TabularClassificationDataModule(TUDataModule):
         """Tabular binary classification datamodule.
 
         Args:
-            root (str | Path): Root directory of the datasets.
-            batch_size (int): Number of samples per batch during training.
-            eval_batch_size (int | None): Number of samples per batch during
+            root: Root directory of the datasets.
+            batch_size: Number of samples per batch during training.
+            eval_batch_size: Number of samples per batch during
                 evaluation. Defaults to :attr:`batch_size`.
-            val_split (float, optional): Share of the training samples to use
+            val_split: Share of the training samples to use
                 as validation set. Defaults to ``0``.
-            test_split (float, optional): Share of the full dataset to hold out
+            test_split: Share of the full dataset to hold out
                 as test set (used when the dataset has no predefined split).
                 Defaults to ``0.2``.
-            num_workers (int, optional): Number of data-loading subprocesses.
+            num_workers: Number of data-loading subprocesses.
                 Defaults to ``1``.
-            pin_memory (bool, optional): Whether to pin memory. Defaults to
+            pin_memory: Whether to pin memory. Defaults to
                 ``True``.
-            persistent_workers (bool, optional): Whether to keep workers alive
+            persistent_workers: Whether to keep workers alive
                 between epochs. Defaults to ``True``.
-            binary (bool, optional): If ``True``, returns scalar targets.
+            binary: If ``True``, returns scalar targets.
                 Defaults to ``True``.
         """
         super().__init__(
@@ -95,7 +95,7 @@ class TabularClassificationDataModule(TUDataModule):
         """Create train, val, and test splits.
 
         Args:
-            stage (str | None, optional): ``"fit"``, ``"test"``, or ``None``
+            stage: ``"fit"``, ``"test"``, or ``None``
                 (both). Defaults to ``None``.
         """
         if stage == "fit" or stage is None:
@@ -235,25 +235,25 @@ class WineQualityDataModule(TabularClassificationDataModule):
         """Wine Quality datamodule.
 
         Args:
-            root (str | Path): Root directory of the datasets.
-            batch_size (int): Number of samples per training batch.
-            eval_batch_size (int | None): Samples per evaluation batch.
+            root: Root directory of the datasets.
+            batch_size: Number of samples per training batch.
+            eval_batch_size: Samples per evaluation batch.
                 Defaults to :attr:`batch_size`.
-            val_split (float, optional): Share of training samples used for
+            val_split: Share of training samples used for
                 validation. Defaults to ``0``.
-            test_split (float, optional): Share of the full dataset held out
+            test_split: Share of the full dataset held out
                 as test set. Defaults to ``0.2``.
-            num_workers (int, optional): Data-loading subprocesses. Defaults
+            num_workers: Data-loading subprocesses. Defaults
                 to ``1``.
-            pin_memory (bool, optional): Whether to pin memory. Defaults to
+            pin_memory: Whether to pin memory. Defaults to
                 ``True``.
-            persistent_workers (bool, optional): Whether to keep workers alive
+            persistent_workers: Whether to keep workers alive
                 between epochs. Defaults to ``True``.
-            binary (bool, optional): If ``True``, binarises quality scores.
+            binary: If ``True``, binarises quality scores.
                 Defaults to ``True``.
-            variant (str, optional): ``"red"`` or ``"white"``. Defaults to
+            variant: ``"red"`` or ``"white"``. Defaults to
                 ``"red"``.
-            threshold (int, optional): Quality threshold for binary mode.
+            threshold: Quality threshold for binary mode.
                 Defaults to ``6``.
         """
         super().__init__(

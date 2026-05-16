@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pandas as pd
 import torch
-from torch import Generator
+from torch import Generator, Tensor
 from torch.utils.data import Dataset
 from torchvision.datasets.utils import (
     download_and_extract_archive,
@@ -91,22 +91,20 @@ class TabularClassificationDataset(Dataset, ABC):
         """Tabular binary classification dataset.
 
         Args:
-            root (str | Path): Root directory of the datasets.
-            transform (callable, optional): A function/transform that takes in a
+            root: Root directory of the datasets.
+            transform: A function/transform that takes in a
                 tensor and returns a transformed version. Defaults to ``None``.
-            target_transform (callable, optional): A function/transform that takes
+            target_transform: A function/transform that takes
                 in the target and transforms it. Defaults to ``None``.
-            binary (bool, optional): If ``True``, returns scalar targets; otherwise
+            binary: If ``True``, returns scalar targets; otherwise
                 one-hot encodes them into two classes. Defaults to ``True``.
-            download (bool, optional): If ``True``, downloads the dataset from the
+            download: If ``True``, downloads the dataset from the
                 internet. If already present, it is not downloaded again. Defaults
                 to ``False``.
-            train (bool, optional): If ``True``, use the training split. Defaults
-                to ``True``.
-            test_split (float, optional): Fraction of the dataset held out as test
+            train: If ``True``, use the training split. Defaults to ``True``.
+            test_split: Fraction of the dataset held out as test
                 set when :attr:`need_split` is ``True``. Defaults to ``0.2``.
-            split_seed (int, optional): Random seed for the train/test split.
-                Defaults to ``21893027``.
+            split_seed: Random seed for the train/test split. Defaults to ``21893027``.
 
         Note:
             The licenses of the datasets may differ from TorchUncertainty's
@@ -122,23 +120,27 @@ class TabularClassificationDataset(Dataset, ABC):
             self.download()
 
         self._make_dataset()
-        if self.apply_standardization:
-            self._compute_statistics()
-            self._standardize()
 
         if self.need_split:
             gen = Generator().manual_seed(split_seed)
-            self.split_idx = torch.ones(len(self)).multinomial(
+            train_idx = torch.ones(len(self)).multinomial(
                 num_samples=int((1 - test_split) * len(self)),
                 replacement=False,
                 generator=gen,
             )
-            if not self.train:
-                self.split_idx = torch.tensor(
-                    [i for i in range(len(self)) if i not in self.split_idx]
-                )
+            test_idx = torch.tensor([i for i in range(len(self)) if i not in train_idx])
+            if self.apply_standardization:
+                # Compute statistics from the training split only to avoid
+                # leaking test-set information into the normalization.
+                self._compute_statistics(self.data[train_idx])
+                self._standardize()
+            self.split_idx = train_idx if self.train else test_idx
             self.data = self.data[self.split_idx]
             self.targets = self.targets[self.split_idx]
+        elif self.apply_standardization:
+            self._compute_statistics()
+            self._standardize()
+
         self._postprocess_targets(binary)
 
     def __len__(self) -> int:
@@ -151,9 +153,10 @@ class TabularClassificationDataset(Dataset, ABC):
     def _standardize(self) -> None:
         self.data = (self.data - self.data_mean) / self.data_std
 
-    def _compute_statistics(self) -> None:
-        self.data_mean = self.data.mean(dim=0)
-        self.data_std = self.data.std(dim=0)
+    def _compute_statistics(self, data: Tensor | None = None) -> None:
+        d = self.data if data is None else data
+        self.data_mean = d.mean(dim=0)
+        self.data_std = d.std(dim=0)
         self.data_std[self.data_std == 0] = 1
 
     def download(self) -> None:
