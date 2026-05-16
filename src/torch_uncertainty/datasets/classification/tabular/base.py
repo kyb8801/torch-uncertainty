@@ -1,11 +1,8 @@
-import gzip
-import io
 import logging
 from abc import ABC, abstractmethod
 from collections.abc import Callable
 from pathlib import Path
 
-import pandas as pd
 import torch
 from torch import Generator, Tensor
 from torch.utils.data import Dataset
@@ -14,46 +11,7 @@ from torchvision.datasets.utils import (
     download_url,
 )
 
-
-def _load_arff(path: Path) -> pd.DataFrame:
-    """Parse an ARFF file into a pandas DataFrame.
-
-    Handles both plain text and gzip-compressed ARFF files.
-    """
-    try:
-        with gzip.open(path, "rt", encoding="utf-8") as f:
-            content = f.read()
-    except (gzip.BadGzipFile, OSError):
-        with path.open(encoding="utf-8") as f:
-            content = f.read()
-
-    col_names = []
-    data_start = 0
-    lines = content.splitlines()
-
-    for i, line in enumerate(lines):
-        stripped = line.strip()
-        lower = stripped.lower()
-        if not stripped or stripped.startswith("%"):
-            continue
-        if lower.startswith("@relation"):
-            continue
-        if lower.startswith("@attribute"):
-            parts = stripped.split(None, 2)
-            col_names.append(parts[1].strip("'\""))
-        elif lower == "@data":
-            data_start = i + 1
-            break
-
-    data_content = "\n".join(lines[data_start:])
-    return pd.read_csv(
-        io.StringIO(data_content),
-        header=None,
-        names=col_names,
-        na_values=["?", ""],
-        skipinitialspace=True,
-        quotechar="'",
-    )
+from torch_uncertainty.datasets.utils import load_arff  # noqa: F401
 
 
 class TabularClassificationDataset(Dataset, ABC):
@@ -194,7 +152,7 @@ class TabularClassificationDataset(Dataset, ABC):
     def _make_dataset(self) -> None:
         """Populate ``self.data`` (float32 tensor) and ``self.targets`` (long tensor)."""
 
-    def __getitem__(self, index: int) -> tuple[torch.Tensor, torch.Tensor]:
+    def __getitem__(self, index: int) -> tuple[Tensor, Tensor]:
         """Get the row of id index of the tabular data."""
         data = self.data[index, :]
         if self.transform is not None:

@@ -4,7 +4,7 @@ from pathlib import Path
 import pandas as pd
 import torch
 
-from .tabular_classification import TabularClassificationDataset
+from .base import TabularClassificationDataset
 
 
 class WineQuality(TabularClassificationDataset):

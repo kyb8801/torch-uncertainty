@@ -1,7 +1,7 @@
-import pandas as pd
 import torch
+from torchvision.datasets.utils import download_url
 
-from .tabular_classification import TabularClassificationDataset, _load_arff
+from .base import TabularClassificationDataset, load_arff
 
 
 class AmazonAccess(TabularClassificationDataset):
@@ -29,18 +29,18 @@ class AmazonAccess(TabularClassificationDataset):
     def download(self) -> None:
         if self._check_integrity():
             return
-        from torchvision.datasets.utils import download_url
 
         (self.root / self.dataset_name).mkdir(parents=True, exist_ok=True)
         download_url(self.url, root=str(self.root / self.dataset_name), filename=self.filename)
 
     def _make_dataset(self) -> None:
-        df = _load_arff(self.root / self.dataset_name / self.filename)
+        df = load_arff(self.root / self.dataset_name / self.filename)
         target_col = "target" if "target" in df.columns else df.columns[-1]
         self.targets = torch.tensor(df[target_col].astype(int).values.copy(), dtype=torch.long)
         df = df.drop(columns=[target_col])
-        cat_cols = df.select_dtypes(include="object").columns
-        df = pd.get_dummies(df, columns=cat_cols).astype(float)
-        # Treat all columns as categorical (high-cardinality integer IDs)
+        # All 9 features are high-cardinality nominal integer IDs; label-encode
+        # each column to avoid the OOM that one-hot encoding would cause.
+        for col in df.columns:
+            df[col] = df[col].astype("category").cat.codes.astype(float)
         self.data = torch.as_tensor(df.values, dtype=torch.float32)
         self.num_features = self.data.shape[1]

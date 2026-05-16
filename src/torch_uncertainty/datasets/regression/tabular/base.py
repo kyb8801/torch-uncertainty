@@ -8,6 +8,8 @@ from torch import Generator, Tensor, tensor
 from torch.utils.data import Dataset
 from torchvision.datasets.utils import download_and_extract_archive, download_url
 
+from torch_uncertainty.datasets.utils import load_arff  # noqa: F401
+
 
 class TabularRegressionDataset(Dataset, ABC):
     """Abstract base class for UCI regression datasets.
@@ -107,13 +109,15 @@ class TabularRegressionDataset(Dataset, ABC):
         data: Tensor | None = None,
         targets: Tensor | None = None,
     ) -> None:
-        d = self.data if data is None else data
-        t = self.targets if targets is None else targets
-        self.data_mean = d.mean(dim=0)
-        self.data_std = d.std(dim=0)
+        # Use float64 to avoid precision loss for large-valued features when
+        # computing the mean (e.g. NavalPropulsionPlant columns at ~1e9).
+        d = (self.data if data is None else data).double()
+        t = (self.targets if targets is None else targets).double()
+        self.data_mean = d.mean(dim=0).float()
+        self.data_std = d.std(dim=0).float()
         self.data_std[self.data_std == 0] = 1
-        self.target_mean = t.mean(dim=0)
-        self.target_std = t.std(dim=0)
+        self.target_mean = t.mean(dim=0).float()
+        self.target_std = t.std(dim=0).float()
         self.target_std[self.target_std == 0] = 1
 
     def _standardize(self) -> None:

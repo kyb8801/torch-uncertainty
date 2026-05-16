@@ -3,6 +3,7 @@ from .adult import AdultCensusIncome
 from .amazon_access import AmazonAccess
 from .aps_failure import APSFailure
 from .bank_marketing import BankMarketing
+from .base import TabularClassificationDataset
 from .credit_approval import CreditApproval
 from .credit_g import GermanCredit
 from .dota2_games import DOTA2Games
@@ -12,6 +13,5 @@ from .kdd_churn import KDDChurn
 from .online_shoppers import OnlineShoppers
 from .pima_diabetes import PimaDiabetes
 from .spam_base import SpamBase
-from .tabular_classification import TabularClassificationDataset
 from .telco_churn import TelcoChurn
 from .wine_quality import WineQuality

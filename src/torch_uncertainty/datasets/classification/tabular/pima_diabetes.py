@@ -1,7 +1,7 @@
 import torch
 from torchvision.datasets.utils import download_url
 
-from .tabular_classification import TabularClassificationDataset, _load_arff
+from .base import TabularClassificationDataset, load_arff
 
 
 class PimaDiabetes(TabularClassificationDataset):
@@ -33,7 +33,7 @@ class PimaDiabetes(TabularClassificationDataset):
         download_url(self.url, root=str(self.root / self.dataset_name), filename=self.filename)
 
     def _make_dataset(self) -> None:
-        df = _load_arff(self.root / self.dataset_name / self.filename)
+        df = load_arff(self.root / self.dataset_name / self.filename)
         target_col = "class"
         target_vals = df[target_col].str.strip()
         # OpenML encodes: tested_negative → 0, tested_positive → 1

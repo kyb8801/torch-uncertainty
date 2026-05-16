@@ -2,7 +2,7 @@ import pandas as pd
 import torch
 from torchvision.datasets.utils import download_url
 
-from .tabular_classification import TabularClassificationDataset, _load_arff
+from .base import TabularClassificationDataset, load_arff
 
 
 class KDDChurn(TabularClassificationDataset):
@@ -36,7 +36,7 @@ class KDDChurn(TabularClassificationDataset):
         download_url(self.url, root=str(self.root / self.dataset_name), filename=self.filename)
 
     def _make_dataset(self) -> None:
-        df = _load_arff(self.root / self.dataset_name / self.filename)
+        df = load_arff(self.root / self.dataset_name / self.filename)
         target_col = "CHURN"
         self.targets = torch.as_tensor(
             (df[target_col].astype(float) > 0).astype(int).values, dtype=torch.long

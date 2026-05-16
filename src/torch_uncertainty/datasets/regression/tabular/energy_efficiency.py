@@ -1,27 +1,25 @@
-import pandas as pd
 import torch
 
-from .base import TabularRegressionDataset
+from .base import TabularRegressionDataset, load_arff
 
 
 class EnergyEfficiency(TabularRegressionDataset):
     """The UCI Energy Efficiency dataset.
 
-    Predicts the heating load of buildings. The first two feature columns and
-    the last three columns of the raw Excel file are dropped (they are either
-    uninformative or the second target).
+    Predicts the heating load of buildings from eight building features.
+    The cooling load (second target) is dropped.
 
     Note:
         The licenses of the datasets may differ from TorchUncertainty's
         license. Check before use.
     """
 
-    url = "https://archive.ics.uci.edu/static/public/242/energy+efficiency.zip"
-    filename = "ENB2012_data.xlsx"
+    url = "https://api.openml.org/data/v1/download/22111824"
+    filename = "energy_efficiency.arff"
     dataset_name = "energy-efficiency"
-    md5 = "2018fb7b50778fdc1304d50a78874579"
+    is_archive = False
 
     def _make_dataset(self) -> None:
-        array = pd.read_excel(self._data_path / self.filename).to_numpy()
-        self.data = torch.tensor(array[:, 2:-3], dtype=torch.float32)
+        array = load_arff(self._data_path / self.filename).to_numpy()
+        self.data = torch.tensor(array[:, :-2], dtype=torch.float32)
         self.targets = torch.tensor(array[:, -2], dtype=torch.float32)

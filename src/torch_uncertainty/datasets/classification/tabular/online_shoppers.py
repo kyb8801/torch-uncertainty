@@ -1,7 +1,7 @@
 import pandas as pd
 import torch
 
-from .tabular_classification import TabularClassificationDataset
+from .base import TabularClassificationDataset
 
 
 class OnlineShoppers(TabularClassificationDataset):

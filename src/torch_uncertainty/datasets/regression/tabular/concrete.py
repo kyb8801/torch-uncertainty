@@ -1,7 +1,6 @@
-import pandas as pd
 import torch
 
-from .base import TabularRegressionDataset
+from .base import TabularRegressionDataset, load_arff
 
 
 class Concrete(TabularRegressionDataset):
@@ -12,12 +11,12 @@ class Concrete(TabularRegressionDataset):
         license. Check before use.
     """
 
-    url = "https://archive.ics.uci.edu/static/public/165/concrete+compressive+strength.zip"
-    filename = "Concrete_Data.xls"
+    url = "https://api.openml.org/data/v1/download/22111823"
+    filename = "concrete.arff"
     dataset_name = "concrete"
-    md5 = "eba3e28907d4515244165b6b2c311b7b"
+    is_archive = False
 
     def _make_dataset(self) -> None:
-        array = pd.read_excel(self._data_path / self.filename).to_numpy()
+        array = load_arff(self._data_path / self.filename).to_numpy()
         self.data = torch.tensor(array[:, :-1], dtype=torch.float32)
         self.targets = torch.tensor(array[:, -1], dtype=torch.float32)

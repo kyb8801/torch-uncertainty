@@ -5,7 +5,7 @@ import pandas as pd
 import torch
 from torchvision.datasets.utils import download_and_extract_archive, extract_archive
 
-from .tabular_classification import TabularClassificationDataset
+from .base import TabularClassificationDataset
 
 
 class BankMarketing(TabularClassificationDataset):
