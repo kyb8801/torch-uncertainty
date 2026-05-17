@@ -35,9 +35,16 @@ def load_arff(path: Path) -> pd.DataFrame:
         if lower.startswith("@attribute"):
             parts = stripped.split(None, 2)
             col_names.append(parts[1].strip("'\""))
-        elif lower == "@data":
+        elif lower.startswith("@data"):
             data_start = i + 1
             break
+
+    if not col_names or data_start == 0:
+        raise ValueError(
+            f"Could not parse ARFF file '{path}': no @attribute or @data section found. "
+            "The file may be corrupt or not a valid ARFF file. "
+            "Delete the cached file and re-download."
+        )
 
     data_content = "\n".join(lines[data_start:])
     return pd.read_csv(

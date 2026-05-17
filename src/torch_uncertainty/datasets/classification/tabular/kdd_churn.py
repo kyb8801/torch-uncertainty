@@ -39,7 +39,7 @@ class KDDChurn(TabularClassificationDataset):
         df = load_arff(self.root / self.dataset_name / self.filename)
         target_col = "CHURN"
         self.targets = torch.as_tensor(
-            (df[target_col].astype(float) > 0).astype(int).values, dtype=torch.long
+            (df[target_col].astype(float) > 0).astype(int).values.copy(), dtype=torch.long
         )
         df = df.drop(columns=[target_col])
         # Impute and label-encode: one-hot encoding is impractical here because

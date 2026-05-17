@@ -1,5 +1,4 @@
 import torch
-from torchvision.datasets.utils import download_url
 
 from .base import TabularClassificationDataset, load_arff
 
@@ -25,13 +24,6 @@ class AmazonAccess(TabularClassificationDataset):
     dataset_name = "amazon_access"
     filename = "amazon_employee_access.arff"
     is_archive = False
-
-    def download(self) -> None:
-        if self._check_integrity():
-            return
-
-        (self.root / self.dataset_name).mkdir(parents=True, exist_ok=True)
-        download_url(self.url, root=str(self.root / self.dataset_name), filename=self.filename)
 
     def _make_dataset(self) -> None:
         df = load_arff(self.root / self.dataset_name / self.filename)

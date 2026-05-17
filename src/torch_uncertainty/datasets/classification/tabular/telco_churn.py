@@ -36,10 +36,11 @@ class TelcoChurn(TabularClassificationDataset):
         target_col = "class"
         target_vals = df[target_col]
         if pd.api.types.is_numeric_dtype(target_vals):
-            self.targets = torch.as_tensor(target_vals.astype(int).values, dtype=torch.long)
+            self.targets = torch.as_tensor(target_vals.astype(int).values.copy(), dtype=torch.long)
         else:
             self.targets = torch.as_tensor(
-                (target_vals.str.strip().str.lower() == "true").astype(int).values, dtype=torch.long
+                (target_vals.str.strip().str.lower() == "true").astype(int).values.copy(),
+                dtype=torch.long,
             )
         df = df.drop(columns=[target_col])
         cat_cols = df.select_dtypes(include="object").columns
