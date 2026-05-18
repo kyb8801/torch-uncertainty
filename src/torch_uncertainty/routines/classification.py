@@ -503,7 +503,6 @@ class ClassificationRoutine(LightningModule):
                 self.test_id_ens_metrics.update(probs_per_est)
 
             if self.eval_ood:
-                self.test_ood_entropy.update(probs)
                 self.test_ood_metrics.update(ood_scores, torch.zeros_like(targets))
 
             if self.id_score_storage is not None:
