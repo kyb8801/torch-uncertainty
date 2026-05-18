@@ -258,6 +258,7 @@ class ClassificationRoutine(LightningModule):
 
         if self.eval_shift:
             self.test_shift_metrics = cls_metrics.clone(prefix="shift/")
+            self.test_shift_entropy = Entropy()
 
         # metrics for ensembles only
         if self.is_ensemble:
@@ -512,6 +513,7 @@ class ClassificationRoutine(LightningModule):
                 self.post_cls_metrics.update(pp_probs, targets)
 
         if self.eval_ood and dataloader_idx == 1:
+            self.test_ood_entropy.update(probs)
             self.test_ood_metrics.update(ood_scores, torch.ones_like(targets))
 
             if self.is_ensemble:
@@ -521,7 +523,9 @@ class ClassificationRoutine(LightningModule):
                 self.ood_score_storage.append(ood_scores.detach().cpu())
 
         if self.eval_shift and dataloader_idx == (2 if self.eval_ood else 1):
+            self.test_shift_entropy.update(probs)
             self.test_shift_metrics.update(probs, targets)
+
             if self.is_ensemble:
                 self.test_shift_ens_metrics.update(probs_per_est)
 
@@ -570,6 +574,9 @@ class ClassificationRoutine(LightningModule):
         if self.eval_shift:
             result_dict |= self.test_shift_metrics.compute() | {
                 "shift/severity": self.trainer.datamodule.shift_severity,
+            }
+            result_dict |= self.test_ood_metrics.compute() | {
+                "shift/Entropy": self.test_shift_entropy.compute()
             }
 
             if self.is_ensemble:
