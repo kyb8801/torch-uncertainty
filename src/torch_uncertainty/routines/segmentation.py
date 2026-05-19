@@ -30,6 +30,7 @@ from torch_uncertainty.metrics import (
     SegmentationBinaryAUROC,
     SegmentationBinaryAveragePrecision,
     SegmentationFPR95,
+    SegmentationMetric,
     SmoothCalibrationError,
 )
 from torch_uncertainty.ood_criteria import (
@@ -196,10 +197,14 @@ class SegmentationRoutine(LightningModule):
             ],
         )
 
-        self.val_seg_metrics = seg_metrics.clone(prefix="val/")
-        self.val_sbsmpl_seg_metrics = sbsmpl_seg_metrics.clone(prefix="val/")
-        self.test_seg_metrics = seg_metrics.clone(prefix="test/")
-        self.test_sbsmpl_seg_metrics = sbsmpl_seg_metrics.clone(prefix="test/")
+        self.val_seg_metrics = SegmentationMetric(seg_metrics.clone(prefix="val/"))
+        self.val_sbsmpl_seg_metrics = SegmentationMetric(
+            sbsmpl_seg_metrics.clone(prefix="val/"), subsampling_rate=self.metric_subsampling_rate
+        )
+        self.test_seg_metrics = SegmentationMetric(seg_metrics.clone(prefix="test/"))
+        self.test_sbsmpl_seg_metrics = SegmentationMetric(
+            sbsmpl_seg_metrics.clone(prefix="test/"), subsampling_rate=self.metric_subsampling_rate
+        )
 
         if self.eval_ood:
             ood_metrics = MetricCollection(
@@ -209,7 +214,7 @@ class SegmentationRoutine(LightningModule):
                     "FPR95": SegmentationFPR95(pos_label=1),
                 }
             )
-            self.test_ood_metrics = ood_metrics.clone(prefix="ood/")
+            self.test_ood_metrics = SegmentationMetric(ood_metrics.clone(prefix="ood/"))
 
     def configure_optimizers(self) -> OptimizerLRScheduler:
         return self.optim_recipe
@@ -295,14 +300,12 @@ class SegmentationRoutine(LightningModule):
             logits.shape[-2:],
             interpolation=F.InterpolationMode.NEAREST,
         )
-        logits = rearrange(logits, "(m b) c h w -> (b h w) m c", b=targets.size(0))
-        probs_per_est = logits.softmax(dim=-1)
+        logits = rearrange(logits, "(m b) c h w -> b m c h w", b=targets.size(0))
+        probs_per_est = logits.softmax(dim=2)
         probs = probs_per_est.mean(dim=1)
-        targets = targets.flatten()
-        valid_mask = (targets != 255) * (targets < self.num_classes)
-        probs, targets = probs[valid_mask], targets[valid_mask]
-        self.val_seg_metrics.update(probs, targets)
-        self.val_sbsmpl_seg_metrics.update(*self._subsample(probs, targets))
+        ignore_mask = (targets == 255) | (targets >= self.num_classes)
+        self.val_seg_metrics.update(probs, targets, ignore_mask=ignore_mask)
+        self.val_sbsmpl_seg_metrics.update(probs, targets, ignore_mask=ignore_mask)
 
     def test_step(
         self,
@@ -324,10 +327,11 @@ class SegmentationRoutine(LightningModule):
         if self.test_num_flops is None:
             flop_counter = FlopCounterMode(display=False)
             with flop_counter:
-                self.forward(img)
+                logits = self.forward(img)
             self.test_num_flops = flop_counter.get_total_flops()
+        else:
+            logits = self.forward(img)
 
-        logits = self.forward(img)
         targets = F.resize(
             targets,
             logits.shape[-2:],
@@ -346,22 +350,15 @@ class SegmentationRoutine(LightningModule):
                 _pred = _prb.argmax(dim=0, keepdim=True)
                 self.sample_buffer.append((_img, _pred, _tgt))
 
-        probs_per_est = rearrange(probs_per_est, "b m c h w -> (b h w) m c")
-        probs = rearrange(probs, "b c h w -> (b h w) c")
-        targets = targets.flatten()
-        valid_mask = targets != 255
-        probs, probs_per_est, targets = (
-            probs[valid_mask],
-            probs_per_est[valid_mask],
-            targets[valid_mask],
-        )
+        ignore_mask = targets == 255
         id_mask = targets < self.num_classes
-        ood_mask = targets >= self.num_classes
+        ood_mask = ~id_mask
 
         if dataloader_idx == 0:
-            id_probs, _, id_targets = probs[id_mask], probs_per_est[id_mask], targets[id_mask]
-            self.test_seg_metrics.update(id_probs, id_targets)
-            self.test_sbsmpl_seg_metrics.update(*self._subsample(id_probs, id_targets))
+            self.test_seg_metrics.update(probs, targets, ignore_mask=(ignore_mask | ood_mask))
+            self.test_sbsmpl_seg_metrics.update(
+                probs, targets, ignore_mask=(ignore_mask | ood_mask)
+            )
 
         if self.eval_ood and dataloader_idx == 1:
             if self.ood_criterion.input_type == OODCriterionInputType.PROB:
@@ -377,7 +374,7 @@ class SegmentationRoutine(LightningModule):
             labels[id_mask] = 0  # ID examples
             labels[ood_mask] = 1  # OOD examples
 
-            self.test_ood_metrics.update(ood_scores, labels)
+            self.test_ood_metrics.update(ood_scores, labels, ignore_mask=ignore_mask)
 
     def on_validation_epoch_end(self) -> None:
         """Compute and log the values of the collected metrics in `validation_step`."""
@@ -461,21 +458,6 @@ class SegmentationRoutine(LightningModule):
                 f"Segmentation results/{i}",
                 show_segmentation_predictions(pred_mask, gt_mask),
             )
-
-    def _subsample(self, pred: Tensor, target: Tensor) -> tuple[Tensor, Tensor]:
-        """Select a random sample of the data to compute the loss onto.
-
-        Args:
-            pred (Tensor): the prediction tensor.
-            target (Tensor): the target tensor.
-
-        Returns:
-            Tuple[Tensor, Tensor]: the subsampled prediction and target tensors.
-        """
-        total_size = target.size(0)
-        num_samples = max(1, int(total_size * self.metric_subsampling_rate))
-        indices = torch.randperm(total_size, device=pred.device)[:num_samples]
-        return pred[indices], target[indices]
 
 
 def _segmentation_routine_checks(

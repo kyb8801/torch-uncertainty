@@ -7,3 +7,4 @@ from .patched_calibration_error import (
 from .seg_binary_auroc import SegmentationBinaryAUROC
 from .seg_binary_average_precision import SegmentationBinaryAveragePrecision
 from .seg_fpr95 import SegmentationFPR95
+from .wrapper import SegmentationMetric
