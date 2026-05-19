@@ -413,15 +413,15 @@ class SegmentationRoutine(LightningModule):
         """Plot uncertainty quantification metrics and segmentation figures."""
         self.logger.experiment.add_figure(
             "Calibration/Reliabity diagram",
-            self.test_sbsmpl_seg_metrics["cal/ECE"].plot()[0],
+            self.test_sbsmpl_seg_metrics.metric["cal/ECE"].plot()[0],
         )
         self.logger.experiment.add_figure(
             "Selective Classification/Risk-Coverage curve",
-            self.test_sbsmpl_seg_metrics["sc/AURC"].plot()[0],
+            self.test_sbsmpl_seg_metrics.metric["sc/AURC"].plot()[0],
         )
         self.logger.experiment.add_figure(
             "Selective Classification/Generalized Risk-Coverage curve",
-            self.test_sbsmpl_seg_metrics["sc/AUGRC"].plot()[0],
+            self.test_sbsmpl_seg_metrics.metric["sc/AUGRC"].plot()[0],
         )
         if self.trainer.datamodule is not None:
             self._log_segmentation_plots()

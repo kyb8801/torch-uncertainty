@@ -56,6 +56,8 @@ class SegmentationMetric(Metric):
 
         if keep_mask.all():
             # If all pixels are kept, we can directly use the metric without masking
+            preds = rearrange(preds, "b c h w -> (b h w) c")
+            target = target.flatten()
             self.metric.update(preds, target)
         else:
             preds = rearrange(preds, "b c h w -> b h w c")[keep_mask]
