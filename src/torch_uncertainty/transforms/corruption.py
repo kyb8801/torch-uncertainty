@@ -116,7 +116,7 @@ class GaussianNoise(TUCorruption):
         """Apply a Gaussian noise corruption to tensor images.
 
         Args:
-            severity (int): Severity level of the corruption.
+            severity: Severity level of the corruption.
         """
         super().__init__(severity)
         self.scale = [0.08, 0.12, 0.18, 0.26, 0.38][severity - 1]
@@ -125,7 +125,7 @@ class GaussianNoise(TUCorruption):
         """Apply Gaussian noise on an input image.
 
         Args:
-            img (Tensor): A potentially batched image of shape (C, H, W) or (B, C, H, W)
+            img: A potentially batched image of shape (C, H, W) or (B, C, H, W)
         """
         if self.severity == 0:
             return img
@@ -139,7 +139,7 @@ class ShotNoise(TUCorruption):
         """Apply a shot (Poisson) noise corruption to tensor images.
 
         Args:
-            severity (int): Severity level of the corruption.
+            severity: Severity level of the corruption.
         """
         super().__init__(severity)
         self.scale = [60, 25, 12, 5, 3][severity - 1]
@@ -148,7 +148,7 @@ class ShotNoise(TUCorruption):
         """Apply Poisson noise on an input image.
 
         Args:
-            img (Tensor): A potentially batched image of shape (C, H, W) or (B, C, H, W)
+            img: A potentially batched image of shape (C, H, W) or (B, C, H, W)
         """
         if self.severity == 0:
             return img
@@ -163,8 +163,8 @@ class ImpulseNoise(TUCorruption):
         tensor images.
 
         Args:
-            severity (int): Severity level of the corruption.
-            black_white (bool): If black and white, set all pixel channel values to 0 or 1.
+            severity: Severity level of the corruption.
+            black_white: If black and white, set all pixel channel values to 0 or 1.
                 Defaults to ``False`` (as in the original paper).
         """
         super().__init__(severity)
@@ -228,7 +228,7 @@ class DefocusBlur(TUCorruption):
         """Apply a defocus blur corruption to unbatched tensor images.
 
         Args:
-            severity (int): Severity level of the corruption.
+            severity: Severity level of the corruption.
         """
         super().__init__(severity)
         if not kornia_installed:
@@ -303,8 +303,8 @@ class GlassBlur(TUCorruption):
         Faster implementation using a symetrized offset distribution.
 
         Args:
-            severity (int): Severity level of the corruption.
-            seed (int | None): Optional seed for the rng.
+            severity: Severity level of the corruption.
+            seed: Optional seed for the rng.
 
         Note:
             The hyperparameters have been adapted to output images qualitatively calibrated with
@@ -376,8 +376,8 @@ class OriginalGlassBlur(TUCorruption):
         Original, likely incorrect and very slow implementation.
 
         Args:
-            severity (int): Severity level of the corruption.
-            seed (int | None): Optional seed for the rng.
+            severity: Severity level of the corruption.
+            seed: Optional seed for the rng.
         """
         super().__init__(severity)
         if not kornia_installed:
@@ -435,8 +435,8 @@ class MotionBlur(TUCorruption):
         """Apply a motion blur corruption to unbatched tensor images.
 
         Args:
-            severity (int): Severity level of the corruption.
-            seed (int | None): Optional seed for the rng.
+            severity: Severity level of the corruption.
+            seed: Optional seed for the rng.
 
         Note:
             Originally, Hendrycks et al. used Gaussian motion blur. To remove the dependency with
@@ -493,7 +493,7 @@ class ZoomBlur(TUCorruption):
         """Apply a zoom blur corruption to unbatched tensor images.
 
         Args:
-            severity (int): Severity level of the corruption.
+            severity: Severity level of the corruption.
         """
         super().__init__(severity)
         self.zooms = [
@@ -526,8 +526,8 @@ class Snow(TUCorruption):
         """Apply a snow effect on unbatched tensor images.
 
         Args:
-            severity (int): Severity level of the corruption.
-            seed (int | None): Optional seed for the rng.
+            severity: Severity level of the corruption.
+            seed: Optional seed for the rng.
 
         Note:
             The transformation has been slightly modified, see MotionBlur for details.
@@ -578,8 +578,8 @@ class Frost(TUCorruption):
         """Apply a frost corruption effect on unbatched tensor images.
 
         Args:
-            severity (int): Severity level of the corruption.
-            seed (int | None): Optional seed for the rng.
+            severity: Severity level of the corruption.
+            seed: Optional seed for the rng.
         """
         super().__init__(severity)
         self.rng = np.random.default_rng(seed)
@@ -650,8 +650,8 @@ class Fog(TUCorruption):
         """Apply a fog corruption effect on unbatched tensor images.
 
         Args:
-            severity (int): Severity level of the corruption.
-            seed (int | None): Optional seed for the rng.
+            severity: Severity level of the corruption.
+            seed: Optional seed for the rng.
         """
         super().__init__(severity)
         self.mix = [(1.5, 2), (2, 2), (2.5, 1.7), (2.5, 1.5), (3, 1.4)][severity - 1]
@@ -682,7 +682,7 @@ class Brightness(IBrightness, TUCorruption):
         """Apply a brightness corruption to unbatched tensor images.
 
         Args:
-            severity (int): Severity level of the corruption.
+            severity: Severity level of the corruption.
 
         Note:
             The values have been changed to better reflect the magnitude of the original
@@ -704,7 +704,7 @@ class Contrast(IContrast, TUCorruption):
         """Apply a contrast corruption to unbatched tensor images.
 
         Args:
-            severity (int): Severity level of the corruption.
+            severity: Severity level of the corruption.
         """
         TUCorruption.__init__(self, severity)
         self.level = [0.4, 0.3, 0.2, 0.1, 0.05][severity - 1]
@@ -720,7 +720,7 @@ class Pixelate(TUCorruption):
         """Apply a pixelation corruption to unbatched tensor images.
 
         Args:
-            severity (int): Severity level of the corruption.
+            severity: Severity level of the corruption.
         """
         super().__init__(severity)
         self.quality = [0.6, 0.5, 0.4, 0.3, 0.25][severity - 1]
@@ -744,7 +744,7 @@ class JPEGCompression(TUCorruption):
         """Apply a JPEG compression corruption to unbatched tensor images.
 
         Args:
-            severity (int): Severity level of the corruption.
+            severity: Severity level of the corruption.
         """
         super().__init__(severity)
         self.quality = [25, 18, 15, 10, 7][severity - 1]
@@ -762,8 +762,8 @@ class Elastic(TUCorruption):
         """Apply an elastic corruption to unbatched tensor images.
 
         Args:
-            severity (int): Severity level of the corruption.
-            seed (int | None): Optional seed for the rng.
+            severity: Severity level of the corruption.
+            seed: Optional seed for the rng.
 
         Note:
             mix[0][1] has been changed to 0.5 to avoid errors when dealing with small images.
@@ -872,8 +872,8 @@ class SpeckleNoise(TUCorruption):
         """Apply speckle noise to tensor images.
 
         Args:
-            severity (int): Severity level of the corruption.
-            seed (int | None): Optional seed for the rng.
+            severity: Severity level of the corruption.
+            seed: Optional seed for the rng.
         """
         super().__init__(severity)
         self.scale = [0.15, 0.2, 0.35, 0.45, 0.6][severity - 1]
@@ -883,7 +883,7 @@ class SpeckleNoise(TUCorruption):
         """Apply speckle noise on images.
 
         Args:
-            img (Tensor): A potentially batched image of shape (C, H, W) or (B, C, H, W).
+            img: A potentially batched image of shape (C, H, W) or (B, C, H, W).
         """
         if self.severity == 0:
             return img
@@ -901,7 +901,7 @@ class GaussianBlur(TUCorruption):
         """Apply a Gaussian blur corruption to unbatched tensor images.
 
         Args:
-            severity (int): Severity level of the corruption.
+            severity: Severity level of the corruption.
         """
         super().__init__(severity)
         if not kornia_installed:
@@ -937,7 +937,7 @@ class Saturation(ISaturation, TUCorruption):
         """Apply a saturation corruption to unbatched tensor images.
 
         Args:
-            severity (int): Severity level of the corruption.
+            severity: Severity level of the corruption.
         """
         TUCorruption.__init__(self, severity)
         self.severity = severity

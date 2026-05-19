@@ -340,18 +340,18 @@ def masked_resnet(
     """Masksembles of ResNet.
 
     Args:
-        in_channels (int): Number of input channels.
-        num_classes (int): Number of classes to predict.
-        arch (int): The architecture of the ResNet.
-        num_estimators (int): Number of estimators in the ensemble.
-        scale (float): The scale of the mask.
-        width_multiplier (float): Width multiplier. Defaults to 1.
-        groups (int): Number of groups within each estimator. Defaults to 1.
-        conv_bias (bool): Whether to use bias in convolutions. Defaults to ``True``.
-        dropout_rate (float): Dropout rate. Defaults to ``0``.
-        style (ResNetStyle | Literal["imagenet", "cifar"]): Whether to use the ImageNet or CIFAR
-            structure. Defaults to ``ResNetStyle.IMAGENET``.
-        normalization_layer (nn.Module): Normalization layer.
+        in_channels: Number of input channels.
+        num_classes: Number of classes to predict.
+        arch: The architecture of the ResNet.
+        num_estimators: Number of estimators in the ensemble.
+        scale: The scale of the mask.
+        width_multiplier: Width multiplier. Defaults to ``1``.
+        groups: Number of groups within each estimator. Defaults to ``1``.
+        conv_bias: Whether to use bias in convolutions. Defaults to ``True``.
+        dropout_rate: Dropout rate. Defaults to ``0``.
+        style: Whether to use the ImageNet or CIFAR structure.
+            Defaults to ``ResNetStyle.IMAGENET``.
+        normalization_layer: Normalization layer. Defaults to ``nn.BatchNorm2d``.
         repeat_strategy ("legacy"|"paper"): The repeat
             strategy to use during training:
 

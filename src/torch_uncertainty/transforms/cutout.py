@@ -7,8 +7,8 @@ class Cutout(nn.Module):
         """Cutout augmentation class.
 
         Args:
-            length (int): Length of the cutout square.
-            value (int): Pixel value to be filled in the cutout square.
+            length: Length of the cutout square.
+            value: Pixel value to be filled in the cutout square.
         """
         super().__init__()
 

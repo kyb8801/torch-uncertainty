@@ -27,13 +27,13 @@ class UCRUEADataset(Dataset):
         """UCR/UEA Time Series Classification Dataset.
 
         Args:
-            dataset_name (str): Name of the dataset to load.
-            split (str): Split to use (``"train"``, ``"test"`` or ``"ood"``). Defaults to ``"train"``.
-            transform (Callable | None): Transform to apply to the input data. Defaults
+            dataset_name: Name of the dataset to load.
+            split: Split to use (``"train"``, ``"test"`` or ``"ood"``). Defaults to ``"train"``.
+            transform: Transform to apply to the input data. Defaults
                 to ``None``.
-            target_transform (Callable | None): Transform to apply to the target data.
+            target_transform: Transform to apply to the target data.
                 Defaults to ``None``.
-            create_ood (bool): Whether to create an out-of-distribution (OOD) dataset based
+            create_ood: Whether to create an out-of-distribution (OOD) dataset based
                 on the last class in the dataset. Defaults to ``False``.
 
         Raises:
@@ -80,7 +80,7 @@ class UCRUEADataset(Dataset):
         """Get a data sample from the dataset.
 
         Args:
-            index (int): The index of the sample to retrieve.
+            index: The index of the sample to retrieve.
 
         Returns:
             tuple[torch.Tensor, torch.Tensor]: A tuple containing the input tensor and the target tensor.

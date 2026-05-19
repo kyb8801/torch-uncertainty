@@ -43,19 +43,18 @@ def get_dist_conv_layer(dist_family: str) -> type[nn.Module]:
 
 
 class _ExpandOutputLinear(nn.Module, ABC):
-    """Abstract class for expanding the output of any nn.Module using an `out_features` argument.
-
-    Args:
-        base_layer (type[nn.Module]): The base layer class.
-        event_dim (int): The number of event dimensions.
-        num_params (int): The number of parameters to output. For instance, the normal distribution
-            has 2 parameters (loc and scale).
-        **layer_args: Additional arguments for the base layer.
-    """
-
     def __init__(
         self, base_layer: type[nn.Module], event_dim: int, num_params: int, **layer_args
     ) -> None:
+        """Abstract class for expanding the output of any nn.Module using an `out_features` argument.
+
+        Args:
+            base_layer: The base layer class.
+            event_dim: The number of event dimensions.
+            num_params: The number of parameters to output. For instance, the normal distribution
+                has 2 parameters (loc and scale).
+            **layer_args: Additional arguments for the base layer.
+        """
         if "out_features" not in inspect.getfullargspec(base_layer.__init__).args:
             raise ValueError(f"{base_layer.__name__} does not have an `out_features` argument.")
 
@@ -68,23 +67,22 @@ class _ExpandOutputLinear(nn.Module, ABC):
 
     @abstractmethod
     def forward(self, x: Tensor) -> dict[str, Tensor]:
-        pass
+        """Expand the base layer output into distribution parameters."""
 
 
 class _ExpandOutputConvNd(nn.Module, ABC):
-    """Abstract class for expanding the output of any nn.Module using an `out_channels` argument.
-
-    Args:
-        base_layer (type[nn.Module]): The base layer class.
-        event_dim (int): The number of event dimensions.
-        num_params (int): The number of parameters to output. For instance, the normal distribution
-            has 2 parameters (loc and scale).
-        **layer_args: Additional arguments for the base layer.
-    """
-
     def __init__(
         self, base_layer: type[nn.Module], event_dim: int, num_params: int, **layer_args
     ) -> None:
+        """Abstract class for expanding the output of any nn.Module using an `out_channels` argument.
+
+        Args:
+            base_layer: The base layer class.
+            event_dim: The number of event dimensions.
+            num_params: The number of parameters to output. For instance, the normal distribution
+                has 2 parameters (loc and scale).
+            **layer_args: Additional arguments for the base layer.
+        """
         if "out_channels" not in inspect.getfullargspec(base_layer.__init__).args:
             raise ValueError(f"{base_layer.__name__} does not have an `out_channels` argument.")
 
@@ -97,19 +95,10 @@ class _ExpandOutputConvNd(nn.Module, ABC):
 
     @abstractmethod
     def forward(self, x: Tensor) -> dict[str, Tensor]:
-        pass
+        """Expand the base layer output into distribution parameters."""
 
 
 class _LocScaleLinear(_ExpandOutputLinear):
-    """Base Linear layer for any distribution with loc and scale parameters.
-
-    Args:
-        base_layer (type[nn.Module]): The base layer class.
-        event_dim (int): The number of event dimensions.
-        min_scale (float): The minimal value of the scale parameter.
-        **layer_args: Additional arguments for the base layer.
-    """
-
     def __init__(
         self,
         base_layer: type[nn.Module],
@@ -117,6 +106,14 @@ class _LocScaleLinear(_ExpandOutputLinear):
         min_scale: float = 1e-6,
         **layer_args,
     ) -> None:
+        """Base Linear layer for any distribution with loc and scale parameters.
+
+        Args:
+            base_layer: The base layer class.
+            event_dim: The number of event dimensions.
+            min_scale: The minimal value of the scale parameter.
+            **layer_args: Additional arguments for the base layer.
+        """
         super().__init__(
             base_layer=base_layer,
             event_dim=event_dim,
@@ -135,15 +132,6 @@ class _LocScaleLinear(_ExpandOutputLinear):
 
 
 class _LocScaleConvNd(_ExpandOutputConvNd):
-    """Base Convolutional layer for any distribution with loc and scale parameters.
-
-    Args:
-        base_layer (type[nn.Module]): The base layer class.
-        event_dim (int): The number of event dimensions.
-        min_scale (float): The minimal value of the scale parameter.
-        **layer_args: Additional arguments for the base layer.
-    """
-
     def __init__(
         self,
         base_layer: type[nn.Module],
@@ -151,6 +139,14 @@ class _LocScaleConvNd(_ExpandOutputConvNd):
         min_scale: float = 1e-6,
         **layer_args,
     ) -> None:
+        """Base Convolutional layer for any distribution with loc and scale parameters.
+
+        Args:
+            base_layer: The base layer class.
+            event_dim: The number of event dimensions.
+            min_scale: The minimal value of the scale parameter.
+            **layer_args: Additional arguments for the base layer.
+        """
         super().__init__(
             base_layer=base_layer,
             event_dim=event_dim,
@@ -172,9 +168,9 @@ class NormalLinear(_LocScaleLinear):
     r"""Normal Distribution Linear Density Layer.
 
     Args:
-        base_layer (type[nn.Module]): The base layer class.
-        event_dim (int): The number of event dimensions.
-        min_scale (float): The minimal value of the scale parameter.
+        base_layer: The base layer class.
+        event_dim: The number of event dimensions.
+        min_scale: The minimal value of the scale parameter.
         **layer_args: Additional arguments for the base layer.
 
     Shape:
@@ -194,16 +190,16 @@ class NormalConvNd(_LocScaleConvNd):
     r"""Normal Distribution Convolutional Density Layer.
 
     Args:
-        in_channels (int): The number of input channels.
-        out_channels (int): The number of event channels.
-        kernel_size (int | tuple[int]): The size of the convolutional kernel.
-        stride (int | tuple[int]): The stride of the convolution.
-        padding (int | tuple[int]): The padding of the convolution.
-        dilation (int | tuple[int]): The dilation of the convolution.
-        groups (int): The number of groups in the convolution.
-        min_scale (float): The minimal value of the scale parameter.
-        device (torch.device): The device where the layer is stored.
-        dtype (torch.dtype): The datatype of the layer.
+        in_channels: The number of input channels.
+        out_channels: The number of event channels.
+        kernel_size: The size of the convolutional kernel.
+        stride: The stride of the convolution.
+        padding: The padding of the convolution.
+        dilation: The dilation of the convolution.
+        groups: The number of groups in the convolution.
+        min_scale: The minimal value of the scale parameter.
+        device: The device where the layer is stored.
+        dtype: The datatype of the layer.
 
     Shape:
         - Input: :math:`(N, C_{in}, \ast)` where :math:`\ast` means any number of dimensions and
@@ -221,9 +217,9 @@ class LaplaceLinear(_LocScaleLinear):
     r"""Laplace Distribution Linear Density Layer.
 
     Args:
-        base_layer (type[nn.Module]): The base layer class.
-        event_dim (int): The number of event dimensions.
-        min_scale (float): The minimal value of the scale parameter.
+        base_layer: The base layer class.
+        event_dim: The number of event dimensions.
+        min_scale: The minimal value of the scale parameter.
         **layer_args: Additional arguments for the base layer.
 
     Shape:
@@ -243,16 +239,16 @@ class LaplaceConvNd(_LocScaleConvNd):
     r"""Laplace Distribution Convolutional Density Layer.
 
     Args:
-        in_channels (int): The number of input channels.
-        out_channels (int): The number of event channels.
-        kernel_size (int | tuple[int]): The size of the convolutional kernel.
-        stride (int | tuple[int]): The stride of the convolution.
-        padding (int | tuple[int]): The padding of the convolution.
-        dilation (int | tuple[int]): The dilation of the convolution.
-        groups (int): The number of groups in the convolution.
-        min_scale (float): The minimal value of the scale parameter.
-        device (torch.device): The device where the layer is stored.
-        dtype (torch.dtype): The datatype of the layer.
+        in_channels: The number of input channels.
+        out_channels: The number of event channels.
+        kernel_size: The size of the convolutional kernel.
+        stride: The stride of the convolution.
+        padding: The padding of the convolution.
+        dilation: The dilation of the convolution.
+        groups: The number of groups in the convolution.
+        min_scale: The minimal value of the scale parameter.
+        device: The device where the layer is stored.
+        dtype: The datatype of the layer.
 
     Shape:
         - Input: :math:`(N, C_{in}, \ast)` where :math:`\ast` means any number of dimensions and
@@ -270,9 +266,9 @@ class CauchyLinear(_LocScaleLinear):
     r"""Cauchy Distribution Linear Density Layer.
 
     Args:
-        base_layer (type[nn.Module]): The base layer class.
-        event_dim (int): The number of event dimensions.
-        min_scale (float): The minimal value of the scale parameter.
+        base_layer: The base layer class.
+        event_dim: The number of event dimensions.
+        min_scale: The minimal value of the scale parameter.
         **layer_args: Additional arguments for the base layer.
 
     Shape:
@@ -292,16 +288,16 @@ class CauchyConvNd(_LocScaleConvNd):
     r"""Cauchy Distribution Convolutional Density Layer.
 
     Args:
-        in_channels (int): The number of input channels.
-        out_channels (int): The number of event channels.
-        kernel_size (int | tuple[int]): The size of the convolutional kernel.
-        stride (int | tuple[int]): The stride of the convolution.
-        padding (int | tuple[int]): The padding of the convolution.
-        dilation (int | tuple[int]): The dilation of the convolution.
-        groups (int): The number of groups in the convolution.
-        min_scale (float): The minimal value of the scale parameter.
-        device (torch.device): The device where the layer is stored.
-        dtype (torch.dtype): The datatype of the layer.
+        in_channels: The number of input channels.
+        out_channels: The number of event channels.
+        kernel_size: The size of the convolutional kernel.
+        stride: The stride of the convolution.
+        padding: The padding of the convolution.
+        dilation: The dilation of the convolution.
+        groups: The number of groups in the convolution.
+        min_scale: The minimal value of the scale parameter.
+        device: The device where the layer is stored.
+        dtype: The datatype of the layer.
 
     Shape:
         - Input: :math:`(N, C_{in}, \ast)` where :math:`\ast` means any number of dimensions and
@@ -319,9 +315,9 @@ class GammaLinear(_ExpandOutputLinear):
     """Gamma distribution Linear Density Layer.
 
     Args:
-        base_layer (type[nn.Module]): The base layer class.
-        event_dim (int): The number of event dimensions.
-        min_scale (float): The minimal value of the scale parameter.
+        base_layer: The base layer class.
+        event_dim: The number of event dimensions.
+        min_scale: The minimal value of the scale parameter.
         **layer_args: Additional arguments for the base layer.
 
     Note:
@@ -360,9 +356,9 @@ class GammaConvNd(_ExpandOutputConvNd):
     """Gamma distribution Convolutional Density Layer.
 
     Args:
-        base_layer (type[nn.Module]): The base layer class.
-        event_dim (int): The number of event dimensions.
-        min_scale (float): The minimal value of the scale parameter.
+        base_layer: The base layer class.
+        event_dim: The number of event dimensions.
+        min_scale: The minimal value of the scale parameter.
         **layer_args: Additional arguments for the base layer.
 
     Note:
@@ -406,11 +402,11 @@ class StudentTLinear(_ExpandOutputLinear):
         r"""Student's T-Distribution Linear Density Layer.
 
         Args:
-            base_layer (type[nn.Module]): The base layer class.
-            event_dim (int): The number of event dimensions.
-            min_scale (float): The minimal value of the scale parameter.
-            min_df (float): The minimal value of the degrees of freedom parameter.
-            fixed_df (float): If not None, the degrees of freedom parameter is fixed to this value.
+            base_layer: The base layer class.
+            event_dim: The number of event dimensions.
+            min_scale: The minimal value of the scale parameter.
+            min_df: The minimal value of the degrees of freedom parameter.
+            fixed_df: If not None, the degrees of freedom parameter is fixed to this value.
                 Otherwise, it is learned.
             **layer_args: Additional arguments for the base layer.
 
@@ -465,11 +461,11 @@ class StudentTConvNd(_ExpandOutputConvNd):
         r"""Student's T-Distribution Convolutional Density Layer.
 
         Args:
-            base_layer (type[nn.Module]): The base layer class.
-            event_dim (int): The number of event dimensions.
-            min_scale (float): The minimal value of the scale parameter.
-            min_df (float): The minimal value of the degrees of freedom parameter.
-            fixed_df (float): If not None, the degrees of freedom parameter is fixed to this value.
+            base_layer: The base layer class.
+            event_dim: The number of event dimensions.
+            min_scale: The minimal value of the scale parameter.
+            min_df: The minimal value of the degrees of freedom parameter.
+            fixed_df: If not None, the degrees of freedom parameter is fixed to this value.
                 Otherwise, it is learned.
             **layer_args: Additional arguments for the base layer.
 
@@ -523,11 +519,11 @@ class NormalInverseGammaLinear(_ExpandOutputLinear):
         r"""Normal-Inverse-Gamma Distribution Linear Density Layer.
 
         Args:
-            base_layer (type[nn.Module]): The base layer class.
-            event_dim (int): The number of event dimensions.
-            min_lmbda (float): The minimal value of the :math:`\lambda` parameter.
-            min_alpha (float): The minimal value of the :math:`\alpha` parameter.
-            min_beta (float): The minimal value of the :math:`\beta` parameter.
+            base_layer: The base layer class.
+            event_dim: The number of event dimensions.
+            min_lmbda: The minimal value of the :math:`\lambda` parameter.
+            min_alpha: The minimal value of the :math:`\alpha` parameter.
+            min_beta: The minimal value of the :math:`\beta` parameter.
             **layer_args: Additional arguments for the base layer.
 
         Shape:
@@ -591,11 +587,11 @@ class NormalInverseGammaConvNd(_ExpandOutputConvNd):
         r"""Normal-Inverse-Gamma Distribution Convolutional Density Layer.
 
         Args:
-            base_layer (type[nn.Module]): The base layer class.
-            event_dim (int): The number of event dimensions.
-            min_lmbda (float): The minimal value of the :math:`\lambda` parameter.
-            min_alpha (float): The minimal value of the :math:`\alpha` parameter.
-            min_beta (float): The minimal value of the :math:`\beta` parameter.
+            base_layer: The base layer class.
+            event_dim: The number of event dimensions.
+            min_lmbda: The minimal value of the :math:`\lambda` parameter.
+            min_alpha: The minimal value of the :math:`\alpha` parameter.
+            min_beta: The minimal value of the :math:`\beta` parameter.
             **layer_args: Additional arguments for the base layer.
 
         Shape:

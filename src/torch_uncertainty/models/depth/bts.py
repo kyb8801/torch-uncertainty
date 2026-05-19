@@ -51,14 +51,14 @@ class AtrousBlock2d(nn.Module):
         """Atrous block with 1x1 and 3x3 convolutions.
 
         Args:
-            in_channels (int): Number of input channels.
-            out_channels (int): Number of output channels.
-            dilation (int): Dilation rate for the 3x3 convolution.
-            norm_first (bool): Whether to apply normalization before the 1x1 convolution.
+            in_channels : Number of input channels.
+            out_channels : Number of output channels.
+            dilation : Dilation rate for the 3x3 convolution.
+            norm_first: Whether to apply normalization before the 1x1 convolution.
                 Defaults to ``True``.
-            norm_momentum (float): Momentum for the normalization layer. Defaults to ``0.1``.
-            device: torch device. Defaults to ``None``.
-            dtype: torch dtype. Defaults to ``None``.
+            norm_momentum: Momentum for the normalization layer. Defaults to ``0.1``.
+            device: Torch device. Defaults to ``None``.
+            dtype: Torch dtype. Defaults to ``None``.
         """
         super().__init__()
 
@@ -113,11 +113,11 @@ class UpConv2d(nn.Module):
         """Upsampling convolution.
 
         Args:
-            in_channels (int): Number of input channels.
-            out_channels (int): Number of output channels.
-            ratio (int): Upsampling ratio.
-            device: torch device. Defaults to ``None``.
-            dtype: torch dtype. Defaults to ``None``.
+            in_channels: Number of input channels.
+            out_channels: Number of output channels.
+            ratio: Upsampling ratio.
+            device: Torch device. Defaults to ``None``.
+            dtype: Torch dtype. Defaults to ``None``.
         """
         super().__init__()
         self.conv = nn.Conv2d(
@@ -264,8 +264,8 @@ class BTSBackbone(Backbone):  # coverage: ignore
         """BTS backbone.
 
         Args:
-        backbone_name (str): Name of the backbone.
-        pretrained (bool): Use a pretrained backbone.
+            backbone_name: Name of the backbone.
+            pretrained: Whether to use pretrained weights.
         """
         feat_names: list[str] = []
         if isinstance(backbone_name, str):
@@ -319,11 +319,11 @@ class BTSDecoder(nn.Module):
         """BTS decoder.
 
         Args:
-            max_depth (float): The maximum predicted depth.
-            feat_out_channels (list[int]): The number of output channels from the backbone.
-            num_features (int): The number of features to use in the decoder.
-            dist_family (str | None): The distribution family name. ``None`` means point-wise
-            prediction. Defaults to ``None``.
+            max_depth: The maximum predicted depth.
+            feat_out_channels: The number of output channels from the backbone.
+            num_features: The number of features to use in the decoder.
+            dist_family: The distribution family name. ``None`` means point-wise
+                prediction. Defaults to ``None``.
         """
         super().__init__()
         self.max_depth = max_depth
@@ -522,7 +522,7 @@ class BTSDecoder(nn.Module):
 
         Note:
             Depending of the :attr:`dist_family` of the backbone, the output can
-            be a dictionnary of distribution parameters or a single tensor.
+            be a dictionary of distribution parameters or a single tensor.
         """
         # TODO: handle focal
         out = self.depth(self.feat_forward(features))
@@ -552,11 +552,11 @@ class _BTS(nn.Module):
         """BTS model.
 
         Args:
-            backbone_name (str): Name of the encoding backbone.
-            max_depth (float): Maximum predicted depth.
-            bts_size (int): BTS feature size. Defaults to 512.
-            dist_family (str): Distribution family name. Defaults to None.
-            pretrained_backbone (bool): Use a pretrained backbone. Defaults to True.
+            backbone_name: Name of the encoding backbone.
+            max_depth: Maximum predicted depth.
+            bts_size: BTS feature size. Defaults to ``512``.
+            dist_family: Distribution family name. Defaults to ``None``.
+            pretrained_backbone: Use a pretrained backbone. Defaults to ``True``.
 
         References:
             [1] `From Big to Small: Multi-Scale Local Planar Guidance for Monocular Depth Estimation
@@ -573,8 +573,8 @@ class _BTS(nn.Module):
         """Forward pass.
 
         Args:
-            x (Tensor): Input tensor.
-            focal (float): Focal length for API consistency.
+            x: Input tensor.
+            focal: Focal length for API consistency. Defaults to ``None``.
         """
         return self.decoder(self.backbone(x))
 
@@ -600,14 +600,14 @@ def bts_resnet(
     dist_family: str | None = None,
     pretrained_backbone: bool = True,
 ) -> _BTS:
-    """BTS model with ResNet-50 backbone.
+    """BTS model with a ResNet backbone.
 
     Args:
-        arch (int): The number of layers of the underlying ResNet model: 50 or 101.
-        max_depth (float): Maximum predicted depth.
-        bts_size (int): BTS feature size. Defaults to 512.
-        dist_family (str): Distribution family name. Defaults to None.
-        pretrained_backbone (bool): Use a pretrained backbone. Defaults to True.
+        arch: The number of layers of the underlying ResNet model: 50 or 101.
+        max_depth: Maximum predicted depth.
+        bts_size: BTS feature size. Defaults to ``512``.
+        dist_family: Distribution family name. Defaults to ``None``.
+        pretrained_backbone: Use a pretrained backbone. Defaults to ``True``.
     """
     return _bts(
         f"resnet{arch}",

@@ -35,18 +35,18 @@ class CIFAR10N(CIFAR10):
         """`CIFAR-10N <https://github.com/UCSC-REAL/cifar-10-100n>`_ Dataset.
 
         Args:
-            root (str): Root directory of dataset where file
+            root: Root directory of dataset where file
                 ``cifar-10h-probs.npy`` exists or will be saved to if download
                 is set to ``True``.
-            train (bool): For API consistency, not used.
-            file_arg (str): The type of label noise to use. One of the following:
+            train: For API consistency, not used.
+            file_arg: The type of label noise to use. One of the following:
                 ``"aggre_label"``, ``"worse_label"``, ``"random_label1"``, ``"random_label2"``, ``"random_label3"``.
-            transform (callable): A function/transform that takes in
+            transform: A function/transform that takes in
                 a PIL image and returns a transformed version. E.g,
                 ``transforms.RandomCrop``. Defaults to ``None``.
-            target_transform (callable): A function/transform that
+            target_transform: A function/transform that
                 takes in the target and transforms it. Defaults to ``None``.
-            download (bool): If ``True``, downloads the dataset from the
+            download: If ``True``, downloads the dataset from the
                 internet and puts it in root directory. If dataset is already
                 downloaded, it is not downloaded again. Defaults to ``False``.
         """
@@ -106,18 +106,18 @@ class CIFAR100N(CIFAR100):
         """`CIFAR-100N <https://github.com/UCSC-REAL/cifar-10-100n>`_ Dataset.
 
         Args:
-            root (string): Root directory of dataset where file
+            root: Root directory of dataset where file
                 ``cifar-100h-probs.npy`` exists or will be saved to if download
                 is set to True.
-            train (bool): For API consistency, not used.
-            file_arg (str): The type of label noise to use. One of the following:
+            train: For API consistency, not used.
+            file_arg: The type of label noise to use. One of the following:
                 ``"fine_label"``, ``"coarse_label"``.
-            transform (callable): A function/transform that takes in
+            transform: A function/transform that takes in
                 a PIL image and returns a transformed version. E.g,
                 ``transforms.RandomCrop``. Defaults to ``None``.
-            target_transform (callable): A function/transform that
+            target_transform: A function/transform that
                 takes in the target and transforms it. Defaults to ``None``.
-            download (bool): If True, downloads the dataset from the
+            download: If True, downloads the dataset from the
                 internet and puts it in root directory. If dataset is already
                 downloaded, it is not downloaded again. Defaults to ``False``.
         """

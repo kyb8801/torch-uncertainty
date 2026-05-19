@@ -14,10 +14,10 @@ class DistributionNLL(CategoricalNLL):
         """Update state with the predicted distributions and the targets.
 
         Args:
-            dist (torch.distributions.Distribution): Predicted distributions.
-            target (Tensor): Ground truth labels.
-            padding_mask (Tensor): The padding mask. Defaults to None.
-                Sets the loss to 0 for padded values.
+            dist: Predicted distributions.
+            target: Ground truth labels.
+            padding_mask: Optional padding mask. Sets the loss to 0 for padded values. Defaults to
+                ``None``.
         """
         nlog_prob = -dist.log_prob(target)
         if padding_mask is not None:
@@ -29,7 +29,7 @@ class DistributionNLL(CategoricalNLL):
             self.total += padding_mask.sum() if padding_mask is not None else target.numel()
 
     def compute(self) -> Tensor:
-        """Computes NLL based on inputs passed in to ``update`` previously."""
+        """Compute NLL based on inputs passed to ``update``."""
         values = dim_zero_cat(self.values)
 
         if self.reduction == "sum":

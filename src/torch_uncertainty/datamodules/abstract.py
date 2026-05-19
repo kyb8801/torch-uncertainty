@@ -50,17 +50,17 @@ class TUDataModule(LightningDataModule, ABC):
         logic. It also provide the basic argparse arguments for the datamodules.
 
         Args:
-            root (str): Root directory of the datasets.
-            batch_size (int): Number of samples per batch during training.
-            eval_batch_size (int | None) : Number of samples per batch during evaluation (val
-                and test). Set to batch_size if None.
-            val_split (float | None): Share of samples to use for validation.
-            num_workers (int): Number of workers to use for data loading.
-            pin_memory (bool): Whether to pin memory.
-            persistent_workers (bool): Whether to use persistent workers.
-            num_tta (int): Number of test-time augmentations (TTA). Defaults to ``1`` (no TTA).
-            postprocess_set (str): Which split to use as post-processing set to fit the
-                post-processing method. Defaults to ``val``.
+            root: Root directory of the datasets.
+            batch_size: Number of samples per batch during training.
+            eval_batch_size: Number of samples per batch during evaluation (val and test).
+                Set to batch_size if ``None``.
+            val_split: Share of samples to use for validation.
+            num_workers: Number of workers to use for data loading.
+            pin_memory: Whether to pin memory.
+            persistent_workers: Whether to use persistent workers.
+            num_tta: Number of test-time augmentations (TTA). Defaults to ``1`` (no TTA).
+            postprocess_set: Which split to use as post-processing set to fit the
+                post-processing method. Defaults to ``"val"``.
 
         Warning:
             Please ensure that the :attr:`batch_size` is a multiple of :attr:`num_tta`.
@@ -90,7 +90,7 @@ class TUDataModule(LightningDataModule, ABC):
 
     @abstractmethod
     def setup(self, stage: str | None = None) -> None:
-        pass
+        """Prepare the datasets for the requested stage."""
 
     def get_train_set(self) -> Dataset:
         """Get the training set."""
@@ -157,10 +157,9 @@ class TUDataModule(LightningDataModule, ABC):
         """Create a dataloader for a given dataset.
 
         Args:
-            dataset (Dataset): Dataset to create a dataloader for.
-            training (bool): Whether it is a training or evaluation dataloader.
-            shuffle (bool): Whether to shuffle the dataset. Defaults
-                to False.
+            dataset: Dataset to create a dataloader for.
+            training: Whether it is a training or evaluation dataloader.
+            shuffle: Whether to shuffle the dataset. Defaults to ``False``.
 
         Return:
             DataLoader: Dataloader for the given dataset.
@@ -179,9 +178,11 @@ class TUDataModule(LightningDataModule, ABC):
     # It is generally "Dataset.samples" or "Dataset.data"
     # They are used for constructing cross validation splits
     def _get_train_data(self) -> ArrayLike:
+        """Return the training inputs used to build cross-validation splits."""
         raise NotImplementedError
 
     def _get_train_targets(self) -> ArrayLike:
+        """Return the training targets used to build cross-validation splits."""
         raise NotImplementedError
 
     def make_cross_val_splits(self, n_splits: int = 10, train_over: int = 4) -> list:

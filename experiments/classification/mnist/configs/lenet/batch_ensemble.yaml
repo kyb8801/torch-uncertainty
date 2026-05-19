@@ -3,7 +3,7 @@ seed_everything: false
 eval_after_fit: true
 trainer:
   fast_dev_run: false
-  accelerator: gpu
+  accelerator: auto
   devices: 1
   precision: 16-mixed
   max_epochs: 10

@@ -15,6 +15,7 @@ class TestMLPModel:
         )
         mlp(1, 1, hidden_dims=[])
         packed_mlp(1, 1, hidden_dims=[])
+        packed_mlp(1, 1, hidden_dims=[4, 4], num_estimators=2, alpha=2, gamma=1)
         bayesian_mlp(1, 1, hidden_dims=[1, 1, 1])
 
     def test_batched_mlp(self) -> None:

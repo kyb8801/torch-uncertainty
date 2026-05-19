@@ -28,23 +28,19 @@ class BatchLinear(nn.Module):
     ) -> None:
         r"""BatchEnsemble-style Linear layer.
 
-        Apply a linear transformation using BatchEnsemble method to the incoming
-        data.
+        Apply a linear transformation using the BatchEnsemble method to the
+        incoming data.
 
         .. math::
             y=(x\circ \widehat{r_{group}})W^{T}\circ \widehat{s_{group}} + \widehat{b}
 
         Args:
-            in_features (int): Number of input features.
-            out_features (int): Number of output features.
-            num_estimators (int): Number of estimators in the ensemble, referred as
-                :math:`M`.
-            bias (bool): If ``True``, adds a learnable bias to the
-                output. Defaults to ``True``.
-            device (Any): Device to use for the parameters and
-                buffers of this module. Defaults to ``None``.
-            dtype (Any): Data type to use for the parameters and
-                buffers of this module. Defaults to ``None``.
+            in_features: Number of input features.
+            out_features: Number of output features.
+            num_estimators: Number of estimators in the ensemble (``M``).
+            bias: If ``True``, adds a learnable bias to the output. Defaults to ``True``.
+            device: Device to use for parameters and buffers. Defaults to ``None``.
+            dtype: Data type to use for parameters and buffers. Defaults to ``None``.
 
         Reference:
             Introduced by the paper `BatchEnsemble: An Alternative Approach to
@@ -60,14 +56,12 @@ class BatchLinear(nn.Module):
                 :math:`(H_{out}, H_{in})` shared between the estimators. The values
                 are initialized from :math:`\mathcal{U}(-\sqrt{k}, \sqrt{k})`,
                 where :math:`k = \frac{1}{H_{in}}`.
-            r_group: The learnable matrice of shape :math:`(M, H_{in})` where each row
-                consist of the vector :math:`r_{i}` corresponding to the
-                :math:`i^{th}` ensemble member. The values are initialized from
-                :math:`\mathcal{N}(1.0, 0.5)`.
-            s_group: The learnable matrice of shape :math:`(M, H_{out})` where each row
-                consist of the vector :math:`s_{i}` corresponding to the
-                :math:`i^{th}` ensemble member. The values are initialized from
-                :math:`\mathcal{N}(1.0, 0.5)`.
+            r_group: Learnable matrix of shape :math:`(M, H_{in})` where each row
+                is the vector :math:`r_{i}` corresponding to the :math:`i^{th}`
+                ensemble member. Initialized from :math:`\mathcal{N}(1.0, 0.5)`.
+            s_group: Learnable matrix of shape :math:`(M, H_{out})` where each row
+                is the vector :math:`s_{i}` corresponding to the :math:`i^{th}`
+                ensemble member. Initialized from :math:`\mathcal{N}(1.0, 0.5)`.
             bias: The learnable bias (:math:`b`) of shape :math:`(M, H_{out})`
                 where each row corresponds to the bias of the :math:`i^{th}`
                 ensemble member. If :attr:`bias` is ``True``, the values are
@@ -124,8 +118,8 @@ class BatchLinear(nn.Module):
         r"""Create a BatchEnsemble-style Linear layer from an existing Linear layer.
 
         Args:
-            linear (nn.Linear): The Linear layer to convert.
-            num_estimators (int): Number of ensemble members.
+            linear: The Linear layer to convert.
+            num_estimators: Number of ensemble members.
 
         Returns:
             BatchLinear: The converted BatchEnsemble-style Linear layer.
@@ -219,7 +213,7 @@ class BatchConv1d(nn.Module):
     ) -> None:
         r"""BatchEnsemble-style Conv1d layer.
 
-        Applies a 1d convolution over an input signal composed of several input
+        Apply a 1d convolution over an input signal composed of several input
         planes using BatchEnsemble method to the incoming data.
 
         In the simplest case, the output value of the layer with input size
@@ -244,24 +238,19 @@ class BatchConv1d(nn.Module):
             <https://www.tensorflow.org>`_.
 
         Args:
-            in_channels (int): Number of channels in the input images.
-            out_channels (int): Number of channels produced by the convolution.
-            kernel_size (int): Size of the convolving kernel.
-            num_estimators (int): Number of estimators in the ensemble referred as
-                :math:`M` here.
-            stride (int): Stride of the convolution. Defaults to
-                ``1``.
-            padding (int or str): Padding added to all four sides
-                of the input. Defaults to ``0``.
-            dilation (int): Spacing between kernel elements.
-                Defaults to ``1``.
-            groups (int): Number of blocked connections from input
+            in_channels: Number of channels in the input images.
+            out_channels: Number of channels produced by the convolution.
+            kernel_size: Size of the convolving kernel.
+            num_estimators: Number of estimators in the ensemble referred as :math:`M` here.
+            stride: Stride of the convolution. Defaults to ``1``.
+            padding: Padding added to all four sides of the input. Defaults to ``0``.
+            dilation: Spacing between kernel elements. Defaults to ``1``.
+            groups: Number of blocked connections from input
                 channels to output channels. Defaults to ``1``.
-            bias (bool): If ``True``, adds a learnable bias to the
-                output. Defaults to ``True``.
-            device (Any): Device to use for the parameters and
+            bias: If ``True``, adds a learnable bias to the output. Defaults to ``True``.
+            device: Device to use for the parameters and
                 buffers of this module. Defaults to ``None``.
-            dtype (Any): Data type to use for the parameters and
+            dtype: Data type to use for the parameters and
                 buffers of this module. Defaults to ``None``.
 
         Attributes:
@@ -348,8 +337,8 @@ class BatchConv1d(nn.Module):
         r"""Create a BatchEnsemble-style Conv1d layer from an existing Conv1d layer.
 
         Args:
-            conv1d (nn.Conv1d): The Conv1d layer to convert.
-            num_estimators (int): Number of ensemble members.
+            conv1d: The Conv1d layer to convert.
+            num_estimators: Number of ensemble members.
 
         Returns:
             BatchConv1d: The converted BatchEnsemble-style Conv1d layer.
@@ -451,7 +440,7 @@ class BatchConv2d(nn.Module):
     ) -> None:
         r"""BatchEnsemble-style Conv2d layer.
 
-        Applies a 2d convolution over an input signal composed of several input
+        Apply a 2d convolution over an input signal composed of several input
         planes using BatchEnsemble method to the incoming data.
 
         In the simplest case, the output value of the layer with input size
@@ -476,24 +465,24 @@ class BatchConv2d(nn.Module):
             <https://www.tensorflow.org>`_.
 
         Args:
-            in_channels (int): Number of channels in the input images.
-            out_channels (int): Number of channels produced by the convolution.
-            kernel_size (int or tuple): Size of the convolving kernel.
-            num_estimators (int): Number of estimators in the ensemble referred as
+            in_channels: Number of channels in the input images.
+            out_channels: Number of channels produced by the convolution.
+            kernel_size: Size of the convolving kernel.
+            num_estimators: Number of estimators in the ensemble referred as
                 :math:`M` here.
-            stride (int or tuple): Stride of the convolution. Defaults to
+            stride: Stride of the convolution. Defaults to
                 ``1``.
             padding (int, tuple or str): Padding added to all four sides
                 of the input. Defaults to ``0``.
-            dilation (int or tuple): Spacing between kernel elements.
+            dilation: Spacing between kernel elements.
                 Defaults to ``1``.
-            groups (int): Number of blocked connections from input
+            groups: Number of blocked connections from input
                 channels to output channels. Defaults to ``1``.
-            bias (bool): If ``True``, adds a learnable bias to the
+            bias: If ``True``, adds a learnable bias to the
                 output. Defaults to ``True``.
-            device (Any): Device to use for the parameters and
+            device: Device to use for the parameters and
                 buffers of this module. Defaults to ``None``.
-            dtype (Any): Data type to use for the parameters and
+            dtype: Data type to use for the parameters and
                 buffers of this module. Defaults to ``None``.
 
         Attributes:
@@ -585,8 +574,8 @@ class BatchConv2d(nn.Module):
         r"""Create a BatchEnsemble-style Conv2d layer from an existing Conv2d layer.
 
         Args:
-            conv2d (nn.Conv2d): The Conv2d layer to convert.
-            num_estimators (int): Number of ensemble members.
+            conv2d: The Conv2d layer to convert.
+            num_estimators: Number of ensemble members.
 
         Returns:
             BatchConv2d: The converted BatchEnsemble-style Conv2d layer.
@@ -668,26 +657,25 @@ class BatchConvTranspose2d(nn.Module):
         r"""BatchEnsemble-style ConvTranspose2d layer.
 
         Args:
-            in_channels (int): Number of channels in the input images.
-            out_channels (int): Number of channels produced by the convolution.
-            kernel_size (_size_2_t): Size of the convolving kernel.
-            num_estimators (int): Number of estimators in the ensemble referred as
+            in_channels: Number of channels in the input images.
+            out_channels: Number of channels produced by the convolution.
+            kernel_size: Size of the convolving kernel.
+            num_estimators: Number of estimators in the ensemble referred as
                 :math:`M` here.
-            stride (_size_2_t): Stride of the convolution. Defaults to ``1``.
-            padding (_size_2_t): ``dilation * (kernel_size - 1) - padding`` zero-padding
+            stride: Stride of the convolution. Defaults to ``1``.
+            padding: ``dilation * (kernel_size - 1) - padding`` zero-padding
                 will be added to both sides of each dimension in the input. Defaults to ``0``.
-            output_padding (_size_2_t): Additional size added to one side
+            output_padding: Additional size added to one side
                 of each dimension in the output shape. Defaults to ``0``.
-            groups (int): Number of blocked connections from input channels to output
-                channels. Defaults to ``1``.
-            bias (bool): If ``True``, adds a learnable bias to the output. Defaults to
-                ``True``.
-            dilation (_size_2_t): Spacing between kernel elements. Defaults to ``1``.
-            padding_mode (str): Padding mode for the convolution. Defaults to ``"zeros"``.
-            device (Any): Device to use for the parameters and
-                buffers of this module. Defaults to ``None``.
-            dtype (Any): Data type to use for the parameters and
-                buffers of this module. Defaults to ``None``.
+            groups: Number of blocked connections from input channels to output channels.
+                Defaults to ``1``.
+            bias: If ``True``, adds a learnable bias to the output. Defaults to ``True``.
+            dilation: Spacing between kernel elements. Defaults to ``1``.
+            padding_mode: Padding mode for the convolution. Defaults to ``"zeros"``.
+            device: Device to use for the parameters and buffers of this module.
+                Defaults to ``None``.
+            dtype: Data type to use for the parameters and buffers of this module.
+                Defaults to ``None``.
         """
         factory_kwargs = {"device": device, "dtype": dtype}
         super().__init__()
@@ -730,8 +718,8 @@ class BatchConvTranspose2d(nn.Module):
         r"""Create a BatchEnsemble-style ConvTranspose2d layer from an existing ConvTranspose2d layer.
 
         Args:
-            conv_transpose2d (nn.ConvTranspose2d): The ConvTranspose2d layer to convert.
-            num_estimators (int): Number of ensemble members.
+            conv_transpose2d: The ConvTranspose2d layer to convert.
+            num_estimators: Number of ensemble members.
 
         Returns:
             BatchConvTranspose2d: The converted BatchEnsemble-style ConvTranspose2d layer.

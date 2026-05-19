@@ -382,7 +382,7 @@ class TestClassification:
             baseline_type="ensemble",
             ood_criterion="variation_ratio",
             eval_ood=True,
-            save_in_csv=True,
+            save_to_csv=True,
         )
 
         trainer.fit(model, dm)

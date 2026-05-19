@@ -2,7 +2,7 @@
 eval_after_fit: true
 seed_everything: false
 trainer:
-  accelerator: gpu
+  accelerator: auto
   devices: 1
   logger:
     class_path: lightning.pytorch.loggers.TensorBoardLogger

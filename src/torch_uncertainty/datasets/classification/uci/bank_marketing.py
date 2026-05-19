@@ -34,14 +34,14 @@ class BankMarketing(UCIClassificationDataset):
         """The bank Marketing UCI classification dataset.
 
         Args:
-            root (str | Path): Root directory of the datasets.
-            train (bool): If True, creates dataset from training set, otherwise creates from test set.
-            transform (callable): A function/transform that takes in a numpy array and returns a transformed version.
-            target_transform (callable): A function/transform that takes in the target and transforms it.
-            download (bool): If true, downloads the dataset from the internet and puts it in root directory. If dataset is already downloaded, it is not downloaded again.
-            binary (bool): Whether to use binary classification. Defaults to ``True``.
-            test_split (float): The fraction of the dataset to use as test set.
-            split_seed (int): The random seed for splitting the dataset. Defaults to ``21893027``.
+            root: Root directory of the datasets.
+            train: If True, creates dataset from training set, otherwise creates from test set.
+            transform: A function/transform that takes in a numpy array and returns a transformed version.
+            target_transform: A function/transform that takes in the target and transforms it.
+            download: If true, downloads the dataset from the internet and puts it in root directory. If dataset is already downloaded, it is not downloaded again.
+            binary: Whether to use binary classification. Defaults to ``True``.
+            test_split: The fraction of the dataset to use as test set.
+            split_seed: The random seed for splitting the dataset. Defaults to ``21893027``.
 
         Note:
             The licenses of the datasets may differ from TorchUncertainty's license. Check before use.

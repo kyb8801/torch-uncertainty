@@ -24,13 +24,13 @@ class SeparableConv2d(nn.Module):
         """Separable Convolution with dilation.
 
         Args:
-            in_channels (int): Number of input channels.
-            out_channels (int): Number of output channels.
-            kernel_size (_size_2_t): Kernel size.
-            stride (_size_2_t): Stride. Defaults to 1.
-            padding (_size_2_t): Padding. Defaults to 0.
-            dilation (_size_2_t): Dilation. Defaults to 1.
-            bias (bool): Use biases. Defaults to True.
+            in_channels: Number of input channels.
+            out_channels: Number of output channels.
+            kernel_size: Kernel size.
+            stride: Stride. Defaults to ``1``.
+            padding: Padding. Defaults to ``0``.
+            dilation: Dilation. Defaults to ``1``.
+            bias: Use biases. Defaults to ``True``.
         """
         super().__init__()
         self.separable = nn.Conv2d(
@@ -69,10 +69,10 @@ class InnerConv(nn.Module):
         """Inner convolution block.
 
         Args:
-            in_channels (int): Number of input channels.
-            out_channels (int): Number of output channels.
-            dilation (_size_2_t): Dilation.
-            separable (bool): Use separable convolutions to reduce the number
+            in_channels: Number of input channels.
+            out_channels: Number of output channels.
+            dilation: Dilation.
+            separable: Use separable convolutions to reduce the number
                 of parameters.
         """
         super().__init__()
@@ -105,8 +105,8 @@ class InnerPooling(nn.Module):
         """Inner pooling block.
 
         Args:
-            in_channels (int): Number of input channels.
-            out_channels (int): Number of output channels.
+            in_channels: Number of input channels.
+            out_channels: Number of output channels.
         """
         super().__init__()
         self.pool = nn.AdaptiveAvgPool2d(1)
@@ -130,11 +130,11 @@ class ASPP(nn.Module):
         """Atrous Spatial Pyramid Pooling.
 
         Args:
-            in_channels (int): Number of input channels.
-            atrous_rates (list[int]): Atrous rates for the ASPP module.
-            separable (bool): Use separable convolutions to reduce the number
+            in_channels: Number of input channels.
+            atrous_rates: Atrous rates for the ASPP module.
+            separable: Use separable convolutions to reduce the number
                 of parameters.
-            dropout_rate (float): Dropout rate of the ASPP.
+            dropout_rate: Dropout rate of the ASPP.
         """
         super().__init__()
         out_channels = 256
@@ -175,10 +175,10 @@ class DeepLabV3Backbone(Backbone):
         """DeepLab V3(+) backbone.
 
         Args:
-            backbone_name (str): Backbone name.
-            style (str): Whether to use a DeepLab V3 or V3+ model.
-            pretrained (bool): Use pretrained backbone.
-            norm_momentum (float): BatchNorm momentum.
+            backbone_name: Backbone name.
+            style: Whether to use a DeepLab V3 or V3+ model.
+            pretrained: Use pretrained backbone.
+            norm_momentum: BatchNorm momentum.
         """
         # TODO: handle dilations
         if backbone_name == "resnet50":
@@ -203,12 +203,12 @@ class DeepLabV3Decoder(nn.Module):
     """Decoder for the DeepLabV3 model.
 
     Args:
-        in_channels (int): Number of channels of the input latent space.
-        num_classes (int): Number of classes.
-        aspp_dilate (list[int]): Atrous rates for the ASPP module.
-        separable (bool): Use separable convolutions to reduce the number
-            of parameters. Defaults to False.
-        dropout_rate (float): Dropout rate of the ASPP. Defaults to 0.1.
+        in_channels: Number of channels of the input latent space.
+        num_classes: Number of classes.
+        aspp_dilate: Atrous rates for the ASPP module.
+        separable: Use separable convolutions to reduce the number
+            of parameters. Defaults to ``False``.
+        dropout_rate: Dropout rate of the ASPP. Defaults to ``0.1``.
     """
 
     conv: nn.Module
@@ -250,14 +250,13 @@ class DeepLabV3PlusDecoder(nn.Module):
         """Decoder for the DeepLabV3+ model.
 
         Args:
-            in_channels (int): Number of channels of the input latent space.
-            low_level_channels (int): Number of low-level features channels.
-            num_classes (int): Number of classes.
-            aspp_dilate (list[int]): Atrous rates for the ASPP module.
-            separable (bool): Use separable convolutions to reduce the number
+            in_channels: Number of channels of the input latent space.
+            low_level_channels: Number of low-level features channels.
+            num_classes: Number of classes.
+            aspp_dilate: Atrous rates for the ASPP module.
+            separable: Use separable convolutions to reduce the number
                 of parameters.
-            dropout_rate (float): Dropout rate of the ASPP. Defaults
-                to 0.1.
+            dropout_rate: Dropout rate of the ASPP. Defaults to ``0.1``.
         """
         super().__init__()
         self.project = nn.Sequential(
@@ -301,17 +300,13 @@ class _DeepLabV3(nn.Module):
         """DeepLab V3(+) model.
 
         Args:
-            num_classes (int): Number of classes.
-            backbone_name (Literal["resnet50", "resnet101"]): Backbone name.
-            style (Literal["v3", "v3+"]):  Whether to use a DeepLab V3 or
-                V3+ model.
-            output_stride (int): Output stride. Defaults to 16.
-            separable (bool): Use separable convolutions. Defaults
-                to False.
-            pretrained_backbone (bool): Use pretrained backbone.
-                Defaults to True.
-            norm_momentum (float): BatchNorm momentum. Defaults to
-                0.01.
+            num_classes: Number of classes.
+            backbone_name: Backbone name.
+            style: Whether to use a DeepLab V3 or V3+ model.
+            output_stride: Output stride. Defaults to ``16``.
+            separable: Use separable convolutions. Defaults to ``False``.
+            pretrained_backbone: Use pretrained backbone. Defaults to ``True``.
+            norm_momentum: BatchNorm momentum. Defaults to ``0.01``.
 
         References:
             - Rethinking atrous convolution for semantic image segmentation.
@@ -369,14 +364,14 @@ def deep_lab_v3_resnet(
     """DeepLab V3(+) model with ResNet-50/101 backbone.
 
     Args:
-        num_classes (int): Number of classes.
-        arch (int): Number of layers of the underlying ResNet model: 50 or 101.
+        num_classes: Number of classes.
+        arch: Number of layers of the underlying ResNet model: 50 or 101.
         style (Literal["v3", "v3+"]): Whether to use a DeepLab V3 or V3+ model.
-        output_stride (int): Output stride. Defaults to 16.
-        separable (bool): Use separable convolutions. Defaults to
-            False.
-        pretrained_backbone (bool): Use pretrained backbone. Defaults
-            to True.
+        output_stride: Output stride. Defaults to 16.
+        separable: Use separable convolutions. Defaults to
+            ``False``.
+        pretrained_backbone: Use pretrained backbone. Defaults
+            to ``True``.
     """
     return _DeepLabV3(
         num_classes,

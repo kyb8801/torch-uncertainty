@@ -111,12 +111,12 @@ def dummy_model(
     """Dummy model for testing purposes.
 
     Args:
-        in_channels (int): Number of input channels.
-        num_classes (int): Number of output classes.
-        num_estimators (int): Number of estimators in the ensemble.
-        dropout_rate (float): Dropout rate. Defaults to 0.0.
-        with_feats (bool): Whether to include features. Defaults to True.
-        dist_family (str): Distribution family. Defaults to None.
+        in_channels: Number of input channels.
+        num_classes: Number of output classes.
+        num_estimators: Number of estimators in the ensemble.
+        dropout_rate: Dropout rate. Defaults to ``0.0``.
+        with_feats: Whether to include features. Defaults to ``True``.
+        dist_family: Distribution family. Defaults to ``None``.
 
     Returns:
         _Dummy: Dummy model.
@@ -146,11 +146,11 @@ def dummy_segmentation_model(
     """Dummy segmentation model for testing purposes.
 
     Args:
-        in_channels (int): Number of input channels.
-        num_classes (int): Number of output classes.
-        image_size (int): Size of the input image.
-        dropout_rate (float): Dropout rate. Defaults to 0.0.
-        dist_family (str): Distribution family. Defaults to None.
+        in_channels: Number of input channels.
+        num_classes: Number of output classes.
+        image_size: Size of the input image.
+        dropout_rate: Dropout rate. Defaults to ``0.0``.
+        dist_family: Distribution family. Defaults to ``None``.
 
     Returns:
         nn.Module: Dummy segmentation model.

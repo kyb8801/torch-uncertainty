@@ -23,11 +23,10 @@ def _extract_data(
     """Extract logits and labels from the dataloader.
 
     Args:
-        dataloader (DataLoader): The calibration dataloader.
-        model (nn.Module): Model to calibrate.
-        device (Optional[Literal["cpu", "cuda"]]): Device to use for
-            tensor operations.
-        progress (bool): Whether to show the progress bar.
+        dataloader: The calibration dataloader.
+        model: Model to calibrate.
+        device: Device to use for tensor operations.
+        progress: Whether to show the progress bar.
 
     Returns:
         tuple[Tensor, Tensor]: Tensors containing all logits and labels

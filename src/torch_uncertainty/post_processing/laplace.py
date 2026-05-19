@@ -30,19 +30,15 @@ class LaplaceApprox(PostProcessing):
         This class is a wrapper of Laplace classes from the laplace-torch library.
 
         Args:
-            task (Literal[``"classification"``, ``"regression"``]): task type.
-            model (nn.Module): model to be converted.
-            weight_subset (str): subset of weights to be considered. Defaults to
-                "last_layer".
-            hessian_struct (str): structure of the Hessian matrix. Defaults to
-                "kron".
-            pred_type (Literal["glm", "nn"]): type of posterior predictive,
-                See the Laplace library for more details. Defaults to "glm".
-            link_approx (Literal["mc", "probit", "bridge", "bridge_norm"]):
-                how to approximate the classification link function for the `'glm'`.
+            task: task type.
+            model: model to be converted.
+            weight_subset: subset of weights to be considered. Defaults to ``"last_layer"``.
+            hessian_struct: structure of the Hessian matrix. Defaults to ``"kron"``.
+            pred_type: type of posterior predictive, see the Laplace library for more details.
+                Defaults to ``"glm"``.
+            link_approx: how to approximate the classification link function for the ``"glm"``.
                 See the Laplace library for more details. Defaults to "probit".
-            optimize_prior_precision (bool): whether to optimize the prior
-                precision. Defaults to True.
+            optimize_prior_precision: whether to optimize the prior precision. Defaults to ``True``.
 
         References:
             [1] `Daxberger et al. Laplace Redux - Effortless Bayesian Deep Learning. In NeurIPS 2021

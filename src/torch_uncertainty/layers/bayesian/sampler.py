@@ -53,9 +53,9 @@ class CenteredGaussianMixture(nn.Module):
         """Create a mixture of two centered Gaussian distributions.
 
         Args:
-            sigma_1 (float): Standard deviation of the first Gaussian.
-            sigma_2 (float): Standard deviation of the second Gaussian.
-            pi (float): Mixing coefficient.
+            sigma_1: Standard deviation of the first Gaussian.
+            sigma_2: Standard deviation of the second Gaussian.
+            pi: Mixing coefficient.
         """
         super().__init__()
         self.register_buffer("pi", torch.tensor([pi, 1 - pi]))

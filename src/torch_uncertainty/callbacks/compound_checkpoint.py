@@ -27,29 +27,28 @@ class CompoundCheckpoint(ModelCheckpoint):
         r"""Save the checkpoints maximizing or minimizing a given linear form on the metric values.
 
         Args:
-            compound_metric_dict (dict): A dictionary mapping metric names (key) to their
+            compound_metric_dict: A dictionary mapping metric names (key) to their
                 corresponding factors (value) in the linear form:
 
                 .. math:: \sum_{i} \text{metric}_i \times \text{value}_i
 
-            dirpath (str | Path | None): The directory to save the checkpoints in.
-                Defaults to ``None``.
-            verbose (bool): Whether to print verbose output. Defaults to False.
-            save_last (bool | Literal["link"]): Whether to save the last checkpoint.
+            dirpath: The directory to save the checkpoints in. Defaults to ``None``.
+            verbose: Whether to print verbose output. Defaults to ``False``.
+            save_last: Whether to save the last checkpoint.
                 Defaults to ``False``.
-            save_top_k (int): The number of best checkpoints to save. Defaults to ``1``.
-            save_weights_only (bool): Whether to save only the weights. Defaults to
+            save_top_k: The number of best checkpoints to save. Defaults to ``1``.
+            save_weights_only: Whether to save only the weights. Defaults to
                 ``False``.
-            mode (str): The mode to optimize the compound metric. Defaults to ``"min"``.
-            every_n_train_steps (int | None): The number of training steps to wait
+            mode: The mode to optimize the compound metric. Defaults to ``"min"``.
+            every_n_train_steps: The number of training steps to wait
                 between saving checkpoints. Defaults to ``None``.
-            train_time_interval (timedelta | None): The time interval to wait between
+            train_time_interval: The time interval to wait between
                 saving checkpoints. Defaults to ``None``.
-            every_n_epochs (int | None): The number of epochs to wait between saving
+            every_n_epochs: The number of epochs to wait between saving
                 checkpoints. Defaults to ``None``.
-            save_on_train_epoch_end (bool | None): Whether to save the checkpoint at the
+            save_on_train_epoch_end: Whether to save the checkpoint at the
                 end of each training epoch. Defaults to ``None``.
-            enable_version_counter (bool): Whether to enable the version counter for the
+            enable_version_counter: Whether to enable the version counter for the
                 saved checkpoints. Defaults to ``True``.
         """
         self.compound_metric_dict = compound_metric_dict

@@ -17,10 +17,10 @@ class _MCDropout(nn.Module):
         """MC Dropout wrapper for a model containing nn.Dropout modules.
 
         Args:
-            core_model (nn.Module): model to wrap
-            num_estimators (int): number of estimators to use during the evaluation
-            last_layer (bool): whether to apply dropout to the last layer only.
-            on_batch (bool): Perform the MC-Dropout on the batch-size. Otherwise in a for loop. Useful when constrained in memory.
+            core_model: Model to wrap.
+            num_estimators: Number of estimators to use during evaluation.
+            last_layer: Whether to apply dropout to the last layer only.
+            on_batch: Perform MC-Dropout on the batch dimension instead of in a Python loop.
 
         Warning:
             This module will work only if you apply dropout through modules
@@ -54,8 +54,7 @@ class _MCDropout(nn.Module):
         selected dropout modules.
 
         Args:
-            mode (bool): whether to set the module to training
-                mode. Defaults to True.
+            mode: Whether to set the module to training mode. Defaults to ``True``.
         """
         if not isinstance(mode, bool):
             raise TypeError("Training mode is expected to be boolean")
@@ -78,10 +77,10 @@ class _MCDropout(nn.Module):
         :attr:`last_layer`.
 
         Args:
-            x (Tensor): input tensor of shape (B, ...)
+            x: Input tensor of shape (B, ...).
 
         Returns:
-            Tensor: output tensor of shape (:attr:`num_estimators` * B, ...)
+            Tensor | dict[str, Tensor]: Output tensor of shape (:attr:`num_estimators` * B, ...).
         """
         if self.training:
             return self.core_model(x)
@@ -121,10 +120,10 @@ class _RegMCDropout(_MCDropout):
         :attr:`last_layer`.
 
         Args:
-            x (Tensor): input tensor of shape (B, ...)
+            x: Input tensor of shape (B, ...).
 
         Returns:
-            Tensor: output tensor of shape (:attr:`num_estimators` * B, ...)
+            Tensor | dict[str, Tensor]: Output tensor of shape (:attr:`num_estimators` * B, ...).
         """
         if self.training:
             return self.core_model(x)
@@ -157,12 +156,13 @@ def mc_dropout(
     """MC Dropout wrapper for a model.
 
     Args:
-        core_model (nn.Module): model to wrap
-        num_estimators (int): number of estimators to use last_layer (bool): whether to apply dropout to the last layer only. Defaults to ``False``.
-        on_batch (bool): Increase the batch_size to perform MC-Dropout. Otherwise in a for loop to reduce memory footprint. Defaults to ``True``.
-        last_layer (bool): whether to apply dropout to the last layer only. Defaults to ``False``.
-        task (Literal[``"classification"``, ``"regression"``, ``"segmentation"``, ``"pixel_regression"``]): The model task. Defaults to ``"classification"``.
-        probabilistic (bool): Whether the regression model is probabilistic.
+        core_model: Model to wrap.
+        num_estimators: Number of estimators to use during evaluation.
+        last_layer: Whether to apply dropout to the last layer only. Defaults to ``False``.
+        on_batch: Increase the batch size to perform MC-Dropout instead of using a Python loop.
+            Increases memory footprint. Defaults to ``True``.
+        task: The model task. Defaults to ``"classification"``.
+        probabilistic: Whether the regression model is probabilistic. Defaults to ``None``
 
     Warning:
         Beware that :attr:`on_batch==True` can raise weird errors if not enough memory is available.
@@ -193,6 +193,7 @@ def mc_dropout(
 
 
 def _dropout_checks(filtered_modules: list[_DropoutNd], num_estimators: int) -> None:
+    """Validate the dropout configuration used for MC Dropout."""
     if not filtered_modules:
         raise ValueError(
             "No dropout module found in the model. "

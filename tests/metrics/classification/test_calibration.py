@@ -131,9 +131,78 @@ class TestAdaptiveCalibrationError:
         )
         assert ace.compute().item() > ece.compute().item()
 
+    def test_plot_binary(self) -> None:
+        metric = AdaptiveCalibrationError(task="binary", num_bins=2, norm="l1")
+        metric.update(
+            torch.as_tensor([0.25, 0.25, 0.55, 0.75, 0.75]),
+            torch.as_tensor([0, 0, 1, 1, 1]),
+        )
+        fig, ax = metric.plot()
+        assert isinstance(fig, plt.Figure)
+        assert ax[0].get_xlabel() == "Top-class Confidence (%)"
+        assert ax[0].get_ylabel() == "Success Rate (%)"
+        assert ax[1].get_xlabel() == "Top-class Confidence (%)"
+        assert ax[1].get_ylabel() == "Density (%)"
+        plt.close(fig)
+
+    def test_plot_multiclass(self) -> None:
+        metric = AdaptiveCalibrationError(task="multiclass", num_bins=2, norm="l1", num_classes=3)
+        metric.update(
+            torch.as_tensor(
+                [
+                    [0.25, 0.20, 0.55],
+                    [0.55, 0.05, 0.40],
+                    [0.10, 0.30, 0.60],
+                    [0.90, 0.05, 0.05],
+                ]
+            ),
+            torch.as_tensor([0, 1, 2, 0]),
+        )
+        fig, ax = metric.plot()
+        assert isinstance(fig, plt.Figure)
+        assert ax[0].get_xlabel() == "Top-class Confidence (%)"
+        assert ax[0].get_ylabel() == "Success Rate (%)"
+        assert ax[1].get_xlabel() == "Top-class Confidence (%)"
+        assert ax[1].get_ylabel() == "Density (%)"
+        plt.close(fig)
+
+    def test_plot_custom_labels(self) -> None:
+        metric = AdaptiveCalibrationError(task="binary", num_bins=2, norm="l1")
+        metric.update(
+            torch.as_tensor([0.25, 0.45, 0.55, 0.75]),
+            torch.as_tensor([0, 0, 1, 1]),
+        )
+        fig, ax = metric.plot(
+            title="My Title",
+            rd_xlabel="Conf",
+            rd_ylabel="Acc",
+            ch_xlabel="Conf2",
+            ch_ylabel="Dens",
+        )
+        assert isinstance(fig, plt.Figure)
+        assert ax[0].get_title() == "My Title"
+        assert ax[0].get_xlabel() == "Conf"
+        assert ax[0].get_ylabel() == "Acc"
+        assert ax[1].get_xlabel() == "Conf2"
+        assert ax[1].get_ylabel() == "Dens"
+        plt.close(fig)
+
     def test_errors(self) -> None:
         with pytest.raises(TypeError, match=r"is expected to be `int`"):
             AdaptiveCalibrationError(task="multiclass", num_classes=None)
+
+    def test_invalid_norm_in_compute(self) -> None:
+        from torch_uncertainty.metrics.classification.calibration.adaptive_calibration_error import (
+            _ace_compute,
+        )
+
+        with pytest.raises(ValueError, match="Unexpected norm"):
+            _ace_compute(
+                torch.tensor([0.7, 0.3, 0.8, 0.2]),
+                torch.tensor([1.0, 0.0, 1.0, 0.0]),
+                num_bins=2,
+                norm="bad_norm",
+            )
 
 
 @pytest.fixture

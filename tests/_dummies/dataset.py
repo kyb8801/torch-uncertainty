@@ -13,19 +13,19 @@ class DummyClassificationDataset(Dataset):
     """Dummy dataset for testing purposes.
 
     Args:
-        root (string): Root directory containing the dataset (unused).
-        train (bool): If True, creates dataset from training set,
+        root: Root directory containing the dataset (unused).
+        train: If ``True``, creates dataset from training set,
             otherwise creates from test set (unused).
-        transform (callable): A function/transform that takes in
+        transform: A function/transform that takes in
             a PIL image and returns a transformed version. E.g,
             ``transforms.RandomCrop``
-        target_transform (callable): A function/transform that
+        target_transform: A function/transform that
             takes in the target and transforms it.
-        num_channels (int): Number of channels in the images.
-        image_size (int): Size of the images.
-        num_classes (int): Number of classes in the dataset.
-        num_images (int): Number of images in the dataset.
-        kwargs (Any): Other arguments.
+        num_channels: Number of channels in the images.
+        image_size: Size of the images.
+        num_classes: Number of classes in the dataset.
+        num_images: Number of images in the dataset.
+        kwargs: Other arguments.
     """
 
     def __init__(
@@ -77,7 +77,7 @@ class DummyClassificationDataset(Dataset):
         """Get item from dataset.
 
         Args:
-            index (int): Index.
+            index: Index.
 
         Returns:
             tuple: (image, target) where target is index of the target class.
@@ -136,7 +136,7 @@ class DummyRegressionDataset(Dataset):
         """Get item from dataset.
 
         Args:
-            index (int): Index.
+            index: Index.
 
         Returns:
             tuple: (image, target) where target is index of the target class.

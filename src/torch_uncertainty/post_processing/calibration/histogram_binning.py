@@ -30,12 +30,11 @@ class HistogramBinningScaler(PostProcessing):
         it computes the empirical probability of the positive class.
 
         Args:
-            model (nn.Module): Model to calibrate. Defaults to ``None``.
-            num_bins (int): Number of equal-width bins to use. Defaults to ``15``.
-            eps (float): Small value for stability when converting probs back to logits.
+            model: Model to calibrate. Defaults to ``None``.
+            num_bins: Number of equal-width bins to use. Defaults to ``15``.
+            eps: Small value for stability when converting probs back to logits.
                 Defaults to ``1e-6``.
-            device (Optional[Literal["cpu", "cuda"]]): Device to use for
-                tensor operations. Defaults to ``None``.
+            device: Device to use for tensor operations. Defaults to ``None``.
 
         References:
             [1] Obtaining calibrated probability estimates from decision trees
@@ -59,9 +58,8 @@ class HistogramBinningScaler(PostProcessing):
         """Fit the histogram binning model to the calibration data.
 
         Args:
-            dataloader (DataLoader): Dataloader providing the calibration data.
-            progress (bool): Whether to show a progress bar.
-                Defaults to ``True``.
+            dataloader: Dataloader providing the calibration data.
+            progress: Whether to show a progress bar. Defaults to ``True``.
         """
         if self.model is None or isinstance(self.model, nn.Identity):  # coverage: ignore
             logging.warning(

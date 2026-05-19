@@ -21,13 +21,13 @@ class VectorScaler(Scaler):
         """Vector scaling post-processing for calibrated probabilities.
 
         Args:
-            model (nn.Module): Model to calibrate.
-            num_classes (int): Number of classes.
-            init_temperature (float | Tensor): Initial value for the weights. Defaults to ``1``.
-            lr (float): Learning rate for the optimizer. Defaults to ``0.1``.
-            max_iter (int): Maximum number of iterations for the optimizer. Defaults to ``100``.
-            eps (float): Small value for stability. Defaults to ``1e-8``.
-            device (Optional[Literal["cpu", "cuda"]]): Device to use for optimization. Defaults to ``None``.
+            model: Model to calibrate.
+            num_classes: Number of classes.
+            init_temperature: Initial value for the weights. Defaults to ``1``.
+            lr: Learning rate for the optimizer. Defaults to ``0.1``.
+            max_iter: Maximum number of iterations for the optimizer. Defaults to ``100``.
+            eps: Small value for stability. Defaults to ``1e-8``.
+            device: Device to use for optimization. Defaults to ``None``.
 
         References:
             [1] `On calibration of modern neural networks. In ICML 2017
@@ -47,7 +47,7 @@ class VectorScaler(Scaler):
         """Set the temperature vector to a given value.
 
         Args:
-            val (float | Tensor): Weight temperature vector, or float.
+            val: Weight temperature vector, or float.
         """
         if isinstance(val, float | int) or (isinstance(val, Tensor) and val.size == 1):
             if val <= 0:

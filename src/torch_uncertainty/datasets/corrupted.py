@@ -23,11 +23,11 @@ class CorruptedDataset(VisionDataset):
         """Generate the corrupted version of any VisionDataset.
 
         Args:
-            core_dataset (VisionDataset): dataset to be corrupted.
-            shift_severity (int): intensity of the corruption. Should be in [1, 5].
-            generate (bool): Equivalent of the download attributes of the dataset. If ``True``,
+            core_dataset: dataset to be corrupted.
+            shift_severity: intensity of the corruption. Should be in [1, 5].
+            generate: Equivalent of the download attributes of the dataset. If ``True``,
                 generate a new dataset with all the corrupted images. Defaults to ``False``.
-            on_the_fly (bool): Generate the corrupted version of the dataset on the fly, without
+            on_the_fly: Generate the corrupted version of the dataset on the fly, without
                 saving the images on disk. This is discouraged since the experiment won't be fully
                 reproducible. Defaults to ``False``.
 
@@ -100,8 +100,8 @@ class CorruptedDataset(VisionDataset):
         """Save all images with the given corruption on the disk.
 
         Args:
-            root (Path): The path where to save the images.
-            corruption (nn.Module): The corruption module to apply on the images.
+            root: The path where to save the images.
+            corruption: The corruption module to apply on the images.
         """
         for i in trange(self.core_length, leave=False):
             img, tgt = self.core_dataset[i]
@@ -118,7 +118,7 @@ class CorruptedDataset(VisionDataset):
         """Get the corrupted image and the target.
 
         Args:
-            idx (int): Index of the image to retrieve.
+            idx: Index of the image to retrieve.
         """
         if self.on_the_fly:
             corrupt = corruption_transforms[idx // len(self.core_dataset)]

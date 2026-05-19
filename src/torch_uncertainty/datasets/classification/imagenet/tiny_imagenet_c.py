@@ -52,16 +52,16 @@ class TinyImageNetC(ImageFolder):
         """The corrupted TinyImageNet-C Dataset.
 
         Args:
-            root (str | Path): Root directory of the datasets.
-            transform (callable): A function/transform that takes in
+            root: Root directory of the datasets.
+            transform: A function/transform that takes in
                 a PIL image and returns a transformed version. E.g,
                 ``transforms.RandomCrop``. Defaults to ``None``.
-            target_transform (callable): A function/transform that
+            target_transform: A function/transform that
                 takes in the target and transforms it. Defaults to ``None``.
-            subset (str): The subset to use, one of ``all`` or the keys in
+            subset: The subset to use, one of ``all`` or the keys in
                 ``cifarc_subsets``.
-            shift_severity (int): The shift_severity of the corruption, between ``1`` and ``5``.
-            download (bool): If True, downloads the dataset from the
+            shift_severity: The shift_severity of the corruption, between ``1`` and ``5``.
+            download: If True, downloads the dataset from the
                 internet and puts it in root directory. If dataset is already
                 downloaded, it is not downloaded again. Defaults to ``False``.
 
@@ -102,9 +102,9 @@ class TinyImageNetC(ImageFolder):
         in the dataset.
 
         Args:
-            subset (str): The name of the corruption subset to be used. Choose
+            subset: The name of the corruption subset to be used. Choose
                 `all` for the dataset to contain all subsets.
-            shift_severity (int): The shift_severity of the corruption applied to the
+            shift_severity: The shift_severity of the corruption applied to the
                 images.
         """
         if subset == "all":

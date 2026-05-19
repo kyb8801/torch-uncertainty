@@ -73,12 +73,12 @@ class CIFAR10C(VisionDataset):
         """The corrupted CIFAR-10-C Dataset.
 
         Args:
-            root (str): Root directory of the datasets.
-            transform (callable): A function/transform that takes in a PIL image and returns a transformed version. E.g, ``transforms.RandomCrop``. Defaults to ``None``.
-            target_transform (callable): A function/transform that takes in the target and transforms it. Defaults to ``None``.
-            subset (str): The subset to use, one of ``all`` or the keys in ``cifarc_subsets``.
-            shift_severity (int): The shift_severity of the corruption, between ``1`` and ``5``.
-            download (bool): If ``True``, downloads the dataset from the internet and puts it in root directory. If dataset is already downloaded, it is not downloaded again. Defaults to ``False``.
+            root: Root directory of the datasets.
+            transform: A function/transform that takes in a PIL image and returns a transformed version. E.g, ``transforms.RandomCrop``. Defaults to ``None``.
+            target_transform: A function/transform that takes in the target and transforms it. Defaults to ``None``.
+            subset: The subset to use, one of ``all`` or the keys in ``cifarc_subsets``.
+            shift_severity: The shift_severity of the corruption, between ``1`` and ``5``.
+            download: If ``True``, downloads the dataset from the internet and puts it in root directory. If dataset is already downloaded, it is not downloaded again. Defaults to ``False``.
 
         References:
             [1] `Benchmarking neural network robustness to common corruptions and perturbations. Dan Hendrycks and Thomas Dietterich. In ICLR, 2019 <https://arxiv.org/abs/1903.12261>`_.
@@ -120,10 +120,10 @@ class CIFAR10C(VisionDataset):
         in the dataset.
 
         Args:
-            root (Path): The path to the dataset.
-            subset (str): The name of the corruption subset to be used. Choose
+            root: The path to the dataset.
+            subset: The name of the corruption subset to be used. Choose
                 `all` for the dataset to contain all subsets.
-            shift_severity (int): The shift_severity of the corruption applied to the
+            shift_severity: The shift_severity of the corruption applied to the
                 images.
 
         Returns:
@@ -159,7 +159,7 @@ class CIFAR10C(VisionDataset):
         """Get the samples and targets of the dataset.
 
         Args:
-            index (int): The index of the sample to get.
+            index: The index of the sample to get.
         """
         sample, target = (
             self.samples[index],
@@ -228,12 +228,12 @@ class CIFAR100C(CIFAR10C):
         """The corrupted CIFAR-100-C Dataset.
 
         Args:
-            root (str): Root directory of the datasets.
-            transform (callable): A function/transform that takes in a PIL image and returns a transformed version. E.g, ``transforms.RandomCrop``. Defaults to None.
-            target_transform (callable): A function/transform that takes in the target and transforms it. Defaults to None.
-            subset (str): The subset to use, one of ``all`` or the keys in ``cifarc_subsets``.
-            shift_severity (int): The shift_severity of the corruption, between 1 and 5.
-            download (bool): If True, downloads the dataset from the internet and puts it in root directory. If dataset is already downloaded, it is not downloaded again. Defaults to False.
+            root: Root directory of the datasets.
+            transform: A function/transform that takes in a PIL image and returns a transformed version. E.g, ``transforms.RandomCrop``. Defaults to ``None``.
+            target_transform: A function/transform that takes in the target and transforms it. Defaults to ``None``.
+            subset: The subset to use, one of ``all`` or the keys in ``cifarc_subsets``.
+            shift_severity: The shift_severity of the corruption, between 1 and 5.
+            download: If True, downloads the dataset from the internet and puts it in root directory. If dataset is already downloaded, it is not downloaded again. Defaults to False.
             kwargs: Additional keyword arguments passed to the parent class (CIFAR-10-C).
 
         .. seealso::

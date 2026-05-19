@@ -1,7 +1,7 @@
 seed_everything: false
 eval_after_fit: true
 trainer:
-  accelerator: gpu
+  accelerator: auto
   devices: 1
   precision: 16-mixed
   max_epochs: 50
@@ -24,7 +24,7 @@ routine:
   is_ensemble: true
   num_classes: 3
   loss: CrossEntropyLoss
-  save_in_csv: true
+  save_to_csv: true
   format_batch_fn:
     class_path: torch_uncertainty.transforms.RepeatTarget
     init_args:

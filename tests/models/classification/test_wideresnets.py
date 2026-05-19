@@ -144,6 +144,8 @@ class TestMIMOWide:
 
         with torch.no_grad():
             model(torch.rand((2, 1, 28, 28)))
+            model.eval()
+            model(torch.rand((1, 1, 28, 28)))
 
         with pytest.raises(ValueError):
             _MIMOWideResNet(

@@ -14,13 +14,12 @@ class DECLoss(nn.Module):
         """The Deep Evidential Classification loss.
 
         Args:
-            annealing_step (int | None): Annealing step for the weight of the
-                regularization term. Defaults to None.
-            reg_weight (float | None): Fixed weight of the regularization term.
-                Defaults to None.
-            loss_type (str): Specifies the loss type to apply to the
+            annealing_step: Annealing step for the weight of the
+                regularization term. Defaults to ``None``.
+            reg_weight: Fixed weight of the regularization term. Defaults to ``None``.
+            loss_type: Specifies the loss type to apply to the
                 Dirichlet parameters: ``'mse'`` | ``'log'`` | ``'digamma'``.
-            reduction (str): Specifies the reduction to apply to the
+            reduction: Specifies the reduction to apply to the
                 output:``'none'`` | ``'mean'`` | ``'sum'``.
 
         References:
@@ -175,10 +174,10 @@ class ConfidencePenaltyLoss(nn.Module):
         """The Confidence Penalty Loss.
 
         Args:
-            reg_weight (float): The weight of the regularization term.
-            reduction (str): specifies the reduction to apply to the
+            reg_weight: The weight of the regularization term.
+            reduction: specifies the reduction to apply to the
                 output:``'none'`` | ``'mean'`` | ``'sum'``. Defaults to "mean".
-            eps (float): A small value to avoid numerical instability.
+            eps: A small value to avoid numerical instability.
                 Defaults to ``1e-6.``
 
         References:
@@ -206,8 +205,8 @@ class ConfidencePenaltyLoss(nn.Module):
         """Compute the Confidence Penalty loss.
 
         Args:
-            logits (Tensor): The inputs of the Bayesian Neural Network
-            targets (Tensor): The target values
+            logits: The inputs of the Bayesian Neural Network
+            targets: The target values
 
         Returns:
             Tensor: The Confidence Penalty loss
@@ -233,8 +232,8 @@ class ConflictualLoss(nn.Module):
         r"""The Conflictual Loss.
 
         Args:
-            reg_weight (float): The weight of the regularization term.
-            reduction (str): specifies the reduction to apply to the
+            reg_weight: The weight of the regularization term.
+            reduction: specifies the reduction to apply to the
                 output:``'none'`` | ``'mean'`` | ``'sum'``.
 
         References:
@@ -258,8 +257,8 @@ class ConflictualLoss(nn.Module):
         """Compute the conflictual loss.
 
         Args:
-            logits (Tensor): The outputs of the model.
-            targets (Tensor): The target values.
+            logits: The outputs of the model.
+            targets: The target values.
 
         Returns:
             Tensor: The conflictual loss.
@@ -286,9 +285,9 @@ class FocalLoss(nn.Module):
         """Focal-Loss for classification tasks.
 
         Args:
-            gamma (float): A constant, as described in the paper.
-            alpha (Tensor): Weights for each class. Defaults to ``None``.
-            reduction (str): ``'mean'``, ``'sum'`` or ``'none'``. Defaults to ``'mean'``.
+            gamma: A constant, as described in the paper.
+            alpha: Weights for each class. Defaults to ``None``.
+            reduction: ``'mean'``, ``'sum'`` or ``'none'``. Defaults to ``'mean'``.
 
         References:
             [1] `Lin, T.-Y., Goyal, P., Girshick, R., He, K., & Dollár, P. (2017). Focal Loss for Dense Object Detection.
@@ -344,15 +343,15 @@ class BCEWithLogitsLSLoss(nn.BCEWithLogitsLoss):
         the BCEWithLogitsLoss.
 
         Args:
-            weight (Tensor): A manual rescaling weight given to the
+            weight: A manual rescaling weight given to the
                 loss of each batch element. If given, has to be a Tensor of size
                 "nbatch". Defaults to ``None``.
-            reduction (str): Specifies the reduction to apply to the
+            reduction: Specifies the reduction to apply to the
                 output: ``'none'`` | ``'mean'`` | ``'sum``'. ``'none'``: no reduction will be applied,
                 ``'mean'``: the sum of the output will be divided by the number of
                 elements in the output, ``'sum'``: the output will be summed. Defaults
                 to ``'mean'``.
-            label_smoothing (float): The label smoothing factor. Defaults
+            label_smoothing: The label smoothing factor. Defaults
                 to ``0.0``.
         """
         super().__init__(weight=weight, reduction=reduction)
@@ -449,13 +448,13 @@ class MixupMPLoss(nn.CrossEntropyLoss):
         ratio r.
 
         Args:
-            mixup_ratio (float): Ratio of number of mixup samples vs normal samples
+            mixup_ratio: Ratio of number of mixup samples vs normal samples
                 output by the MixupMP transform. This should match the transform's
                 :attr:`mixup_ratio` hyperparameter. Defaults to ``1.0`` (equal weighting).
-            weight (Tensor | None): a manual rescaling weight given to each class.
-            ignore_index (int): Specifies a target value that is ignored
+            weight: a manual rescaling weight given to each class.
+            ignore_index: Specifies a target value that is ignored
                 and does not contribute to the input gradient. Defaults to ``-100``.
-            reduction (str): Specifies the reduction to apply to the output: 'none'|'mean'|'sum'.
+            reduction: Specifies the reduction to apply to the output: 'none'|'mean'|'sum'.
 
         See Also:
             torch_uncertainty/transforms/mixup.py — MixupMP transform implementation.
@@ -477,8 +476,8 @@ class MixupMPLoss(nn.CrossEntropyLoss):
         that case by manually using F.kl_div if needed.
 
         Args:
-            input (Tensor): model logits shape (N_total, num_classes)
-            target (Tensor): target labels (one-hot or class indices) shape (N_total, ...)
+            input: model logits shape (N_total, num_classes)
+            target: target labels (one-hot or class indices) shape (N_total, ...)
         """
         # determine how many samples correspond to mixup vs normal
         mixup_count = round((self.mixup_ratio / (self.mixup_ratio + 1)) * input.size(0))

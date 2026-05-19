@@ -66,37 +66,31 @@ class PixelRegressionRoutine(LightningModule):
         eval_shift: bool = False,
         num_image_plot: int = 4,
         log_plots: bool = False,
-        save_in_csv: bool = False,
+        save_to_csv: bool = False,
         csv_filename: str = "results.csv",
     ) -> None:
         r"""Routine for training & testing on **pixel regression** tasks.
 
         Args:
-            model (nn.Module): Model to train.
-            output_dim (int): Number of outputs of the model.
-            loss (nn.Module): Loss function to optimize the :attr:`model`.
+            model: Model to train.
+            output_dim: Number of outputs of the model.
+            loss: Loss function to optimize the :attr:`model`.
                 Defaults to ``None``.
-            dist_family (str): The distribution family to use for
-                probabilistic pixel regression. If ``None`` then point-wise regression.
+            dist_family: The distribution family to use for probabilistic pixel regression.
+                If ``None`` then point-wise regression. Defaults to ``None``.
+            dist_estimate: The estimate to use when computing the point-wise metrics.
+                Defaults to ``"mean"``.
+            is_ensemble: Whether the model is an ensemble. Defaults to ``False``.
+            optim_recipe: The optimizer and optionally the scheduler to use, or a callable that returns them.
                 Defaults to ``None``.
-            dist_estimate (str): The estimate to use when computing the
-                point-wise metrics. Defaults to ``"mean"``.
-            is_ensemble (bool): Whether the model is an ensemble.
+            eval_shift: Indicates whether to evaluate the Distribution shift performance.
                 Defaults to ``False``.
-            optim_recipe (Callable[[nn.Module], OptimizerLRScheduler] | OptimizerLRScheduler): The optimizer and
-                optionally the scheduler to use, or a callable that returns them. Defaults to ``None``.
-            eval_shift (bool): Indicates whether to evaluate the Distribution
-                shift performance. Defaults to ``False``.
-            format_batch_fn (nn.Module): The function to format the
-                batch. Defaults to ``None``.
-            num_image_plot (int): Number of images to plot. Defaults to ``4``.
-            log_plots (bool): Indicates whether to log plots from
-                metrics. Defaults to ``False``.
-            save_in_csv (bool): Save the results in csv. Defaults to
-                ``False``.
-            csv_filename (str): Name of the csv file. Defaults to
-                ``"results.csv"``. Note that this is only used if
-                :attr:`save_in_csv` is ``True``.
+            format_batch_fn: The function to format the batch. Defaults to ``None``.
+            num_image_plot: Number of images to plot. Defaults to ``4``.
+            log_plots: Indicates whether to log plots from metrics. Defaults to ``False``.
+            save_to_csv: Save the results in csv. Defaults to ``False``.
+            csv_filename: Name of the csv file. Defaults to ``"results.csv"``.
+                Note that this is only used if :attr:`save_to_csv` is ``True``.
         """
         super().__init__()
         _depth_routine_checks(output_dim, num_image_plot, log_plots)
@@ -112,7 +106,7 @@ class PixelRegressionRoutine(LightningModule):
         self.dist_estimate = dist_estimate
         self.probabilistic = dist_family is not None
         self.loss = loss
-        self.save_in_csv = save_in_csv
+        self.save_to_csv = save_to_csv
         self.csv_filename = csv_filename
         self.num_image_plot = num_image_plot
         self.is_ensemble = is_ensemble
@@ -197,7 +191,7 @@ class PixelRegressionRoutine(LightningModule):
         is one-dimensional and if the routine contains a single model.
 
         Args:
-            inputs (Tensor): The input tensor.
+            inputs: The input tensor.
 
         Returns:
             Tensor: The output tensor.
@@ -215,7 +209,7 @@ class PixelRegressionRoutine(LightningModule):
         """Perform a single training step based on the input tensors.
 
         Args:
-            batch (tuple[Tensor, Tensor]): the training data and their corresponding targets
+            batch: the training data and their corresponding targets
 
         Returns:
             Tensor: the loss corresponding to this training step.
@@ -254,7 +248,7 @@ class PixelRegressionRoutine(LightningModule):
         """Get the prediction and handle predicted eventual distribution parameters.
 
         Args:
-            inputs (Tensor): the input data.
+            inputs: the input data.
 
         Returns:
             tuple[Tensor, Distribution | None]: the prediction as a Tensor and a distribution.
@@ -283,8 +277,8 @@ class PixelRegressionRoutine(LightningModule):
         Compute the prediction of the model and the value of the metrics on the validation batch.
 
         Args:
-            batch (tuple[Tensor, Tensor]): the validation images and their corresponding targets.
-            batch_idx (int): the id of the batch. Optionally plot images and the predictions with
+            batch: the validation images and their corresponding targets.
+            batch_idx : the id of the batch. Optionally plot images and the predictions with
                 the first batch.
         """
         inputs, targets = batch
@@ -318,9 +312,9 @@ class PixelRegressionRoutine(LightningModule):
         handle OOD and distribution-shifted images.
 
         Args:
-            batch (tuple[Tensor, Tensor]): the test data and their corresponding targets.
-            batch_idx (int): the number of the current batch (unused).
-            dataloader_idx (int): 0 if in-distribution, 1 if out-of-distribution.
+            batch: the test data and their corresponding targets.
+            batch_idx : the number of the current batch (unused).
+            dataloader_idx : 0 if in-distribution, 1 if out-of-distribution.
         """
         if dataloader_idx != 0:
             raise NotImplementedError(
@@ -387,7 +381,7 @@ class PixelRegressionRoutine(LightningModule):
         if self.probabilistic:
             self.test_prob_metrics.reset()
 
-        if self.save_in_csv and self.logger is not None:
+        if self.save_to_csv and self.logger is not None:
             csv_writer(
                 Path(self.logger.log_dir) / self.csv_filename,
                 result_dict,
@@ -428,10 +422,10 @@ def colorize(
     """Colorize a tensor of depth values.
 
     Args:
-        value (Tensor): The tensor of depth values.
-        vmin (float): The minimum depth value. Defaults to None.
-        vmax (float): The maximum depth value. Defaults to None.
-        cmap (str): The colormap to use. Defaults to 'magma'.
+        value: The tensor of depth values.
+        vmin: The minimum depth value. Defaults to ``None``.
+        vmax: The maximum depth value. Defaults to ``None``.
+        cmap: The colormap to use. Defaults to ``'magma'``.
     """
     vmin = value.min().item() if vmin is None else vmin
     vmax = value.max().item() if vmax is None else vmax
@@ -448,9 +442,9 @@ def _depth_routine_checks(output_dim: int, num_image_plot: int, log_plots: bool)
     """Check the domains of the routine's parameters.
 
     Args:
-        output_dim (int): the dimension of the output of the regression task.
-        num_image_plot (int): the number of images to plot at evaluation time.
-        log_plots (bool): whether to plot images and predictions during evaluation.
+        output_dim : the dimension of the output of the regression task.
+        num_image_plot : the number of images to plot at evaluation time.
+        log_plots: whether to plot images and predictions during evaluation.
     """
     if output_dim < 1:
         raise ValueError(f"output_dim must be positive, got {output_dim}.")

@@ -5,8 +5,7 @@ from torchmetrics import MeanAbsoluteError, MeanSquaredError
 
 class MeanGTRelativeAbsoluteError(MeanAbsoluteError):
     def __init__(self, **kwargs) -> None:
-        r"""Compute Mean Absolute Error relative to the Ground Truth (MAErel
-        or ARErel).
+        r"""Compute the Mean Absolute Error relative to the Ground Truth (MAErel or ARErel).
 
         This metric is commonly used in tasks where the relative deviation of
         predictions with respect to the ground truth is important.
