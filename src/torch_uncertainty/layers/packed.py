@@ -824,9 +824,8 @@ class PackedMultiheadAttention(nn.Module):
             dtype: The dtype to use for the layer's parameters. Defaults to ``None``.
 
         Reference:
-            - `Attention Is All You Need <https://arxiv.org/abs/1706.03762>`_: Original Multihead Attention formulation.
-            - `Hierarchical Light Tranformer Ensembles for Multimodal Trajectory Forecasting <https://arxiv.org/abs/2403.17678>`_
-              : Packed-Ensembles-style Multihead Attention formulation.
+            - `Attention Is All You Need <https://arxiv.org/abs/1706.03762>`_: original Multihead Attention formulation.
+            - `Hierarchical Light Transformer Ensembles for Multimodal Trajectory Forecasting <https://arxiv.org/abs/2403.17678>`_: Packed-Ensembles-style Multihead Attention formulation.
         """
         factory_kwargs = {"device": device, "dtype": dtype}
         super().__init__()
@@ -1171,9 +1170,8 @@ class PackedTransformerEncoderLayer(nn.Module):
                 ``None``.
 
         Reference:
-            - `Attention Is All You Need <https://arxiv.org/abs/1706.03762>`_: Original Multihead Attention formulation.
-            - `Hierarchical Light Tranformer Ensembles for Multimodal Trajectory Forecasting <https://arxiv.org/abs/2403.17678>`_
-              : Packed-Ensembles-style Multihead Attention formulation.
+            - `Attention Is All You Need <https://arxiv.org/abs/1706.03762>`_: original Multihead Attention formulation.
+            - `Hierarchical Light Transformer Ensembles for Multimodal Trajectory Forecasting <https://arxiv.org/abs/2403.17678>`_: Packed-Ensembles-style Multihead Attention formulation.
         """
         factory_kwargs = {"device": device, "dtype": dtype}
         super().__init__()
@@ -1382,9 +1380,8 @@ class PackedTransformerDecoderLayer(nn.Module):
                 ``None``.
 
         Reference:
-            - `Attention Is All You Need <https://arxiv.org/abs/1706.03762>`_: Original Multihead Attention formulation.
-            - `Hierarchical Light Tranformer Ensembles for Multimodal Trajectory Forecasting <https://arxiv.org/abs/2403.17678>`_
-              : Packed-Ensembles-style Multihead Attention formulation.
+            - `Attention Is All You Need <https://arxiv.org/abs/1706.03762>`_: original Multihead Attention formulation.
+            - `Hierarchical Light Transformer Ensembles for Multimodal Trajectory Forecasting <https://arxiv.org/abs/2403.17678>`_: Packed-Ensembles-style Multihead Attention formulation.
         """
         factory_kwargs = {"device": device, "dtype": dtype}
         super().__init__()
