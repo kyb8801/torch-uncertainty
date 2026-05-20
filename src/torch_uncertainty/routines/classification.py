@@ -612,7 +612,7 @@ class ClassificationRoutine(LightningModule):
     def _plot_results(self):
         """Plot uncertainty quantification metrics."""
         self.logger.experiment.add_figure(
-            "Reliabity diagram", self.test_cls_metrics["cal/ECE"].plot()[0]
+            "Reliability diagram", self.test_cls_metrics["cal/ECE"].plot()[0]
         )
         self.logger.experiment.add_figure(
             "Risk-Coverage curve",
@@ -625,7 +625,7 @@ class ClassificationRoutine(LightningModule):
 
         if self.post_processing is not None and not isinstance(self.post_processing, Conformal):
             self.logger.experiment.add_figure(
-                "Reliabity diagram after calibration",
+                "Reliability diagram after calibration",
                 self.post_cls_metrics["cal/ECE"].plot()[0],
             )
 

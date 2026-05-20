@@ -25,7 +25,7 @@ If you are interested in contributing to TorchUncertainty, we recommend the
 following steps to set up a clean development environment and ensure that
 the continuous integration does not break.
 
-1. Install `uv` following the steps from their [website](https://docs.astral.sh/uv/getting-started/installation/)
+1. Install `uv` following the steps [here](https://docs.astral.sh/uv/getting-started/installation/)
 2. Clone the repository
 3. Install torch-uncertainty with the dev packages:
    - `uv sync --extra gpu` for GPU-based systems
