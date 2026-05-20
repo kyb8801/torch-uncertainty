@@ -78,9 +78,7 @@ class CoverageRate(Metric):
         self.add_state("correct", torch.zeros(size, dtype=torch.long), dist_reduce_fx="sum")
         self.add_state("total", torch.zeros(size, dtype=torch.float), dist_reduce_fx="sum")
 
-    def update(
-        self, preds: torch.Tensor, target: torch.Tensor
-    ) -> None:  # pyrefly: ignore[bad-override]
+    def update(self, preds: torch.Tensor, target: torch.Tensor) -> None:
         """Update the metric state with predictions and targets.
 
         Args:
