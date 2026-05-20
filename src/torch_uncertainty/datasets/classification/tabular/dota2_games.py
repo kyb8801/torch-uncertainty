@@ -30,9 +30,7 @@ class DOTA2Games(TabularClassificationDataset):
         return pd.read_csv(self.root / self.dataset_name / fname, header=None)
 
     def _split(self, df: pd.DataFrame) -> tuple[Tensor, Tensor]:
-        targets = torch.as_tensor(
-            np.where(df.iloc[:, 0] == 1, 1, 0).copy(), dtype=torch.long
-        )
+        targets = torch.as_tensor(np.where(df.iloc[:, 0] == 1, 1, 0).copy(), dtype=torch.long)
         features = df.drop(columns=[0])
         data = torch.as_tensor(features.values.astype(float).copy(), dtype=torch.float32)
         return data, targets

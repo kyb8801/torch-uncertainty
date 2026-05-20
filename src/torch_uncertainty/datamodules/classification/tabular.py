@@ -255,9 +255,7 @@ class WineQualityDataModule(TabularClassificationDataModule):
         self.threshold = threshold
 
     def prepare_data(self) -> None:
-        self.dataset_class(
-            root=self.root, download=True, download_only=True, variant=self.variant
-        )
+        self.dataset_class(root=self.root, download=True, download_only=True, variant=self.variant)
 
     def setup(self, stage: str | None = None) -> None:
         kwargs = {

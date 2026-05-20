@@ -60,8 +60,9 @@ class SetSize(Metric):
             self.add_state("sizes", default=[], dist_reduce_fx="cat")
         self.add_state("total", default=torch.tensor(0, dtype=torch.long), dist_reduce_fx="sum")
 
-    # pyrefly: ignore[bad-override]
-    def update(self, preds: torch.Tensor, targets: torch.Tensor | None = None) -> None:
+    def update(
+        self, preds: torch.Tensor, targets: torch.Tensor | None = None
+    ) -> None:  # pyrefly: ignore[bad-override]
         """Update the metric state with predictions and targets.
 
         Args:

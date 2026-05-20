@@ -51,9 +51,7 @@ class BankMarketing(TabularClassificationDataset):
             self.root / self.dataset_name / "bank-additional" / self.filename,
             sep=";",
         )
-        self.targets = torch.as_tensor(
-            np.where(data["y"] == "yes", 1, 0).copy(), dtype=torch.long
-        )
+        self.targets = torch.as_tensor(np.where(data["y"] == "yes", 1, 0).copy(), dtype=torch.long)
         data = data.drop(columns=["y"])
         # Compress columns whose unique non-null values are literally {"yes", "no"}.
         # Other 2-value object columns (e.g. ``contact``: cellular/telephone) must
