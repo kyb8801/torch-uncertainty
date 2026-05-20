@@ -223,9 +223,9 @@ class ClassificationRoutine(LightningModule):
             metrics_dict |= {
                 "cls/AUROC": BinaryAUROC(),
                 "cls/AUPR": BinaryAveragePrecision(),
-                "cls/FRP95": FPR95(pos_label=1),
+                "cls/FPR95": FPR95(pos_label=1),
             }
-            groups.extend([["cls/AUROC", "cls/AUPR"], ["cls/FRP95"]])
+            groups.extend([["cls/AUROC", "cls/AUPR"], ["cls/FPR95"]])
 
         cls_metrics = MetricCollection(metrics_dict, compute_groups=groups)
         self.val_cls_metrics = cls_metrics.clone(prefix="val/")
