@@ -1,5 +1,6 @@
 import torch
 
+from torch_uncertainty.metrics.segmentation import PAvPU
 from torch_uncertainty.metrics.segmentation.seg_binary_auroc import SegmentationBinaryAUROC
 from torch_uncertainty.metrics.segmentation.seg_binary_average_precision import (
     SegmentationBinaryAveragePrecision,
@@ -78,3 +79,43 @@ class TestSegmentationFPR95:
             metric.update(preds, target)
         result = metric.compute()
         assert result.ndim == 0
+
+
+class TestPAvPU:
+    def test_update_and_compute(self) -> None:
+        metric = PAvPU(patch_size=2, acc_threshold=0.5, unc_threshold=0.4 + 1e-6)
+        # Test the example from the paper (https://arxiv.org/pdf/1811.12709) showcased in Figure 2.
+        target = torch.tensor([[[1, 2, 5, 7], [6, 4, 3, 3], [10, 9, 5, 0], [8, 6, 4, 4]]])
+        preds = torch.tensor(
+            [
+                [
+                    [
+                        [0.01, 0.9, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01],
+                        [0.03, 0.03, 0.7, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03],
+                        [0.06, 0.06, 0.06, 0.06, 0.4, 0.06, 0.06, 0.06, 0.06, 0.06, 0.06],
+                        [0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.7, 0.03, 0.03, 0.03],
+                    ],
+                    [
+                        [0.07, 0.07, 0.07, 0.07, 0.07, 0.3, 0.07, 0.07, 0.07, 0.07, 0.07],
+                        [0.06, 0.06, 0.06, 0.06, 0.06, 0.06, 0.4, 0.06, 0.06, 0.06, 0.06],
+                        [0.02, 0.02, 0.02, 0.8, 0.02, 0.02, 0.02, 0.02, 0.02, 0.02, 0.02],
+                        [0.01, 0.01, 0.01, 0.9, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01],
+                    ],
+                    [
+                        [0.02, 0.02, 0.02, 0.02, 0.02, 0.02, 0.02, 0.02, 0.02, 0.02, 0.8],
+                        [0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.04, 0.6, 0.04],
+                        [0.05, 0.05, 0.05, 0.05, 0.5, 0.05, 0.05, 0.05, 0.05, 0.05, 0.05],
+                        [0.7, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03, 0.03],
+                    ],
+                    [
+                        [0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.9, 0.01, 0.01],
+                        [0.07, 0.07, 0.07, 0.07, 0.07, 0.07, 0.07, 0.3, 0.07, 0.07, 0.07],
+                        [0.06, 0.06, 0.06, 0.4, 0.06, 0.06, 0.06, 0.06, 0.06, 0.06, 0.06],
+                        [0.02, 0.02, 0.02, 0.02, 0.8, 0.02, 0.02, 0.02, 0.02, 0.02, 0.02],
+                    ],
+                ]
+            ]
+        ).permute(0, 3, 1, 2)
+        metric.update(preds, target)
+        result = metric.compute()
+        assert result == torch.tensor(0.75)
