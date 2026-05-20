@@ -12,6 +12,7 @@ from torchmetrics.functional.classification.calibration_error import (
     _multiclass_calibration_error_tensor_validation,
 )
 from torchmetrics.utilities.data import dim_zero_cat
+from torchmetrics.utilities.enums import ClassificationTaskNoMultilabel
 
 
 def _patched_binary_calibration_error_arg_validation(
@@ -216,42 +217,35 @@ class PatchedMulticlassCalibrationError(Metric):
         self,
         num_classes: int,
         patch_size: int,
-        n_bins: int = 15,
+        num_bins: int = 15,
         norm: Literal["l1", "l2", "max"] = "l1",
-        ignore_index: int | None = None,
         validate_args: bool = True,
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
         if validate_args:
             _patched_multiclass_calibration_error_arg_validation(
-                patch_size, num_classes, n_bins, norm, ignore_index
+                patch_size, num_classes, num_bins, norm, None
             )
         self.num_classes = num_classes
         self.patch_size = patch_size
-        self.n_bins = n_bins
+        self.num_bins = num_bins
         self.norm = norm
-        self.ignore_index = ignore_index
         self.validate_args = validate_args
         self.add_state("confidences", [], dist_reduce_fx="cat")
         self.add_state("accuracies", [], dist_reduce_fx="cat")
 
-    def update(self, preds: Tensor, target: Tensor) -> None:
+    def update(self, preds: Tensor, target: Tensor, ignore_mask: Tensor | None = None) -> None:
         """Update metric states with predictions and targets."""
         if self.validate_args:
-            _multiclass_calibration_error_tensor_validation(
-                preds, target, self.num_classes, self.ignore_index
-            )
+            _multiclass_calibration_error_tensor_validation(preds, target, self.num_classes, None)
         if not torch.all((preds >= 0) & (preds <= 1)):
             preds = preds.softmax(dim=1)
 
         conf, predictions = preds.max(dim=1)  # (B, H, W)
         acc = (predictions == target).float()  # (B, H, W)
 
-        if self.ignore_index is not None:
-            valid = (target != self.ignore_index).float()
-        else:
-            valid = torch.ones_like(conf)
+        valid = (~ignore_mask).float() if ignore_mask is not None else torch.ones_like(conf)
 
         patch_conf, patch_acc = _pool_patches(conf, acc, valid, self.patch_size)
         self.confidences.append(patch_conf)
@@ -261,4 +255,36 @@ class PatchedMulticlassCalibrationError(Metric):
         """Compute metric."""
         confidences = dim_zero_cat(self.confidences)
         accuracies = dim_zero_cat(self.accuracies)
-        return _ce_compute(confidences, accuracies, self.n_bins, norm=self.norm)
+        return _ce_compute(confidences, accuracies, self.num_bins, norm=self.norm)
+
+
+class PatchedCalibrationError:
+    def __new__(
+        cls: type["PatchedCalibrationError"],
+        task: Literal["binary", "multiclass"],
+        n_bins: int = 15,
+        norm: Literal["l1", "l2", "max"] = "l1",
+        num_classes: int | None = None,
+        ignore_index: int | None = None,
+        validate_args: bool = True,
+        **kwargs: Any,
+    ) -> Metric:
+        """Initialize task metric."""
+        task = ClassificationTaskNoMultilabel.from_str(task)
+        kwargs.update(
+            {
+                "n_bins": n_bins,
+                "norm": norm,
+                "ignore_index": ignore_index,
+                "validate_args": validate_args,
+            }
+        )
+        if task == ClassificationTaskNoMultilabel.BINARY:
+            return PatchedBinaryCalibrationError(**kwargs)
+        if task == ClassificationTaskNoMultilabel.MULTICLASS:
+            if not isinstance(num_classes, int):
+                raise ValueError(
+                    f"`num_classes` is expected to be `int` but `{type(num_classes)} was passed.`"
+                )
+            return PatchedMulticlassCalibrationError(num_classes, **kwargs)
+        raise ValueError(f"Not handled value: {task}")
