@@ -65,6 +65,7 @@ TorchUncertainty also houses multiple official implementations of papers from ma
    installation
    quickstart
    auto_tutorials/index
+   evaluation
    cli_guide
    api
    contributing
