@@ -34,5 +34,5 @@ class AmazonAccess(TabularClassificationDataset):
         # each column to avoid the OOM that one-hot encoding would cause.
         for col in df.columns:
             df[col] = df[col].astype("category").cat.codes.astype(float)
-        self.data = torch.as_tensor(df.values, dtype=torch.float32)
+        self.data = torch.as_tensor(df.values.copy(), dtype=torch.float32)
         self.num_features = self.data.shape[1]

@@ -27,8 +27,8 @@ class OnlineShoppers(TabularClassificationDataset):
             true_values=["TRUE"],
             false_values=["FALSE"],
         )
-        self.targets = torch.as_tensor(data["Revenue"].values, dtype=torch.long)
+        self.targets = torch.as_tensor(data["Revenue"].values.copy(), dtype=torch.long)
         data = pd.get_dummies(data).astype(float)
         data = data.drop(columns=["Revenue"])
-        self.data = torch.as_tensor(data.values, dtype=torch.float32)
+        self.data = torch.as_tensor(data.values.copy(), dtype=torch.float32)
         self.num_features = self.data.shape[1]

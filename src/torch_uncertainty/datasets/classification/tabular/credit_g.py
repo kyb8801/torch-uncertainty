@@ -7,9 +7,10 @@ from .base import TabularClassificationDataset
 class GermanCredit(TabularClassificationDataset):
     """The UCI Statlog German Credit dataset.
 
-    Predicts credit risk (good/bad). All features use the integer-coded
-    representation from ``german.data``; categorical attributes are encoded
-    with ``pd.get_dummies``.
+    Predicts credit risk (good/bad). Reads the ``german.data`` file, whose
+    categorical attributes are encoded as string codes (``A11``, ``A34`` ...)
+    and are one-hot expanded via :func:`pandas.get_dummies`; numeric attributes
+    are kept as-is.
 
     Reference:
         H. Hofmann, *Statlog (German Credit Data)*, UCI ML Repository, 1994.
@@ -30,7 +31,9 @@ class GermanCredit(TabularClassificationDataset):
             header=None,
         )
         # Last column: 1 = good credit → 0, 2 = bad credit → 1
-        self.targets = torch.as_tensor((data.iloc[:, -1].values - 1), dtype=torch.long)
+        self.targets = torch.as_tensor((data.iloc[:, -1].values - 1).copy(), dtype=torch.long)
         data = data.iloc[:, :-1]
-        self.data = torch.as_tensor(pd.get_dummies(data).astype(float).values, dtype=torch.float32)
+        self.data = torch.as_tensor(
+            pd.get_dummies(data).astype(float).values.copy(), dtype=torch.float32
+        )
         self.num_features = self.data.shape[1]

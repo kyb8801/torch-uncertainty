@@ -31,7 +31,7 @@ class CreditApproval(TabularClassificationDataset):
         )
         # Target is the last column: '+' → 1, '-' → 0
         self.targets = torch.as_tensor(
-            (data.iloc[:, -1] == "+").astype(int).values, dtype=torch.long
+            (data.iloc[:, -1] == "+").astype(int).values.copy(), dtype=torch.long
         )
         data = data.iloc[:, :-1]
         # Impute missing values
@@ -40,5 +40,7 @@ class CreditApproval(TabularClassificationDataset):
                 data[col] = data[col].fillna(data[col].mode()[0])
             else:
                 data[col] = data[col].fillna(data[col].mean())
-        self.data = torch.as_tensor(pd.get_dummies(data).astype(float).values, dtype=torch.float32)
+        self.data = torch.as_tensor(
+            pd.get_dummies(data).astype(float).values.copy(), dtype=torch.float32
+        )
         self.num_features = self.data.shape[1]

@@ -51,11 +51,18 @@ class BankMarketing(TabularClassificationDataset):
             self.root / self.dataset_name / "bank-additional" / self.filename,
             sep=";",
         )
-        self.targets = torch.as_tensor(np.where(data["y"] == "yes", 1, 0), dtype=torch.long)
+        self.targets = torch.as_tensor(
+            np.where(data["y"] == "yes", 1, 0).copy(), dtype=torch.long
+        )
         data = data.drop(columns=["y"])
-        binary_cols = data.select_dtypes(include="object").columns
-        for col in binary_cols:
-            if data[col].nunique() == 2:
+        # Compress columns whose unique non-null values are literally {"yes", "no"}.
+        # Other 2-value object columns (e.g. ``contact``: cellular/telephone) must
+        # be left to one-hot encoding to avoid silently zeroing out a real feature.
+        for col in data.select_dtypes(include="object").columns:
+            uniques = set(data[col].dropna().unique())
+            if uniques == {"yes", "no"}:
                 data[col] = np.where(data[col] == "yes", 1, 0)
-        self.data = torch.as_tensor(pd.get_dummies(data).astype(float).values, dtype=torch.float32)
+        self.data = torch.as_tensor(
+            pd.get_dummies(data).astype(float).values.copy(), dtype=torch.float32
+        )
         self.num_features = self.data.shape[1]

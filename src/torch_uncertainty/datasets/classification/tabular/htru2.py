@@ -26,6 +26,6 @@ class HTRU2(TabularClassificationDataset):
 
     def _make_dataset(self) -> None:
         data = pd.read_csv(self.root / self.dataset_name / self.filename, header=None)
-        self.targets = torch.tensor(data.iloc[:, -1].to_numpy(), dtype=torch.long)
+        self.targets = torch.tensor(data.iloc[:, -1].to_numpy().copy(), dtype=torch.long)
         self.data = torch.tensor(data.iloc[:, :-1].to_numpy().copy(), dtype=torch.float32)
         self.num_features = self.data.shape[1]

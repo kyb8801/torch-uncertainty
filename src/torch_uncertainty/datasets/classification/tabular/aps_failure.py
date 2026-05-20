@@ -1,8 +1,6 @@
-import logging
-
 import pandas as pd
 import torch
-from torchvision.datasets.utils import download_and_extract_archive
+from torch import Tensor
 
 from .base import TabularClassificationDataset
 
@@ -12,7 +10,8 @@ class APSFailure(TabularClassificationDataset):
 
     Predicts whether an air pressure system (APS) component caused a truck
     failure. The dataset is provided pre-split; ``train=False`` loads the
-    held-out test set. Missing values (``na``) are imputed with the column mean.
+    held-out test set. Missing values (``na``) are imputed with the
+    training-set column mean for both splits.
 
     Reference:
         M. Cerqueira et al., *Predicting Failures in Industrial Plants*,
@@ -27,36 +26,39 @@ class APSFailure(TabularClassificationDataset):
     dataset_name = "aps_failure"
     filename = "aps_failure_training_set.csv"
     need_split = False
+    pre_split = True
 
-    def _check_integrity(self) -> bool:
-        return (self.root / self.dataset_name / self.filename).is_file()
-
-    def download(self) -> None:
-        if self._check_integrity():
-            logging.info("Files already downloaded and verified")
-            return
-        download_and_extract_archive(
-            self.url,
-            download_root=self.root / self.dataset_name,
-            filename="aps_failure.zip",
-        )
-
-    def _make_dataset(self) -> None:
-        fname = "aps_failure_training_set.csv" if self.train else "aps_failure_test_set.csv"
+    def _read(self, fname: str) -> pd.DataFrame:
         # The CSV files begin with ~20 comment lines followed by the header row.
-        data = pd.read_csv(
+        return pd.read_csv(
             self.root / self.dataset_name / fname,
             na_values=["na"],
             comment=None,
             header=0,
             skiprows=20,
         )
-        self.targets = torch.tensor(
-            (data["class"] == "pos").astype(int).to_numpy(), dtype=torch.long
+
+    def _make_pre_split_dataset(self) -> tuple[Tensor, Tensor, Tensor, Tensor]:
+        train_df = self._read("aps_failure_training_set.csv")
+        test_df = self._read("aps_failure_test_set.csv")
+
+        train_targets = torch.tensor(
+            (train_df["class"] == "pos").astype(int).to_numpy().copy(), dtype=torch.long
         )
-        data = data.drop(columns=["class"])
-        # Impute missing values with column mean
-        data = data.apply(pd.to_numeric, errors="coerce")
-        data = data.fillna(data.mean())
-        self.data = torch.tensor(data.to_numpy(dtype=float), dtype=torch.float32)
-        self.num_features = self.data.shape[1]
+        test_targets = torch.tensor(
+            (test_df["class"] == "pos").astype(int).to_numpy().copy(), dtype=torch.long
+        )
+        train_df = train_df.drop(columns=["class"])
+        test_df = test_df.drop(columns=["class"])
+
+        train_df = train_df.apply(pd.to_numeric, errors="coerce")
+        test_df = test_df.apply(pd.to_numeric, errors="coerce")
+        # Impute with training-set column mean
+        train_means = train_df.mean()
+        train_df = train_df.fillna(train_means)
+        test_df = test_df.fillna(train_means)
+
+        train_data = torch.tensor(train_df.to_numpy(dtype=float).copy(), dtype=torch.float32)
+        test_data = torch.tensor(test_df.to_numpy(dtype=float).copy(), dtype=torch.float32)
+        self.num_features = train_data.shape[1]
+        return train_data, train_targets, test_data, test_targets

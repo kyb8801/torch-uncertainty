@@ -1,5 +1,4 @@
 import torch
-from torchvision.datasets.utils import download_url
 
 from .base import TabularClassificationDataset, load_arff
 
@@ -26,20 +25,14 @@ class PimaDiabetes(TabularClassificationDataset):
     filename = "pima_diabetes.arff"
     is_archive = False
 
-    def download(self) -> None:
-        if self._check_integrity():
-            return
-        (self.root / self.dataset_name).mkdir(parents=True, exist_ok=True)
-        download_url(self.url, root=str(self.root / self.dataset_name), filename=self.filename)
-
     def _make_dataset(self) -> None:
         df = load_arff(self.root / self.dataset_name / self.filename)
         target_col = "class"
         target_vals = df[target_col].str.strip()
         # OpenML encodes: tested_negative → 0, tested_positive → 1
         self.targets = torch.as_tensor(
-            (target_vals == "tested_positive").astype(int).values, dtype=torch.long
+            (target_vals == "tested_positive").astype(int).values.copy(), dtype=torch.long
         )
         df = df.drop(columns=[target_col])
-        self.data = torch.as_tensor(df.values.astype(float), dtype=torch.float32)
+        self.data = torch.as_tensor(df.values.astype(float).copy(), dtype=torch.float32)
         self.num_features = self.data.shape[1]

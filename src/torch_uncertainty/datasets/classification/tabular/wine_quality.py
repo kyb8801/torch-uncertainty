@@ -12,7 +12,9 @@ class WineQuality(TabularClassificationDataset):
 
     Predicts wine quality from physicochemical measurements. Supports both
     red and white wine variants. In binary mode the quality score is
-    thresholded; in multi-class mode the raw integer scores (3-9) are kept.
+    thresholded against ``threshold`` to produce 0/1 labels; in multi-class
+    mode the raw quality scores are remapped to contiguous indices starting
+    at 0 so they can be used directly with ``CrossEntropyLoss``.
 
     Reference:
         P. Cortez et al., *Modeling wine preferences by data mining from
@@ -38,6 +40,7 @@ class WineQuality(TabularClassificationDataset):
         train: bool = True,
         test_split: float = 0.2,
         split_seed: int = 21893027,
+        download_only: bool = False,
         variant: str = "red",
         threshold: int = 6,
     ) -> None:
@@ -60,6 +63,8 @@ class WineQuality(TabularClassificationDataset):
                 set. Defaults to ``0.2``.
             split_seed (int, optional): Seed for the train/test split.
                 Defaults to ``21893027``.
+            download_only (bool, optional): If ``True``, only download the
+                files and skip feature processing. Defaults to ``False``.
             variant (str, optional): ``"red"`` or ``"white"``. Defaults to
                 ``"red"``.
             threshold (int, optional): Quality threshold for binary mode.
@@ -80,6 +85,7 @@ class WineQuality(TabularClassificationDataset):
             train=train,
             test_split=test_split,
             split_seed=split_seed,
+            download_only=download_only,
         )
 
     def _check_integrity(self) -> bool:
@@ -94,7 +100,16 @@ class WineQuality(TabularClassificationDataset):
         data = data.drop(columns=["quality"])
         self.data = torch.tensor(data.to_numpy().copy(), dtype=torch.float32)
         self.num_features = self.data.shape[1]
+        # Derive the raw → contiguous-index mapping from the full file so train
+        # and test instances agree on class indices even if some scores happen
+        # to be absent from one of the splits.
+        unique = torch.unique(self.targets).sort().values
+        mapping = torch.full((int(unique.max().item()) + 1,), -1, dtype=torch.long)
+        mapping[unique] = torch.arange(len(unique), dtype=torch.long)
+        self._quality_mapping = mapping
 
     def _postprocess_targets(self, binary: bool) -> None:
         if binary:
             self.targets = (self.targets >= self._threshold).long()
+        else:
+            self.targets = self._quality_mapping[self.targets]
