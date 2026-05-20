@@ -477,6 +477,21 @@ class AdaptiveCalibrationError:
         to the distribution of predicted probabilities. Unlike uniform binning, adaptive binning
         ensures a more balanced representation of predictions across bins.
 
+        Given top-class confidences :math:`\hat{p}_i` and corresponding accuracies
+        :math:`a_i = \mathbf{1}[\hat{y}_i = y_i]`, the samples are sorted by confidence and
+        split into :math:`M` bins :math:`B_1, \dots, B_M` containing (approximately) the
+        same number of samples. With ``norm="l1"``, the metric is
+
+        .. math::
+            \text{ACE} = \sum_{m=1}^{M} \frac{|B_m|}{N}
+            \left| \operatorname{acc}(B_m) - \operatorname{conf}(B_m) \right|,
+
+        where
+        :math:`\operatorname{acc}(B_m) = \tfrac{1}{|B_m|} \sum_{i \in B_m} a_i` and
+        :math:`\operatorname{conf}(B_m) = \tfrac{1}{|B_m|} \sum_{i \in B_m} \hat{p}_i`.
+        Setting ``norm="l2"`` or ``norm="max"`` replaces the absolute differences with
+        their squared/maximum counterpart.
+
         This metric is particularly useful for datasets or models where predictions are
         concentrated in certain regions of the probability space.
 
@@ -525,7 +540,7 @@ class AdaptiveCalibrationError:
             <https://arxiv.org/abs/1904.01685>`_.
 
         .. seealso::
-            - See `:class:`CalibrationError` for a metric that uses uniform binning.
+            - :class:`CalibrationError` for a metric that uses uniform binning.
         """
         task_enum = ClassificationTaskNoMultilabel.from_str(task)
         kwargs.update(
