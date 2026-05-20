@@ -24,62 +24,45 @@ from torch_uncertainty.datamodules.classification import (
 )
 
 
-class TestTabularDataModuleAPI:
-    """Test the TabularClassificationDataModule base-class contract."""
+def _exercise_lifecycle(dm) -> None:
+    dm.prepare_data()
+    dm.setup()
+    dm.train_dataloader()
+    dm.val_dataloader()
+    dm.test_dataloader()
+    dm.setup("fit")
+    dm.setup("test")
+    with pytest.raises(ValueError):
+        dm.setup("other")
+
+
+class TestTabularClassificationDataModule:
+    """TabularClassificationDataModule base-class and HTRU2 representative behavior."""
 
     def test_missing_dataset_class_raises(self) -> None:
         with pytest.raises(TypeError):
             TabularClassificationDataModule(root="./data/", batch_size=128)
 
-    def test_invalid_stage_raises(self) -> None:
-        dm = HTRU2DataModule(root="./data/", batch_size=128)
+    @pytest.mark.parametrize("val_split", [0.0, 0.5])
+    def test_htru2_lifecycle(self, val_split: float) -> None:
+        dm = HTRU2DataModule(root="./data/", batch_size=128, val_split=val_split)
         dm.dataset_class = DummyRegressionDataset
-        dm.prepare_data()
-        dm.setup()
-        with pytest.raises(ValueError):
-            dm.setup("other")
-
-
-class TestHTRU2DataModule:
-    """Testing HTRU2DataModule as a representative classification datamodule."""
-
-    def test_htru2(self) -> None:
-        dm = HTRU2DataModule(root="./data/", batch_size=128)
-        dm.dataset_class = DummyRegressionDataset
-        dm.prepare_data()
-        dm.setup()
-
-        dm.train_dataloader()
-        dm.val_dataloader()
-        dm.test_dataloader()
-
-        dm.setup("fit")
-        dm.setup("test")
-
-    def test_htru2_val_split(self) -> None:
-        dm = HTRU2DataModule(root="./data/", batch_size=128, val_split=0.5)
-        dm.dataset_class = DummyRegressionDataset
-        dm.prepare_data()
-        dm.setup()
-
-        dm.train_dataloader()
-        dm.val_dataloader()
-        dm.test_dataloader()
+        _exercise_lifecycle(dm)
 
 
 class TestWineQualityDataModule:
-    """Testing WineQualityDataModule (variant parameter)."""
+    """WineQualityDataModule has its own setup/prepare_data override."""
 
-    def test_wine_quality_classification(self) -> None:
+    @pytest.mark.parametrize("val_split", [0.0, 0.5])
+    def test_wine_quality_lifecycle_with_dummy(self, val_split: float) -> None:
+        dm = WineQualityDataModule(
+            root="./data/", batch_size=128, variant="red", val_split=val_split
+        )
+        dm.dataset_class = DummyRegressionDataset
+        _exercise_lifecycle(dm)
+
+    def test_wine_quality_real_download(self) -> None:
         try:
-            dm = WineQualityDataModule(root="./data/", batch_size=128, variant="red")
-            dm.prepare_data()
-            dm.setup()
-
-            dm.train_dataloader()
-            dm.val_dataloader()
-            dm.test_dataloader()
-
             dm = WineQualityDataModule(
                 root="./data/", batch_size=128, variant="white", val_split=0.1
             )
@@ -92,17 +75,23 @@ class TestWineQualityDataModule:
 class TestOtherClassificationDataModules:
     """Smoke-test instantiation of all remaining classification datamodules."""
 
-    def test_all_modules_instantiate(self) -> None:
-        AdultCensusIncomeDataModule(root="./data/", batch_size=128)
-        AmazonAccessDataModule(root="./data/", batch_size=128)
-        APSFailureDataModule(root="./data/", batch_size=128)
-        BankMarketingDataModule(root="./data/", batch_size=128)
-        CreditApprovalDataModule(root="./data/", batch_size=128)
-        DOTA2GamesDataModule(root="./data/", batch_size=128)
-        GermanCreditDataModule(root="./data/", batch_size=128)
-        HiggsBosonDataModule(root="./data/", batch_size=128)
-        KDDChurnDataModule(root="./data/", batch_size=128)
-        OnlineShoppersDataModule(root="./data/", batch_size=128)
-        PimaDiabetesDataModule(root="./data/", batch_size=128)
-        SpamBaseDataModule(root="./data/", batch_size=128)
-        TelcoChurnDataModule(root="./data/", batch_size=128)
+    @pytest.mark.parametrize(
+        "cls",
+        [
+            AdultCensusIncomeDataModule,
+            AmazonAccessDataModule,
+            APSFailureDataModule,
+            BankMarketingDataModule,
+            CreditApprovalDataModule,
+            DOTA2GamesDataModule,
+            GermanCreditDataModule,
+            HiggsBosonDataModule,
+            KDDChurnDataModule,
+            OnlineShoppersDataModule,
+            PimaDiabetesDataModule,
+            SpamBaseDataModule,
+            TelcoChurnDataModule,
+        ],
+    )
+    def test_module_instantiates(self, cls) -> None:
+        cls(root="./data/", batch_size=128)
