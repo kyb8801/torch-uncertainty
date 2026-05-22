@@ -46,7 +46,7 @@ jobs:
 
       - name: Sanity-check imports used by docs
         run: |
-          uv run python -c "import torch_uncertainty, torch_uncertainty.callbacks; print(torch_uncertainty.__file__)"
+          uv run  --locked --extra gpu python -c "import torch_uncertainty, torch_uncertainty.callbacks; print(torch_uncertainty.__file__)"
           
       - name: Sphinx build
         if: github.event.pull_request.draft == false
