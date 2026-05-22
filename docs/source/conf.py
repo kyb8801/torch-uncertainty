@@ -9,8 +9,7 @@ from pathlib import Path
 
 from sphinx_gallery.sorting import ExplicitOrder, FileNameSortKey
 
-ROOT = Path(__file__).resolve().parents[2]  # repo root
-sys.path.insert(0, str(ROOT / "src"))
+sys.path.insert(0, str(Path("../../").resolve()))
 
 
 # -- Project information -----------------------------------------------------

@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
 
 env:
-  PYTHON_VERSION: "3.13"
+  PYTHON_VERSION: "3.13.9"
   BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
 
 jobs:
@@ -43,7 +43,7 @@ jobs:
       - name: Install dependencies
         run: |
           uv sync --locked --dev --extra gpu
-          
+
       - name: Sanity-check imports used by docs
         run: |
           uv run python -c "import torch_uncertainty, torch_uncertainty.callbacks; print(torch_uncertainty.__file__)"
