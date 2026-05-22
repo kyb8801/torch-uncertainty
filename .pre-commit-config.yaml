@@ -35,8 +35,6 @@ repos:
       - id: ruff-check
         args:
           [
-            --force-exclude,
-            --fix,
             --exit-non-zero-on-fix,
             --output-format,
             concise,

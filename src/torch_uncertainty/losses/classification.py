@@ -437,69 +437,84 @@ class MixupMPLoss(nn.CrossEntropyLoss):
         """MixupMP loss from Wu & Williamson.
 
         When using the MixupMP transform, the batch returned to the model
-        consists of **mixup-augmented samples** and **original samples** concatenated.
-        The `mixup_ratio` (r) controls the number of mixup samples relative to normal samples
-        produced by the transform:
+        consists of **mixup-augmented samples** followed by **original samples**.
+        The `mixup_ratio` (r) controls the number of mixup samples relative to
+        normal samples produced by the transform:
 
           - r <= 1.0: selects fewer mixup samples,
           - r > 1.0: selects more mixup samples.
 
-        Both mixup and normal samples use cross-entropy but should be **weighted** according to the
-        ratio r.
+        Both branches use cross-entropy (or KL divergence for soft targets)
+        weighted according to the ratio r.
 
         Args:
             mixup_ratio: Ratio of number of mixup samples vs normal samples
                 output by the MixupMP transform. This should match the transform's
-                :attr:`mixup_ratio` hyperparameter. Defaults to ``1.0`` (equal weighting).
+                :attr:`mixup_ratio` hyperparameter. Defaults to ``1.0`` (equal
+                weighting).
             weight: a manual rescaling weight given to each class.
-            ignore_index: Specifies a target value that is ignored
-                and does not contribute to the input gradient. Defaults to ``-100``.
-            reduction: Specifies the reduction to apply to the output: 'none'|'mean'|'sum'.
+            ignore_index: Specifies a target value that is ignored and does not
+                contribute to the input gradient. Only applies to class-index
+                (long) targets. Defaults to ``-100``.
+            reduction: Specifies the reduction to apply to the output:
+                ``'none'`` | ``'mean'`` | ``'sum'``.
+
+        Raises:
+            ValueError: if ``mixup_ratio`` is not strictly positive.
 
         See Also:
             torch_uncertainty/transforms/mixup.py — MixupMP transform implementation.
 
         Reference:
-            "Posterior Uncertainty Quantification in Neural Networks using Data Augmentation"
-            (AISTATS 2024) by Luhuan Wu & Sinead Williamson.
+            "Posterior Uncertainty Quantification in Neural Networks using Data
+            Augmentation" (AISTATS 2024) by Luhuan Wu & Sinead Williamson.
         """
-        super().__init__(weight=weight, ignore_index=ignore_index, reduction=reduction)
         if mixup_ratio <= 0:
-            raise ValueError(f"mixup_ratio must be > 0. Got {mixup_ratio} < 0.")
+            raise ValueError(f"mixup_ratio must be > 0. Got {mixup_ratio}.")
+        super().__init__(weight=weight, ignore_index=ignore_index, reduction=reduction)
         self.mixup_ratio = mixup_ratio
 
-    def forward(self, input: Tensor, target: Tensor) -> Tensor:  # noqa: A002
-        """The mixup transform should arrange outputs as `[mixup, normal]` or
-        `[normal, mixup]` depending on r; this splits them accordingly.
+    def _branch_loss(self, preds: Tensor, targets: Tensor) -> Tensor:
+        """Per-branch loss with empty-slice short-circuit and soft-label dispatch.
 
-        Mixup targets may be soft labels (one-hot float tensor), so we handle
-        that case by manually using F.kl_div if needed.
+        An empty slice contributes a 0-D zero so that whichever branch is empty
+        (depending on ``mixup_ratio``) does not invoke the underlying
+        cross-entropy. torch >= 2.12 validates target dtype even on zero-row
+        inputs, which would otherwise raise ``RuntimeError`` for soft-label
+        batches that fall entirely on the opposite branch.
 
-        Args:
-            input: model logits shape (N_total, num_classes)
-            target: target labels (one-hot or class indices) shape (N_total, ...)
+        Soft (float) targets use KL divergence to match the paper's formulation;
+        class-index (long) targets use the parent class' cross-entropy.
         """
-        # determine how many samples correspond to mixup vs normal
-        mixup_count = round((self.mixup_ratio / (self.mixup_ratio + 1)) * input.size(0))
-
-        # slices: assume mixup first, then normal
-        mixup_preds, mixup_targets = input[:mixup_count], target[:mixup_count]
-        norm_preds, norm_targets = input[mixup_count:], target[mixup_count:]
-
-        # standard cross entropy for normal samples
-        loss_norm = super().forward(norm_preds, norm_targets)
-
-        # mixup may have soft labels
-        if mixup_targets.dtype.is_floating_point:
-            # use KL divergence for soft labels
-            log_prob = F.log_softmax(mixup_preds, dim=-1)
-            loss_mixup = F.kl_div(
+        if preds.size(0) == 0:
+            return preds.new_zeros(())
+        if targets.dtype.is_floating_point:
+            log_prob = F.log_softmax(preds, dim=-1)
+            return F.kl_div(
                 log_prob,
-                mixup_targets,
+                targets,
                 reduction="batchmean" if self.reduction == "mean" else self.reduction,
             )
-        else:
-            loss_mixup = super().forward(mixup_preds, mixup_targets)
+        return super().forward(preds, targets)
+
+    def forward(self, input: Tensor, target: Tensor) -> Tensor:  # noqa: A002
+        """Compute the MixupMP loss.
+
+        The MixupMP transform concatenates ``mixup_count`` mixup-augmented
+        samples followed by the remaining original samples. This loss splits
+        the batch at that boundary and weights the mixup branch by
+        ``mixup_ratio``.
+
+        Args:
+            input: model logits of shape ``(N_total, num_classes)``.
+            target: target labels — either class indices (``long``, shape
+                ``(N_total,)``) or soft labels (``float``, shape
+                ``(N_total, num_classes)``).
+        """
+        mixup_count = round((self.mixup_ratio / (self.mixup_ratio + 1)) * input.size(0))
+
+        loss_mixup = self._branch_loss(input[:mixup_count], target[:mixup_count])
+        loss_norm = self._branch_loss(input[mixup_count:], target[mixup_count:])
 
         # unnormalized as in the paper's implementation
         return self.mixup_ratio * loss_mixup + loss_norm
