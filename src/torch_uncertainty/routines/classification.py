@@ -72,48 +72,40 @@ class ClassificationRoutine(LightningModule):
         post_processing: PostProcessing | None = None,
         num_bins_calibration_error: int = 15,
         log_plots: bool = False,
-        save_in_csv: bool = False,
+        save_to_csv: bool = False,
         csv_filename: str = "results.csv",
     ) -> None:
         r"""Routine for training & testing on **classification** tasks.
 
         Args:
-            model (torch.nn.Module): Model to train.
-            num_classes (int): Number of classes.
-            loss (torch.nn.Module): Loss function to optimize the :attr:`model`.
+            model: Model to train.
+            num_classes: Number of classes.
+            loss: Loss function to optimize the :attr:`model`. Defaults to ``None``.
+            is_ensemble: Indicates whether the model is an ensemble at test time or not.
+                Defaults to ``False``.
+            num_tta: Number of test-time augmentations (TTA). If ``1``: no TTA. Defaults to ``1``.
+            format_batch_fn: Function to format the batch. Defaults to ``None``.
+            optim_recipe: The optimizer and optionally the scheduler to use, or a callable that returns them.
                 Defaults to ``None``.
-            is_ensemble (bool): Indicates whether the model is an
-                ensemble at test time or not. Defaults to ``False``.
-            num_tta (int): Number of test-time augmentations (TTA). If ``1``: no TTA.
-                Defaults to ``1``.
-            format_batch_fn (torch.nn.Module): Function to format the batch.
+            mixup_params: Mixup parameters dictionary. Can include mixup type, mixup mode, distance similarity,
+                kernel tau max, kernel tau std, mixup alpha, and cutmix alpha. If None, no mixup augmentations.
                 Defaults to ``None``.
-            optim_recipe (Callable[[nn.Module], OptimizerLRScheduler] | OptimizerLRScheduler): The optimizer and
-                optionally the scheduler to use, or a callable that returns them. Defaults to ``None``.
-            mixup_params (dict): Mixup parameters. Can include mixup type,
-                mixup mode, distance similarity, kernel tau max, kernel tau std,
-                mixup alpha, and cutmix alpha. If None, no mixup augmentations.
+            eval_ood: Indicates whether to evaluate the OOD detection performance.
+                Defaults to ``False``.
+            eval_shift: Indicates whether to evaluate the Distribution shift performance.
+                Defaults to ``False``.
+            eval_grouping_loss: Indicates whether to evaluate the grouping loss or not.
+                Defaults to ``False``.
+            ood_criterion: Criterion for the binary OOD detection task. Defaults to ``msp``, the Maximum Softmax
+                Probability score.
+            post_processing: Post-processing method to train on the calibration set. No post-processing if None.
                 Defaults to ``None``.
-            eval_ood (bool): Indicates whether to evaluate the OOD
-                detection performance. Defaults to ``False``.
-            eval_shift (bool): Indicates whether to evaluate the Distribution
-                shift performance. Defaults to ``False``.
-            eval_grouping_loss (bool): Indicates whether to evaluate the
-                grouping loss or not. Defaults to ``False``.
-            ood_criterion (TUOODCriterion | str): Criterion for the binary OOD detection
-                task. Defaults to ``msp``, the Maximum Softmax Probability score.
-            post_processing (PostProcessing): Post-processing method
-                to train on the calibration set. No post-processing if None.
-                Defaults to ``None``.
-            num_bins_calibration_error (int): Number of bins to compute calibration
-                error metrics. Defaults to ``15``.
-            log_plots (bool): Indicates whether to log plots from
-                metrics. Defaults to ``False``.
-            save_in_csv (bool): Save the results in csv. Defaults to
-                ``False``.
-            csv_filename (str): Name of the csv file. Defaults to
-                ``"results.csv"``. Note that this is only used if
-                :attr:`save_in_csv` is ``True``.
+            num_bins_calibration_error: Number of bins to compute calibration error metrics.
+                Defaults to ``15``.
+            log_plots: Indicates whether to log plots from metrics. Defaults to ``False``.
+            save_to_csv: Save the results in csv. Defaults to ``False``.
+            csv_filename: Name of the csv file. Defaults to ``"results.csv"``.
+                Note that this is only used if ``save_to_csv`` is ``True``.
 
         Warning:
             You must define :attr:`optim_recipe` if you do not use the Lightning CLI.
@@ -161,7 +153,7 @@ class ClassificationRoutine(LightningModule):
         self.num_tta = num_tta
         self.ood_criterion = get_ood_criterion(ood_criterion)
         self.log_plots = log_plots
-        self.save_in_csv = save_in_csv
+        self.save_to_csv = save_to_csv
         self.csv_filename = csv_filename
         self.binary_cls = num_classes == 1
         self.needs_epoch_update = isinstance(model, EPOCH_UPDATE_MODEL)
@@ -266,6 +258,7 @@ class ClassificationRoutine(LightningModule):
 
         if self.eval_shift:
             self.test_shift_metrics = cls_metrics.clone(prefix="shift/")
+            self.test_shift_entropy = Entropy()
 
         # metrics for ensembles only
         if self.is_ensemble:
@@ -294,8 +287,7 @@ class ClassificationRoutine(LightningModule):
         """Setup the optional mixup augmentation based on the :attr:`mixup_params` dict.
 
         Args:
-            mixup_params (dict | None): the detailed parameters of the mixup augmentation. None if
-                unused.
+            mixup_params: the detailed parameters of the mixup augmentation. ``None`` if unused.
         """
         if mixup_params is None:
             mixup_params = {}
@@ -308,7 +300,7 @@ class ClassificationRoutine(LightningModule):
         """Apply the mixup augmentation on a :attr:`batch` of images.
 
         Args:
-            batch (tuple[Tensor, Tensor]): the images and the corresponding targets.
+            batch: the images and the corresponding targets.
 
         Returns:
             tuple[Tensor, Tensor]: the images and the corresponding targets transformed with mixup.
@@ -371,9 +363,8 @@ class ClassificationRoutine(LightningModule):
         """Forward pass of the inner model.
 
         Args:
-            inputs (Tensor): input tensor.
-            save_feats (bool): whether to store the features or
-                not. Defaults to ``False``.
+            inputs: input tensor.
+            save_feats: whether to store the features or not. Defaults to ``False``.
 
         Note:
             The features are stored in the :attr:`self.features` attribute.
@@ -393,7 +384,7 @@ class ClassificationRoutine(LightningModule):
         """Perform a single training step based on the input tensors.
 
         Args:
-            batch (tuple[Tensor, Tensor]): the training data and their corresponding targets.
+            batch: the training data and their corresponding targets.
 
         Returns:
             Tensor: the loss corresponding to this training step.
@@ -430,7 +421,7 @@ class ClassificationRoutine(LightningModule):
         Compute the prediction of the model and the value of the metrics on the validation batch.
 
         Args:
-            batch (tuple[Tensor, Tensor]): the validation data and their corresponding targets
+            batch: the validation data and their corresponding targets
         """
         inputs, targets = batch
         # remove duplicates when doing TTA
@@ -461,9 +452,9 @@ class ClassificationRoutine(LightningModule):
         handle OOD and distribution-shifted images.
 
         Args:
-            batch (tuple[Tensor, Tensor]): the test data and their corresponding targets.
-            batch_idx (int): the number of the current batch (unused).
-            dataloader_idx (int): 0 if in-distribution, 1 if out-of-distribution and 2 if
+            batch: the test data and their corresponding targets.
+            batch_idx: the number of the current batch (unused).
+            dataloader_idx: 0 if in-distribution, 1 if out-of-distribution and 2 if
                 distribution-shifted.
         """
         inputs, targets = batch
@@ -512,7 +503,6 @@ class ClassificationRoutine(LightningModule):
                 self.test_id_ens_metrics.update(probs_per_est)
 
             if self.eval_ood:
-                self.test_ood_entropy.update(probs)
                 self.test_ood_metrics.update(ood_scores, torch.zeros_like(targets))
 
             if self.id_score_storage is not None:
@@ -522,6 +512,7 @@ class ClassificationRoutine(LightningModule):
                 self.post_cls_metrics.update(pp_probs, targets)
 
         if self.eval_ood and dataloader_idx == 1:
+            self.test_ood_entropy.update(probs)
             self.test_ood_metrics.update(ood_scores, torch.ones_like(targets))
 
             if self.is_ensemble:
@@ -531,7 +522,9 @@ class ClassificationRoutine(LightningModule):
                 self.ood_score_storage.append(ood_scores.detach().cpu())
 
         if self.eval_shift and dataloader_idx == (2 if self.eval_ood else 1):
+            self.test_shift_entropy.update(probs)
             self.test_shift_metrics.update(probs, targets)
+
             if self.is_ensemble:
                 self.test_shift_ens_metrics.update(probs_per_est)
 
@@ -580,6 +573,7 @@ class ClassificationRoutine(LightningModule):
         if self.eval_shift:
             result_dict |= self.test_shift_metrics.compute() | {
                 "shift/severity": self.trainer.datamodule.shift_severity,
+                "shift/Entropy": self.test_shift_entropy.compute(),
             }
 
             if self.is_ensemble:
@@ -609,7 +603,7 @@ class ClassificationRoutine(LightningModule):
             if self.is_ensemble:
                 self.test_shift_ens_metrics.reset()
 
-        if self.save_in_csv and self.logger is not None:
+        if self.save_to_csv and self.logger is not None:
             csv_writer(
                 Path(self.logger.log_dir) / self.csv_filename,
                 result_dict,
@@ -662,15 +656,15 @@ def _classification_routine_checks(
     """Check the domains of the arguments of the classification routine.
 
     Args:
-        model (nn.Module): the model used to make classification predictions.
-        num_classes (int): the number of classes in the dataset.
-        is_ensemble (bool): whether the model is an ensemble or a single model.
-        ood_criterion (TUOODCriterion): OOD criterion for the binary OOD detection task.
-        eval_grouping_loss (bool): whether to evaluate the grouping loss.
-        num_bins_calibration_error (int): the number of bins for the evaluation of the calibration.
-        mixup_params (dict | None): the dictionary to setup the mixup augmentation.
-        post_processing (PostProcessing | None): the post-processing module.
-        format_batch_fn (nn.Module | None): the function for formatting the batch for ensembles.
+        model: the model used to make classification predictions.
+        num_classes: the number of classes in the dataset.
+        is_ensemble: whether the model is an ensemble or a single model.
+        ood_criterion: OOD criterion for the binary OOD detection task.
+        eval_grouping_loss: whether to evaluate the grouping loss.
+        num_bins_calibration_error: the number of bins for the evaluation of the calibration.
+        mixup_params: the dictionary to setup the mixup augmentation.
+        post_processing: the post-processing module.
+        format_batch_fn: the function for formatting the batch for ensembles.
     """
     ood_criterion = get_ood_criterion(ood_criterion)
     if not is_ensemble and ood_criterion.ensemble_only:

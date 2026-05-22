@@ -4,6 +4,7 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
 import sys
 from datetime import datetime
+from importlib.metadata import version as get_version
 from pathlib import Path
 
 from sphinx_gallery.sorting import ExplicitOrder, FileNameSortKey
@@ -14,13 +15,13 @@ sys.path.insert(0, str(Path("../../").resolve()))
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = "TorchUncertainty"
+project = "TorchUncertaint"
 
 copyright = (  # noqa: A001
     f"{datetime.now().year!s}, Adrien Lafage and Olivier Laurent"
 )
 author = "Adrien Lafage and Olivier Laurent"
-release = "0.11.0"
+release = get_version("torch_uncertainty")
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
@@ -38,6 +39,7 @@ extensions = [
     "sphinx_codeautolink",
     "sphinx_gallery.gen_gallery",
     # "sphinx_gallery.load_style",
+    "sphinx_autodoc_typehints",
     "sphinx_design",
 ]
 mathjax3_config = {
@@ -84,8 +86,11 @@ sphinx_gallery_conf = {
 autoclass_content = "init"
 
 autosummary_generate = True
+napoleon_google_docstring = True
+napoleon_include_init_with_doc = False
+napoleon_use_param = True
 napoleon_use_ivar = True
-
+napoleon_use_rtype = True
 
 # Disable docstring inheritance
 autodoc_inherit_docstrings = False

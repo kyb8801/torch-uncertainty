@@ -15,13 +15,13 @@ class ImageNetA(ImageNetVariation):
         Args:
             kwargs: Additional keyword arguments passed to the superclass, including:
 
-                - root (str): Root directory of the datasets.
-                - split (str): For API consistency. Defaults to ``None``.
-                - transform (callable): A function/transform that takes in a PIL image and
+                - root: Root directory of the datasets.
+                - split: For API consistency. Defaults to ``None``.
+                - transform: A function/transform that takes in a PIL image and
                   returns a transformed version. E.g., transforms.RandomCrop. Defaults to ``None``.
-                - target_transform (callable): A function/transform that takes in the target
+                - target_transform: A function/transform that takes in the target
                   and transforms it. Defaults to ``None``.
-                - download (bool): If ``True``, downloads the dataset from the internet
+                - download: If ``True``, downloads the dataset from the internet
                   and puts it in the root directory. If the dataset is already downloaded, it is
                   not downloaded again. Defaults to ``False``.
         """

@@ -47,16 +47,16 @@ class MNISTC(VisionDataset):
         """The corrupted MNIST-C Dataset.
 
         Args:
-            root (str | Path): Root directory of the datasets.
-            transform (callable): A function/transform that takes in
+            root: Root directory of the datasets.
+            transform: A function/transform that takes in
                 a PIL image and returns a transformed version. E.g,
-                ``transforms.RandomCrop``. Defaults to None.
-            target_transform (callable): A function/transform that
-                takes in the target and transforms it. Defaults to None.
-            split (str): The split to use, either 'train' or 'test'.
-            subset (str): The subset to use, one of ``all`` or the keys in
+                ``transforms.RandomCrop``. Defaults to ``None``.
+            target_transform: A function/transform that
+                takes in the target and transforms it. Defaults to ``None``.
+            split: The split to use, either 'train' or 'test'.
+            subset: The subset to use, one of ``all`` or the keys in
                 ``mnistc_subsets``.
-            download (bool): If True, downloads the dataset from the
+            download: If True, downloads the dataset from the
                 internet and puts it in root directory. If dataset is already
                 downloaded, it is not downloaded again. Defaults to False.
 
@@ -110,10 +110,10 @@ class MNISTC(VisionDataset):
         in the dataset.
 
         Args:
-            root (Path): The path to the dataset.
-            subset (str): The name of the corruption subset to be used. Choose
+            root: The path to the dataset.
+            subset: The name of the corruption subset to be used. Choose
                 `all` for the dataset to contain all subsets.
-            split (str): The split to be used, either `train` or `test`.
+            split: The split to be used, either `train` or `test`.
 
         Returns:
             tuple[np.ndarray, np.ndarray]: The samples and labels of the chosen.
@@ -142,7 +142,7 @@ class MNISTC(VisionDataset):
         """Get the samples and targets of the dataset.
 
         Args:
-            index (int): The index of the sample to get.
+            index: The index of the sample to get.
         """
         sample, target = (
             self.samples[index],

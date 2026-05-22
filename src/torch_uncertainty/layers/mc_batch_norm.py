@@ -18,13 +18,12 @@ class _MCBatchNorm(_BatchNorm):
         """Base class for Monte-Carlo Batch Normalization layers.
 
         Args:
-            num_features (int): number of input features.
-            num_estimators (int): number of stochastic estimators.
-            eps (float): eps arg. for the core batch normalization. Defaults to ``0.00001``.
-            affine (bool): affine arg. for the core batch normalization. Defaults to `True`.
-            dtype (torch.dtype): The dtype to use for the layer's parameters. Defaults to ``None``.
-            device (Literal["cpu", "cuda"] | torch.device | None): device.
-                Defaults to ``None``
+            num_features: Number of input features.
+            num_estimators: Number of stochastic estimators.
+            eps: Epsilon argument for the core batch normalization. Defaults to ``0.00001``.
+            affine: Whether to include an affine transformation. Defaults to ``True``.
+            dtype: The dtype to use for the layer's parameters. Defaults to ``None``.
+            device: Device to use for the layer's parameters. Defaults to ``None``.
 
         Warning:
             The update of the batch statistics slightly differs from the method as worded in the
@@ -73,7 +72,7 @@ class _MCBatchNorm(_BatchNorm):
             predictions.
 
         Args:
-            input (Tensor): Input tensor.
+            input: Input tensor.
         """
         if not self.training:
             if self.accumulate:
@@ -89,7 +88,7 @@ class _MCBatchNorm(_BatchNorm):
         """Set the counter.
 
         Args:
-            counter (int): new value for the counter.
+            counter: New value for the counter.
         """
         self.counter = counter % self.num_estimators
 
@@ -105,12 +104,12 @@ class MCBatchNorm1d(_MCBatchNorm):
     """Monte Carlo Batch Normalization over a 2D or 3D (batched) input.
 
     Args:
-        num_features (int): Number of features.
-        num_estimators (int): Number of estimators.
-        eps (float): Epsilon. Defaults to ``0.00001``.
-        affine (bool): Affine. Defaults to ``True``.
-        device (optional): Device. Defaults to ``None``.
-        dtype (optional): Data type. Defaults to ``None``.
+        num_features: Number of features.
+        num_estimators: Number of estimators.
+        eps: Epsilon. Defaults to ``0.00001``.
+        affine: Whether to use a bias. Defaults to ``True``.
+        device: Device. Defaults to ``None``.
+        dtype: Data type. Defaults to ``None``.
 
     Warning:
         This layer should not be used out of the corresponding wrapper.
@@ -132,12 +131,12 @@ class MCBatchNorm2d(_MCBatchNorm):
     """Monte Carlo Batch Normalization over a 3D or 4D (batched) input.
 
     Args:
-        num_features (int): Number of features.
-        num_estimators (int): Number of estimators.
-        eps (float): Epsilon. Defaults to ``0.00001``.
-        affine (bool): Affine. Defaults to ``True``.
-        device (optional): Device. Defaults to ``None``.
-        dtype (optional): Data type. Defaults to ``None``.
+        num_features: Number of features.
+        num_estimators: Number of estimators.
+        eps: Epsilon. Defaults to ``0.00001``.
+        affine: Whether to use a bias. Defaults to ``True``.
+        device: Device. Defaults to ``None``.
+        dtype: Data type. Defaults to ``None``.
 
     Warning:
         This layer should not be used out of the corresponding wrapper.
@@ -159,12 +158,12 @@ class MCBatchNorm3d(_MCBatchNorm):
     """Monte Carlo Batch Normalization over a 4D or 5D (batched) input.
 
     Args:
-        num_features (int): Number of features.
-        num_estimators (int): Number of estimators.
-        eps (float): Epsilon. Defaults to ``0.00001``.
-        affine (bool): Affine. Defaults to ``True``.
-        device (optional): Device. Defaults to ``None``.
-        dtype (optional): Data type. Defaults to ``None``.
+        num_features: Number of features.
+        num_estimators: Number of estimators.
+        eps: Epsilon. Defaults to ``0.00001``.
+        affine: Whether to use a bias. Defaults to ``True``.
+        device: Device. Defaults to ``None``.
+        dtype: Data type. Defaults to ``None``.
 
     Warning:
         This layer should not be used out of the corresponding wrapper.

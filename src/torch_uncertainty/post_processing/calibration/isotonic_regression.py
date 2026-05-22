@@ -37,11 +37,10 @@ class IsotonicRegressionScaler(PostProcessing):
         Multi-class calibration is handled using a one-vs-rest approach per class.
 
         Args:
-            model (nn.Module): Model to calibrate. Defaults to ``None``.
-            eps (float): Small value for stability when converting probs back to logits.
+            model: Model to calibrate. Defaults to ``None``.
+            eps: Small value for stability when converting probs back to logits.
                 Defaults to ``1e-6``.
-            device (Optional[Literal["cpu", "cuda"]]): Device to use for
-                tensor operations. Defaults to ``None``.
+            device: Device to use for tensor operations. Defaults to ``None``.
 
         References:
             [1] Transforming Classifier Scores into Accurate Multiclass
@@ -80,10 +79,8 @@ class IsotonicRegressionScaler(PostProcessing):
         class versus all others.
 
         Args:
-            dataloader (DataLoader): Dataloader providing the calibration data
-                (logits and targets).
-            progress (bool): Whether to show a progress bar during
-                data extraction. Defaults to ``True``.
+            dataloader: Dataloader providing the calibration data (logits and targets).
+            progress: Whether to show a progress bar during data extraction. Defaults to ``True``.
         """
         if self.model is None or isinstance(self.model, nn.Identity):  # coverage: ignore
             logging.warning(
@@ -122,7 +119,7 @@ class IsotonicRegressionScaler(PostProcessing):
         downstream loss functions or metrics.
 
         Args:
-            inputs (Tensor): Input logits to be calibrated.
+            inputs: Input logits to be calibrated.
 
         Returns:
             Tensor: Calibrated logits.

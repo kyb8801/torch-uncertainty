@@ -19,7 +19,7 @@ class SegmentationFPR95(Metric):
         Compute the mean FPR95 per batch across all batches.
 
         Args:
-            pos_label (int): The positive label in the segmentation OOD detection task.
+            pos_label: The positive label in the segmentation OOD detection task.
             **kwargs: Additional keyword arguments for the FPR95 metric.
         """
         super().__init__(**kwargs)

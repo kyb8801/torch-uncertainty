@@ -27,21 +27,19 @@ class DirichletScaler(MatrixScaler):
         """Dirichlet scaling post-processing for calibrated probabilities.
 
         Args:
-            num_classes (int): Number of classes.
-            model (nn.Module | None): Model to calibrate. Defaults to ``None``.
-            init_weight_temperature (float): Initial value for the weight matrix. Defaults to ``1``.
-            init_bias_temperature (float | None): Initial value for the bias. The inverse bias will be
+            num_classes: Number of classes.
+            model: Model to calibrate. Defaults to ``None``.
+            init_weight_temperature: Initial value for the weight matrix. Defaults to ``1``.
+            init_bias_temperature: Initial value for the bias. The inverse bias will be
                 set to the ``0`` vector if set to ``None``. Defaults to ``None``.
-            lr (float): Learning rate for the optimizer. Defaults to ``0.1``.
-            max_iter (int): Maximum number of iterations for the optimizer. Defaults to ``200``.
-            lambda_reg (float | None): Regularization coefficient applied to the
+            lr: Learning rate for the optimizer. Defaults to ``0.1``.
+            max_iter: Maximum number of iterations for the optimizer. Defaults to ``200``.
+            lambda_reg: Regularization coefficient applied to the
                 off-diagonal elements of the weight matrix. Used to mitigate overfitting.
                 Defaults to ``None``.
-            mu_reg (float | None): Regularization coefficient applied to the
-                bias vector. Defaults to ``None``.
-            eps (float): Small value for numerical stability. Defaults to ``1e-8``.
-            device (Optional[Literal["cpu", "cuda"]]): Device to use for optimization.
-                Defaults to ``None``.
+            mu_reg: Regularization coefficient applied to the bias vector. Defaults to ``None``.
+            eps: Small value for numerical stability. Defaults to ``1e-8``.
+            device: Device to use for optimization. Defaults to ``None``.
 
         References:
             [1] `Beyond temperature scaling: Obtaining well-calibrated multiclass
@@ -77,12 +75,10 @@ class DirichletScaler(MatrixScaler):
         """Fit the temperature parameters to the calibration data.
 
         Args:
-            dataloader (DataLoader): Dataloader with the calibration data. If there is no model,
+            dataloader: Dataloader with the calibration data. If there is no model,
                 the dataloader should include the confidence score directly and not the logits.
-            save_logits (bool): Whether to save the logits and
-                labels in memory. Defaults to ``False``.
-            progress (bool): Whether to show a progress bar.
-                Defaults to ``True``.
+            save_logits: Whether to save the logits and labels in memory. Defaults to ``False``.
+            progress: Whether to show a progress bar. Defaults to ``True``.
         """
         if self.model is None or isinstance(self.model, nn.Identity):
             logging.warning(

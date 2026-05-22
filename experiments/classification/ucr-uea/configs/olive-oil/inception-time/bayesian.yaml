@@ -1,7 +1,7 @@
 seed_everything: false
 eval_after_fit: true
 trainer:
-  accelerator: gpu
+  accelerator: auto
   devices: 1
   precision: 16-mixed
   max_epochs: 50
@@ -23,7 +23,7 @@ routine:
   is_ensemble: true
   num_classes: 3
   loss: CrossEntropyLoss
-  save_in_csv: true
+  save_to_csv: true
 data:
   dataset_name: OliveOil
   batch_size: 16

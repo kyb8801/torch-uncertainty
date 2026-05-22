@@ -253,27 +253,21 @@ def masked_wideresnet28x10(
     """Masksembles of Wide-ResNet-28x10.
 
     Args:
-        in_channels (int): Number of input channels.
-        num_classes (int): Number of classes to predict.
-        num_estimators (int): Number of estimators in the ensemble.
-        scale (float): Expansion factor affecting the width of the estimators.
-        conv_bias (bool): Whether to use bias in convolutions. Defaults to
-            ``True``.
-        dropout_rate (float): Dropout rate. Defaults to ``0.3``.
-        groups (int): Number of groups within each estimator. Defaults to
-            ``1``.
-        style (ResNetStyle | Literal["imagenet", "cifar"]): Whether to use the ImageNet or CIFAR
-            structure. Defaults to ``ResNetStyle.IMAGENET``.
-        activation_fn (Callable): Activation function. Defaults to
-            ``torch.nn.functional.relu``.
-        normalization_layer (nn.Module): Normalization layer.
-            Defaults to ``torch.nn.BatchNorm2d``.
-        repeat_strategy ("legacy"|"paper"): The repeat
-            strategy to use during training:
+        in_channels: Number of input channels.
+        num_classes: Number of classes to predict.
+        num_estimators: Number of estimators in the ensemble.
+        scale: Expansion factor affecting the width of the estimators.
+        conv_bias: Whether to use bias in convolutions. Defaults to ``True``.
+        dropout_rate: Dropout rate. Defaults to ``0.3``.
+        groups: Number of groups within each estimator. Defaults to ``1``.
+        style: Whether to use the ImageNet or CIFAR structure. Defaults to ``ResNetStyle.IMAGENET``.
+        activation_fn: Activation function. Defaults to ``torch.nn.functional.relu``.
+        normalization_layer: Normalization layer. Defaults to ``torch.nn.BatchNorm2d``.
+        repeat_strategy: The repeat strategy to use during training:
 
             - "legacy": Repeat inputs for each estimator during both
               training and evaluation.
-            - "paper"(default): Repeat inputs for each estimator only during
+            - "paper" (default): Repeat inputs for each estimator only during
               evaluation.
 
     Returns:

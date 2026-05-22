@@ -27,7 +27,7 @@ class SmoothCalibrationError(Metric):
         refine_steps: int = 10,
         **kwargs,
     ):
-        """Smooth Expected Calibration Error (SmECE).
+        r"""Smooth Expected Calibration Error (SmECE).
 
         This metric implements the Kernel Density Estimation based ECE as
         proposed by Błasiok & Nakkiran (2023). It addresses the limitations of
@@ -36,29 +36,31 @@ class SmoothCalibrationError(Metric):
         bandwidth selection strategy. Computed on the top label.
 
         Args:
-            kernel_type (str): The kernel to use. Choose between:
-                - ``'logit'``: Applies a Gaussian kernel in log-odds space. This
-                    effectively uses an adaptive bandwidth that is narrower near 1.0,
-                    making it ideal for modern overconfident models. (Default)
-                - ``'reflected'``: Applies a Gaussian kernel in probability space
-                    with reflections at 0 and 1 to prevent boundary bias.
-                Note that relplot's original implementation has ``'reflected'`` as default.
-            bandwidth (Literal[auto] | float): The kernel bandwidth $h$. If set to
+            kernel_type: The kernel to use. Choose between:
+            - ``'logit'``: Applies a Gaussian kernel in log-odds space. This
+                effectively uses an adaptive bandwidth that is narrower near 1.0,
+                making it ideal for modern overconfident models. (Default)
+            - ``'reflected'``: Applies a Gaussian kernel in probability space
+                with reflections at 0 and 1 to prevent boundary bias.
+
+                Note that relplot's original implementation uses ``'reflected'`` by default.
+            bandwidth: The kernel bandwidth :math:`h`. If set to
                 ``'auto'``, it uses a fixed-point binary search to find a bandwidth
                 consistent with the error level. Defaults to ``'auto'``.
-            eps (float): The tolerance for the binary search when
+            eps: The tolerance for the binary search when
                 bandwidth is ``'auto'``. Defaults to ``0.001``.
-            mesh_pts (int): The base number of points for the grid
+            mesh_pts: The base number of points for the grid
                 discretization. The actual number may be higher depending on the
                 bandwidth. Defaults to ``200``.
-            refine_steps (int): Number of binary search iterations for
+            refine_steps: Number of binary search iterations for
                 the ``'auto'`` bandwidth. Defaults to ``10``.
             **kwargs: Additional arguments for the :class:`torchmetrics.Metric` base.
 
         Note:
             In the multiclass case, this metric evaluates the calibration of the
             maximum probability (top-label calibration). In the binary case, it
-            evaluates the calibration of the predicted class (i.e., using $max(p, 1-p)$).
+            evaluates the calibration of the predicted class (i.e., using
+            :math:`\max(p, 1-p)`).
 
         Note:
             This implementation has been tested on a use case and provided the same values
@@ -87,10 +89,11 @@ class SmoothCalibrationError(Metric):
         """Update the state with predictions and targets.
 
         Args:
-            preds (Tensor): Predictions from the model.
+            preds: Predictions from the model.
                 - Multiclass: Shape ``(N, C)`` (logits or probabilities).
                 - Binary: Shape ``(N,)`` or ``(N, 1)`` (logits or probabilities).
-            target (Tensor): Ground truth labels.
+
+            target: Ground truth labels.
                 - Multiclass: Shape ``(N,)`` containing class indices.
                 - Binary: Shape ``(N,)`` containing 0 or 1.
         """

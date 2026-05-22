@@ -14,14 +14,11 @@ class Cubic(TensorDataset):
         """A dataset of samples drawn from the cube fct. with homoscedastic noise.
 
         Args:
-            lower_bound (float): Lower bound of the samples. Defaults to
-                ``-4.0``.
-            upper_bound (float): Upper bound of the samples. Defaults to
-                ``4.0``.
-            num_samples (int): Number of samples. Defaults to ``5000``.
-            noise_mean (float): Mean of the noise. Defaults to ``0.0``.
-            noise_std (float): Standard deviation of the noise. Defaults
-                to ``3.0``.
+            lower_bound: Lower bound of the samples. Defaults to ``-4.0``.
+            upper_bound: Upper bound of the samples. Defaults to ``4.0``.
+            num_samples: Number of samples. Defaults to ``5000``.
+            noise_mean: Mean of the noise. Defaults to ``0.0``.
+            noise_std: Standard deviation of the noise. Defaults to ``3.0``.
         """
         noise = (noise_mean, noise_std)
 

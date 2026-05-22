@@ -21,16 +21,14 @@ class ConformalClsTHR(Conformal):
         r"""Conformal prediction post-processing for calibrated models.
 
         Args:
-            alpha (float): The confidence level, meaning we allow :math:`1-\alpha` error.
-            model (nn.Module | None): Model to be calibrated. Defaults to ``None``.
-            ts_init_val (float): Initial value for the temperature.
-                Defaults to ``1.0``.
-            ts_lr (float): Learning rate for the temperature scaling optimizer. Defaults to ``0.1``.
-            ts_max_iter (int): Maximum number of iterations for the temperature scaling
+            alpha: The confidence level, meaning we allow :math:`1-\alpha` error.
+            model: Model to be calibrated. Defaults to ``None``.
+            ts_init_val: Initial value for the temperature. Defaults to ``1.0``.
+            ts_lr: Learning rate for the temperature scaling optimizer. Defaults to ``0.1``.
+            ts_max_iter: Maximum number of iterations for the temperature scaling
                 optimizer. Defaults to ``100``.
-            enable_ts (bool): Whether to scale the logits. Defaults to ``True``.
-            device (Literal["cpu", "cuda"] | torch.device | None): device.
-                Defaults to ``None``.
+            enable_ts: Whether to scale the logits. Defaults to ``True``.
+            device: device. Defaults to ``None``.
 
         Warning:
             This implementation only works in the multiclass setting. Raise an issue if binary is needed.

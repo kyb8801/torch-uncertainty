@@ -32,7 +32,7 @@ class StochasticModel(nn.Module):
         """Check that the module has a sampling method, then sample it.
 
         Args:
-            module (nn.Module): The module to sample.
+            module: The module to sample.
 
         Raises:
             TypeError: Triggered when the module doesn't implement sample.
@@ -51,6 +51,14 @@ class StochasticModel(nn.Module):
         return weight_bias
 
     def sample(self, num_samples: int = 1) -> list[dict[str, Tensor]]:
+        """Sample the wrapped model multiple times.
+
+        Args:
+            num_samples: Number of samples to generate. Defaults to ``1``.
+
+        Returns:
+            list[dict[str, Tensor]]: Sampled model states.
+        """
         sampled_models = [{}] * num_samples
         for module_name in self.core_model._modules:
             module = self.core_model._modules[module_name]
@@ -74,6 +82,7 @@ class StochasticModel(nn.Module):
         return sampled_models
 
     def freeze(self) -> None:
+        """Freeze all Bayesian submodules in the wrapped model."""
         for module in self.core_model.modules():
             if isinstance(module, bayesian_modules):
                 freeze_fn = getattr(module, "freeze", None)
@@ -81,6 +90,7 @@ class StochasticModel(nn.Module):
                     freeze_fn()
 
     def unfreeze(self) -> None:
+        """Unfreeze all Bayesian submodules in the wrapped model."""
         for module in self.core_model.modules():
             if isinstance(module, bayesian_modules):
                 unfreeze_fn = getattr(module, "unfreeze", None)

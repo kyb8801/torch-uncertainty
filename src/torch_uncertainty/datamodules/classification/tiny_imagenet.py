@@ -57,34 +57,34 @@ class TinyImageNetDataModule(TUDataModule):
         SVHN or DTD as Out-of-distribution dataset and Tiny-ImageNet-C as shifted dataset.
 
         Args:
-            root (str): Root directory of the datasets.
-            batch_size (int): Number of samples per batch during training.
-            eval_batch_size (int | None) : Number of samples per batch during evaluation (val
+            root: Root directory of the datasets.
+            batch_size: Number of samples per batch during training.
+            eval_batch_size: Number of samples per batch during evaluation (val
                 and test). Set to :attr:`batch_size` if ``None``. Defaults to ``None``.
-            eval_ood (bool): Whether to evaluate out-of-distribution performance. Defaults to ``False``.
-            eval_shift (bool): Whether to evaluate on shifted data. Defaults to ``False``.
-            num_tta (int): Number of test-time augmentations (TTA). Defaults to ``1`` (no TTA).
-            shift_severity (int): Severity of the shift. Defaults to ``1``.
+            eval_ood: Whether to evaluate out-of-distribution performance. Defaults to ``False``.
+            eval_shift: Whether to evaluate on shifted data. Defaults to ``False``.
+            num_tta: Number of test-time augmentations (TTA). Defaults to ``1`` (no TTA).
+            shift_severity: Severity of the shift. Defaults to ``1``.
             val_split (float or Path): Share of samples to use for validation
                 or path to a yaml file containing a list of validation images
                 ids. Defaults to ``0.0``.
-            postprocess_set (str): The post-hoc calibration dataset to
+            postprocess_set: The post-hoc calibration dataset to
                 use for the post-processing method. Defaults to ``val``.
-            train_transform (nn.Module | None): Custom training transform. Defaults
+            train_transform: Custom training transform. Defaults
                 to ``None``. If not provided, a default transform is used.
-            test_transform (nn.Module | None): Custom test transform. Defaults to
+            test_transform: Custom test transform. Defaults to
                 ``None``. If not provided, a default transform is used.
-            ood_ds (str): Which out-of-distribution dataset to use. Defaults to
+            ood_ds: Which out-of-distribution dataset to use. Defaults to
                 ``"openimage-o"``.
-            test_alt (str): Which test set to use. Defaults to ``None``.
-            procedure (str): Which procedure to use. Defaults to ``None``.
-            train_size (int): Size of training images. Defaults to ``224``.
-            interpolation (str): Interpolation method for the Resize Crops. Defaults to ``"bilinear"``.
-            basic_augment (bool): Whether to apply base augmentations. Defaults to ``True``.
-            rand_augment_opt (str): Which RandAugment to use. Defaults to ``None``.
-            num_workers (int): Number of workers to use for data loading. Defaults to ``1``.
-            pin_memory (bool): Whether to pin memory. Defaults to ``True``.
-            persistent_workers (bool): Whether to use persistent workers. Defaults to ``True``.
+            test_alt: Which test set to use. Defaults to ``None``.
+            procedure: Which procedure to use. Defaults to ``None``.
+            train_size: Size of training images. Defaults to ``224``.
+            interpolation: Interpolation method for the Resize Crops. Defaults to ``"bilinear"``.
+            basic_augment: Whether to apply base augmentations. Defaults to ``True``.
+            rand_augment_opt: Which RandAugment to use. Defaults to ``None``.
+            num_workers: Number of workers to use for data loading. Defaults to ``1``.
+            pin_memory: Whether to pin memory. Defaults to ``True``.
+            persistent_workers: Whether to use persistent workers. Defaults to ``True``.
         """
         super().__init__(
             root=root,

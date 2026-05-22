@@ -16,8 +16,8 @@ repos:
         types: [toml]
       - id: check-yaml
         name: check-yaml
-        language: system
         entry: check-yaml
+        language: system
         types: [yaml]
       - id: check-merge-conflict
         name: check-merge-conflict
@@ -28,24 +28,17 @@ repos:
         entry: check-added-large-files
         language: system
         exclude: uv.lock
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.15.14
+    hooks:
       - id: ruff-check
-        name: ruff-check
-        entry: ruff check
-        language: python
-        types_or: [python, pyi]
-        require_serial: true
         args:
           [
-            --force-exclude,
-            --fix,
             --exit-non-zero-on-fix,
             --output-format,
             concise,
           ]
         exclude: ^auto_tutorial_source/
       - id: ruff-format
-        name: ruff-format
-        entry: ruff format
-        language: python
-        types_or: [python, pyi]
         exclude: ^auto_tutorials_source/

@@ -54,37 +54,36 @@ class CIFAR10DataModule(TUDataModule):
         """DataModule for CIFAR10.
 
         Args:
-            root (str | Path): Root directory of the datasets.
-            batch_size (int): Number of samples per batch during training.
-            eval_batch_size (int | None) : Number of samples per batch during evaluation (val
+            root: Root directory of the datasets.
+            batch_size: Number of samples per batch during training.
+            eval_batch_size: Number of samples per batch during evaluation (val
                 and test). Set to batch_size if ``None``. Defaults to ``None``.
-            eval_ood (bool): Whether to evaluate on out-of-distribution data. Defaults to ``False``.
-            eval_shift (bool): Whether to evaluate on shifted data. Defaults to ``False``.
-            val_split (float): Share of samples to use for validation. Defaults
+            eval_ood: Whether to evaluate on out-of-distribution data. Defaults to ``False``.
+            eval_shift: Whether to evaluate on shifted data. Defaults to ``False``.
+            val_split: Share of samples to use for validation. Defaults
                 to ``0.0``.
-            postprocess_set (str): The post-hoc calibration dataset to
+            postprocess_set: The post-hoc calibration dataset to
                 use for the post-processing method. Defaults to ``val``.
-            num_workers (int): Number of workers to use for data loading. Defaults
-                to ``1``.
-            train_transform (nn.Module | None): Custom training transform. Defaults
-                to ``None``. If not provided, a default transform is used.
-            test_transform (nn.Module | None): Custom test transform. Defaults to
+            num_workers: Number of workers to use for data loading. Defaults to ``1``.
+            train_transform: Custom training transform. Defaults to ``None``. If not provided,
+                a default transform is used.
+            test_transform: Custom test transform. Defaults to
                 ``None``. If not provided, a default transform is used.
-            basic_augment (bool): Whether to apply base augmentations. Defaults to
+            basic_augment: Whether to apply base augmentations. Defaults to
                 ``True``. Only used if ``train_transform`` is not provided.
-            cutout (int): Size of cutout to apply to images. Defaults to ``None``.
+            cutout: Size of cutout to apply to images. Defaults to ``None``.
                 Only used if ``train_transform`` is not provided.
-            randaugment (bool): Whether to apply RandAugment. Defaults to
+            randaugment: Whether to apply RandAugment. Defaults to
                 ``False``. Only used if ``train_transform`` is not provided.
-            auto_augment (str): Which auto-augment to apply. Defaults to ``None``.
+            auto_augment: Which auto-augment to apply. Defaults to ``None``.
                 Only used if ``train_transform`` is not provided.
-            test_alt (str): Which test set to use. Defaults to ``None``.
-            num_tta (int): Number of test-time augmentations (TTA). Defaults to ``1`` (no TTA).
-            shift_severity (int): Severity of corruption to apply for
+            test_alt: Which test set to use. Defaults to ``None``.
+            num_tta: Number of test-time augmentations (TTA). Defaults to ``1`` (no TTA).
+            shift_severity: Severity of corruption to apply for
                 CIFAR10-C. Defaults to ``1``.
-            num_dataloaders (int): Number of dataloaders to use. Defaults to ``1``.
-            pin_memory (bool): Whether to pin memory. Defaults to ``True``.
-            persistent_workers (bool): Whether to use persistent workers. Defaults to ``True``.
+            num_dataloaders: Number of dataloaders to use. Defaults to ``1``.
+            pin_memory: Whether to pin memory. Defaults to ``True``.
+            persistent_workers: Whether to use persistent workers. Defaults to ``True``.
         """
         super().__init__(
             root=root,

@@ -23,14 +23,14 @@ class BatchEnsemble(nn.Module):
         ensuring that each estimator receives the correct data format.
 
         Args:
-            core_model (nn.Module): The BatchEnsemble model.
-            num_estimators (int): Number of ensemble members.
-            repeat_training_inputs (optional, bool): Whether to repeat the input batch during training.
+            core_model: The BatchEnsemble model.
+            num_estimators: Number of ensemble members.
+            repeat_training_inputs: Whether to repeat the input batch during training.
                 If ``True``, the input batch is repeated during both training and evaluation. If ``False``,
-                the input batch is repeated only during evaluation. Default is ``False``.
-            convert_layers (optional, bool): Whether to convert the model's layers to BatchEnsemble layers.
+                the input batch is repeated only during evaluation. Defaults to ``False``.
+            convert_layers: Whether to convert the model's layers to BatchEnsemble layers.
                 If ``True``, the wrapper will convert all ``nn.Linear`` and ``nn.Conv2d`` layers to their
-                BatchEnsemble counterparts. Default is ``False``.
+                BatchEnsemble counterparts. Defaults to ``False``.
 
         Raises:
             ValueError: If neither ``BatchLinear`` nor ``BatchConv2d`` layers are found in the core_model at the
@@ -131,14 +131,14 @@ def batch_ensemble(
     """BatchEnsemble wrapper for a model.
 
     Args:
-        core_model (nn.Module): model to wrap
-        num_estimators (int): number of ensemble members
-        repeat_training_inputs (bool): whether to repeat the input batch during training.
+        core_model: Model to wrap.
+        num_estimators: Number of ensemble members.
+        repeat_training_inputs: Whether to repeat the input batch during training.
             If ``True``, the input batch is repeated during both training and evaluation. If ``False``,
-            the input batch is repeated only during evaluation. Default is ``False``.
-        convert_layers (bool): whether to convert the model's layers to BatchEnsemble layers.
+            the input batch is repeated only during evaluation. Defaults to ``False``.
+        convert_layers: Whether to convert the model's layers to BatchEnsemble layers.
             If ``True``, the wrapper will convert all ``nn.Linear`` and ``nn.Conv2d`` layers to their
-            BatchEnsemble counterparts. Default is ``False``.
+            BatchEnsemble counterparts. Defaults to ``False``.
 
     Returns:
         BatchEnsemble: BatchEnsemble wrapper for the :attr:`core_model`

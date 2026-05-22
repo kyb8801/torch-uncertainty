@@ -16,11 +16,11 @@ class Zero(nn.Module):
         passed as argument (:attr:`model`).
 
         Args:
-            core_model (nn.Module): The inner model to train.
-            num_tta (int): The number of views at evaluation time.
-            filter_views (float): Filter out 1-:attr:`filter_views` of the predictions of the augmented views.
+            core_model: The inner model to train.
+            num_tta: The number of views at evaluation time.
+            filter_views: Filter out 1-:attr:`filter_views` of the predictions of the augmented views.
                 Defaults to ``0.1``.
-            eps (float): for computational stability. Defaults to ``1e-8``;
+            eps: For computational stability. Defaults to ``1e-8``.
         """
         super().__init__()
         _zero_checks(num_tta, filter_views, eps)

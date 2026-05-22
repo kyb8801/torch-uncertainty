@@ -1,0 +1,44 @@
+name: Feature Request
+description: Suggest a new feature or method for TorchUncertainty
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting a feature! TorchUncertainty aims to cover uncertainty quantification methods linked to published papers.
+
+  - type: textarea
+    id: motivation
+    attributes:
+      label: Motivation
+      description: What problem does this feature solve? What use case does it address?
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Describe the feature or method you would like to see added.
+    validations:
+      required: true
+
+  - type: input
+    id: reference
+    attributes:
+      label: Paper reference (if applicable)
+      description: Link or citation for the paper this method is based on.
+      placeholder: "e.g. https://arxiv.org/abs/..."
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Any alternative approaches or workarounds you have tried.
+
+  - type: checkboxes
+    id: contribution
+    attributes:
+      label: Contribution
+      options:
+        - label: I would be willing to implement this feature and open a pull request.

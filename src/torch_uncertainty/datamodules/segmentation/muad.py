@@ -40,16 +40,16 @@ class MUADDataModule(TUDataModule):
         r"""Segmentation DataModule for the MUAD dataset.
 
         Args:
-            root (str or Path): Root directory of the datasets.
-            batch_size (int): Number of samples per batch during training.
-            version (str): Version of the dataset to use. Can be either
+            root: Root directory of the datasets.
+            batch_size: Number of samples per batch during training.
+            version: Version of the dataset to use. Can be either
                 ``full`` or ``small``. Defaults to ``full``.
-            eval_batch_size (int | None) : Number of samples per batch during evaluation (val
+            eval_batch_size: Number of samples per batch during evaluation (val
                 and test). Set to :attr:`batch_size` if ``None``. Defaults to ``None``.
-            eval_ood (bool): Whether to evaluate on the OOD dataset. Defaults to
+            eval_ood: Whether to evaluate on the OOD dataset. Defaults to
                 ``False``. If set to ``True``, the OOD dataset will be used for
                 evaluation in addition of the test dataset.
-            crop_size (sequence or int): Desired input image and
+            crop_size: Desired input image and
                 segmentation mask sizes during training. If :attr:`crop_size` is an
                 int instead of sequence like :math:`(H, W)`, a square crop
                 :math:`(\text{size},\text{size})` is made. If provided a sequence
@@ -57,25 +57,21 @@ class MUADDataModule(TUDataModule):
                 :math:`(\text{size[0]},\text{size[1]})`. Has to be provided if
                 :attr:`train_transform` is not provided. Otherwise has no effect.
                 Defaults to ``1024``.
-            eval_size (sequence or int): Desired input image and
+            eval_size: Desired input image and
                 segmentation mask sizes during inference. If size is an int,
                 smaller edge of the images will be matched to this number, i.e.,
                 :math:`\text{height}>\text{width}`, then image will be rescaled to
                 :math:`(\text{size}\times\text{height}/\text{width},\text{size})`.
                 Has to be provided if :attr:`test_transform` is not provided.
                 Otherwise has no effect. Defaults to ``(1024,2048)``.
-            train_transform (nn.Module | None): Custom training transform. Defaults
-                to ``None``. If not provided, a default transform is used.
-            test_transform (nn.Module | None): Custom test transform. Defaults to
-                ``None``. If not provided, a default transform is used.
-            val_split (float or None): Share of training samples to use
-                for validation. Defaults to ``None``.
-            num_workers (int): Number of dataloaders to use. Defaults to
-                ``1``.
-            pin_memory (bool): Whether to pin memory. Defaults to
-                ``True``.
-            persistent_workers (bool): Whether to use persistent workers.
-                Defaults to ``True``.
+            train_transform: Custom training transform. Defaults to ``None``. If not provided, a
+                default transform is used.
+            test_transform: Custom test transform. Defaults to ``None``. If not provided, a default
+                transform is used.
+            val_split: Share of training samples to use for validation. Defaults to ``None``.
+            num_workers: Number of dataloaders to use. Defaults to ``1``.
+            pin_memory: Whether to pin memory. Defaults to ``True``.
+            persistent_workers: Whether to use persistent workers. Defaults to ``True``.
 
         Note:
             By default this datamodule injects the following transforms into the training and

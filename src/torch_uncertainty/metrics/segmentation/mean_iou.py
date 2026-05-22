@@ -19,13 +19,13 @@ class MeanIntersectionOverUnion(MulticlassStatScores):
         r"""Computes Mean Intersection over Union (IoU) score.
 
         Args:
-            num_classes (int): Integer specifying the number of classes.
-            top_k (int): Number of highest probability or logit score predictions
+            num_classes: Integer specifying the number of classes.
+            top_k: Number of highest probability or logit score predictions
                 considered to find the correct label. Only works when ``preds`` contain
                 probabilities/logits. Defaults to ``1``.
-            ignore_index (int | None): Specifies a target value that is ignored and does
+            ignore_index: Specifies a target value that is ignored and does
                 not contribute to the metric calculation. Defaults to ``None``.
-            validate_args (bool): Bool indicating if input arguments and tensors should
+            validate_args: Bool indicating if input arguments and tensors should
                 be validated for correctness. Set to ``False`` for faster computations. Defaults to
                 ``True``.
             **kwargs: kwargs: Additional keyword arguments, see

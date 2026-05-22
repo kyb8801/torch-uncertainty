@@ -247,25 +247,22 @@ def batched_wideresnet28x10(
     """BatchEnsemble of Wide-ResNet-28x10.
 
     Args:
-        in_channels (int): Number of input channels.
-        num_estimators (int): Number of estimators in the ensemble.
-        conv_bias (bool): Whether to use bias in convolutions. Defaults to
-            ``True``.
-        dropout_rate (float): Dropout rate. Defaults to ``0.3``.
-        num_classes (int): Number of classes to predict.
-        groups (int): Number of groups in the convolutions. Defaults to ``1``.
-        style (ResNetStyle | Literal["imagenet", "cifar"]): Whether to use the ImageNet or CIFAR
-            structure. Defaults to ``ResNetStyle.IMAGENET``.
-        activation_fn (Callable): Activation function. Defaults to
-            ``torch.nn.functional.relu``.
-        normalization_layer (nn.Module): Normalization layer.
-            Defaults to ``torch.nn.BatchNorm2d``.
-        repeat_strategy ("legacy"|"paper"): The repeat
+        in_channels: Number of input channels.
+        num_estimators: Number of estimators in the ensemble.
+        conv_bias: Whether to use bias in convolutions. Defaults to ``True``.
+        dropout_rate: Dropout rate. Defaults to ``0.3``.
+        num_classes: Number of classes to predict.
+        groups: Number of groups in the convolutions. Defaults to ``1``.
+        style: Whether to use the ImageNet or CIFAR structure.
+            Defaults to ``ResNetStyle.IMAGENET``.
+        activation_fn: Activation function. Defaults to ``torch.nn.functional.relu``.
+        normalization_layer: Normalization layer. Defaults to ``torch.nn.BatchNorm2d``.
+        repeat_strategy: The repeat
             strategy to use during training:
 
             - "legacy": Repeat inputs for each estimator during both training
               and evaluation.
-            - "paper"(default): Repeat inputs for each estimator only during
+            - "paper" (default): Repeat inputs for each estimator only during
               evaluation.
 
     Returns:

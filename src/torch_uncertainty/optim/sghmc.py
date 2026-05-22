@@ -20,15 +20,15 @@ class SGHMC(Optimizer):
             Use torch_uncertainty.methods.CheckpointCollector to collect the samples.
 
         Args:
-            params (ParamsT): Iterable of parameters or named_parameters to optimize or iterable of
+            params: Iterable of parameters or named_parameters to optimize or iterable of
                 dicts defining parameter groups. When using named_parameters, all parameters in all
                 groups should be named.
-            lr (float): Learning rate :math:`\epsilon`. Defaults to ``1e-2``.
-            burn_in_steps (int): Number of discarded steps used to update the state. Defaults to ``200``.
-            friction (float): The friction term :math:`C`. Defaults to ``0.05``.
-            noise_factor (float): A factor to reduce the amount of noise and stabilize the training.
+            lr: Learning rate :math:`\epsilon`. Defaults to ``1e-2``.
+            burn_in_steps: Number of discarded steps used to update the state. Defaults to ``200``.
+            friction: The friction term :math:`C`. Defaults to ``0.05``.
+            noise_factor: A factor to reduce the amount of noise and stabilize the training.
                 This parameter was not proposed in the original paper. Defaults to ``1e-2``.
-            weight_decay (float): Weight decay (L2 penalty). Defaults to ``0``.
+            weight_decay: Weight decay (L2 penalty). Defaults to ``0``.
 
         Reference:
             - [1] `Stochastic Gradient Hamiltonian Monte Carlo <https://arxiv.org/pdf/1402.4102>`_.
@@ -49,6 +49,7 @@ class SGHMC(Optimizer):
     def step(
         self, closure: Callable[[], float] | None = None, burn_in: bool = False
     ) -> float | None:
+        # TODO: Check this implementation
         loss = None
         if closure is not None:
             loss = closure()
@@ -108,5 +109,4 @@ class SGHMC(Optimizer):
 
                 # update parameter, Eq. 10 in [2] left equation
                 p.data.add_(momentum)
-
         return loss

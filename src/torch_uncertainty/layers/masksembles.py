@@ -10,15 +10,14 @@ from torch.nn.common_types import _size_2_t
 
 def _generate_masks(m: int, n: int, s: float) -> np.ndarray:
     """Generates set of binary masks with properties defined by n, m, s params.
-    Results of this function are stochastic, that is, calls with the same sets
-    of arguments might generate outputs of different shapes. Check
-    generate_masks and generation_wrapper function for more deterministic
-    behaviour.
+    Results of this function are stochastic: repeated calls with the same
+    arguments may produce different outputs. Use :func:`generate_masks` and
+    :func:`generation_wrapper` for more deterministic behaviour.
 
     Args:
-        m (int): Number of ones in each mask.
-        n (int): Number of masks in the set.
-        s (float): Scale param controls overlap of generated masks.
+        m: Number of ones in each mask.
+        n: Number of masks in the set.
+        s: Scale parameter controlling overlap of generated masks.
 
     Returns:
         np.ndarray: Matrix of binary vectors.
@@ -39,18 +38,19 @@ def _generate_masks(m: int, n: int, s: float) -> np.ndarray:
 
 
 def generate_masks(m: int, n: int, s: float) -> np.ndarray:
-    """Generates set of binary masks with properties defined by n, m, s params
-    Resulting masks are required to have fixed features size.
-    Since process of masks generation is stochastic therefore function
-    evaluates _generate_masks multiple times till expected size is acquired.
+    """Generate a set of binary masks with properties defined by ``m``, ``n``, ``s``.
+
+    The function repeatedly calls :func:`_generate_masks` until the resulting
+    masks match the expected feature size. The process is stochastic, so
+    repetition ensures a correct-sized output.
 
     Args:
-        m (int): number of ones in each mask
-        n (int): number of masks in the set
-        s (float): scale param controls overlap of generated masks
+        m: Number of ones in each mask.
+        n: Number of masks in the set.
+        s: Scale parameter controlling overlap of generated masks.
 
     Returns:
-        np.ndarray: matrix of binary vectors
+        np.ndarray: Matrix of binary vectors.
     """
     masks = _generate_masks(m, n, s)
     # hardcoded formula for expected size, check reference
@@ -61,37 +61,35 @@ def generate_masks(m: int, n: int, s: float) -> np.ndarray:
 
 
 def generation_wrapper(c: int, n: int, scale: float) -> np.ndarray:
-    """Generates set of binary masks with properties defined by c, n, scale
-    params. Allows to generate masks sets with predefined features number c.
-    Particularly convenient to use in torch-like layers where one need to
-    define shapes inputs tensors beforehand.
+    """Generate binary masks with a target number of channel features.
+
+    This wrapper produces masks with an expected number of active features
+    equal to ``c``. It is convenient for torch-like layers where tensor
+    shapes must be known in advance.
 
     Args:
-        c (int): number of channels in generated masks.
-        n (int): number of masks in the set.
-        scale (float): scale param controls overlap of generated masks.
+        c: Number of channels in generated masks.
+        n: Number of masks in the set.
+        scale: Scale parameter controlling overlap of generated masks.
 
     Raises:
-        ValueError: If :attr:`c` < 10.
-        ValueError: If :attr:`s` > 0.6.
+        ValueError: If ``c < 10``.
+        ValueError: If ``scale > 6.0``.
 
     Returns:
         np.ndarray: matrix of binary vectors
     """
     if c < 10:
         raise ValueError(
-            "Masksembles approach couldn't be used in such setups where "
-            "number of channels is less then 10. Current value is "
-            f"(channels={c})."
-            "Please increase number of features in your layer or remove this "
-            "particular instance of Masksembles from your architecture."
+            "Masksembles cannot be used when the number of channels is less than 10. "
+            f"Current value is (channels={c}). Increase the number of features "
+            "or remove this Masksembles instance from your architecture."
         )
 
     if scale > 6.0:
         raise ValueError(
-            "Masksembles approach couldn't be used in such setups where "
-            "scale parameter is larger then 6. Current value is  "
-            f"(scale={scale})."
+            "Masksembles cannot be used when the scale parameter is larger than 6. "
+            f"Current value is (scale={scale})."
         )
 
     # inverse formula for number of active features in masks
@@ -173,14 +171,14 @@ class MaskedLinear(nn.Module):
         estimators (:attr:`num_estimators`) with a given :attr:`scale`.
 
         Args:
-            in_features (int): Number of input features of the linear layer.
-            out_features (int): Number of channels produced by the linear layer.
-            num_estimators (int): The number of estimators grouped in the layer.
-            scale (float): The scale parameter for the masks.
-            bias (bool): It ``True``, adds a learnable bias to the output. Defaults to ``True``.
-            groups (int): Number of blocked connections from input channels to output channels. Defaults to ``1``.
-            device (Any): The desired device of returned tensor. Defaults to ``None``.
-            dtype (Any): The desired data type of returned tensor. Defaults to ``None``.
+            in_features: Number of input features of the linear layer.
+            out_features: Number of channels produced by the linear layer.
+            num_estimators: The number of estimators grouped in the layer.
+            scale: The scale parameter for the masks.
+            bias: It ``True``, adds a learnable bias to the output. Defaults to ``True``.
+            groups: Number of blocked connections from input channels to output channels. Defaults to ``1``.
+            device: The desired device of returned tensor. Defaults to ``None``.
+            dtype: The desired data type of returned tensor. Defaults to ``None``.
 
         Warning:
             Be sure to apply a repeat on the batch at the start of the training
@@ -230,18 +228,18 @@ class MaskedConv2d(nn.Module):
         r"""Masksembles-style Conv2d layer.
 
         Args:
-            in_channels (int): Number of channels in the input image.
-            out_channels (int): Number of channels produced by the convolution.
-            kernel_size (int or tuple): Size of the convolving kernel.
-            num_estimators (int): Number of estimators in the ensemble.
-            scale (float): The scale parameter for the masks.
-            stride (int or tuple): Stride of the convolution. Defaults to ``1``.
+            in_channels: Number of channels in the input image.
+            out_channels: Number of channels produced by the convolution.
+            kernel_size: Size of the convolving kernel.
+            num_estimators: Number of estimators in the ensemble.
+            scale: The scale parameter for the masks.
+            stride: Stride of the convolution. Defaults to ``1``.
             padding (int, tuple or str): Padding added to all four sides of the input. Defaults to ``0``.
-            dilation (int or tuple): Spacing between kernel elements. Defaults to ``1``.
-            groups (int): Number of blocked connexions from input channels to output channels for each estimator. Defaults to ``1``.
-            bias (bool): If ``True``, adds a learnable bias to the output. Defaults to ``True``.
-            device (Any): The desired device of returned tensor. Defaults to ``None``.
-            dtype (Any): The desired data type of returned tensor. Defaults to ``None``.
+            dilation: Spacing between kernel elements. Defaults to ``1``.
+            groups: Number of blocked connexions from input channels to output channels for each estimator. Defaults to ``1``.
+            bias: If ``True``, adds a learnable bias to the output. Defaults to ``True``.
+            device: The desired device of returned tensor. Defaults to ``None``.
+            dtype: The desired data type of returned tensor. Defaults to ``None``.
 
         Warning:
             Be sure to apply a repeat on the batch at the start of the training
@@ -300,20 +298,20 @@ class MaskedConvTranspose2d(nn.Module):
         r"""Masksembles-style ConvTranspose2d layer.
 
         Args:
-            in_channels (int): Number of channels in the input image.
-            out_channels (int): Number of channels produced by the convolution.
-            kernel_size (int or tuple): Size of the convolving kernel.
-            num_estimators (int): Number of estimators in the ensemble.
-            scale (float): The scale parameter for the masks.
-            stride (int or tuple): Stride of the convolution. Defaults to ``1``.
-            padding (int or tuple): Padding added to all four sides of the input. Defaults to ``0``.
+            in_channels: Number of channels in the input image.
+            out_channels: Number of channels produced by the convolution.
+            kernel_size: Size of the convolving kernel.
+            num_estimators: Number of estimators in the ensemble.
+            scale: The scale parameter for the masks.
+            stride: Stride of the convolution. Defaults to ``1``.
+            padding: Padding added to all four sides of the input. Defaults to ``0``.
             output_padding (int, tuple or str): Additional size added to one side of each dimension in the output shape. Defaults to ``0``.
-            groups (int): Number of blocked connexions from input channels to output channels for each estimator. Defaults to ``1``.
-            bias (bool): If ``True``, adds a learnable bias to the output. Defaults to ``True``.
-            dilation (int or tuple): Spacing between kernel elements. Defaults to ``1``.
-            padding_mode (str): _description_. Defaults to ``'zeros'``.
-            device (Any): The desired device of returned tensor. Defaults to ``None``.
-            dtype (Any): The desired data type of returned tensor. Defaults to ``None``.
+            groups: Number of blocked connexions from input channels to output channels for each estimator. Defaults to ``1``.
+            bias: If ``True``, adds a learnable bias to the output. Defaults to ``True``.
+            dilation: Spacing between kernel elements. Defaults to ``1``.
+            padding_mode: _description_. Defaults to ``'zeros'``.
+            device: The desired device of returned tensor. Defaults to ``None``.
+            dtype: The desired data type of returned tensor. Defaults to ``None``.
 
         Warning:
             Be sure to apply a repeat on the batch at the start of the training

@@ -109,11 +109,11 @@ class AbstractMixup(nn.Module, ABC):
         """Abstract Mixup class.
 
         Args:
-            alpha (float): Mixup alpha.
-            num_classes (int): Number of classes.
-            isobatch (bool): Whether to use a single coefficient for the whole batch
+            alpha: Mixup alpha.
+            num_classes: Number of classes.
+            isobatch: Whether to use a single coefficient for the whole batch
                 instead of for each pair. Defaults to ``False``.
-            **kwargs (Any): Keyword arguments for compatibility.
+            **kwargs: Keyword arguments for compatibility.
         """
         super().__init__()
         self.alpha = alpha
@@ -163,10 +163,10 @@ class AbstractMixup(nn.Module, ABC):
         """Apply mixup on a batch of inputs and targets.
 
         Args:
-            x (Tensor): input or input batch.
-            y (Tensor): target or target batch.
-            feats (Tensor | None): features for warping mixup.
-            warp_param (float | None): warping parameter.
+            x: input or input batch.
+            y: target or target batch.
+            feats: features for warping mixup.
+            warp_param: warping parameter.
 
         Returns:
             tuple[Tensor, Tensor]: mixed-up inputs and targets.
@@ -209,13 +209,13 @@ class MixupMP(AbstractMixup):
         inputs and targets, all concatenated.
 
         Args:
-            alpha (float): Mixup alpha.
-            num_classes (int): Number of classes.
-            mixup_ratio (float): Ratio of the number of mixup-ed pairs and normal pairs. Defaults
+            alpha: Mixup alpha.
+            num_classes: Number of classes.
+            mixup_ratio: Ratio of the number of mixup-ed pairs and normal pairs. Defaults
                 to ``1``. This parameter is named "r" in the paper.
-            isobatch (bool): Whether to use a single coefficient for the whole batch
+            isobatch: Whether to use a single coefficient for the whole batch
                 instead of for each pair. Defaults to ``False``.
-            **kwargs (Any): Keyword arguments for compatibility.
+            **kwargs: Keyword arguments for compatibility.
 
         Warning:
             When training MixupMP models with r != 1, you should use the MixupMPLoss

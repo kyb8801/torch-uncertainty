@@ -23,8 +23,7 @@ class Entropy(Metric):
         or the mean confidence across estimators.
 
         Args:
-            reduction (str): Determines how to reduce over the
-                :math:`B`/batch dimension:
+            reduction: Determines how to reduce over the :math:`B`/batch dimension:
 
                 - ``'mean'`` [default]: Averages score across samples
                 - ``'sum'``: Sum score across samples
@@ -99,7 +98,7 @@ class Entropy(Metric):
         """Update the current entropy with a new tensor of probabilities.
 
         Args:
-            probs (torch.Tensor): Probabilities from the model.
+            probs: Probabilities from the model.
         """
         batch_size = probs.size(0)
         entropy = torch.special.entr(probs).sum(dim=-1)
@@ -114,9 +113,7 @@ class Entropy(Metric):
             self.total += batch_size
 
     def compute(self) -> torch.Tensor:
-        """Computes Entropy based on inputs passed in to ``update``
-        previously.
-        """
+        """Compute entropy based on inputs passed to ``update``."""
         values = dim_zero_cat(self.values)
         if self.reduction == "sum":
             return values.sum(dim=-1)
