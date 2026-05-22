@@ -573,9 +573,7 @@ class ClassificationRoutine(LightningModule):
         if self.eval_shift:
             result_dict |= self.test_shift_metrics.compute() | {
                 "shift/severity": self.trainer.datamodule.shift_severity,
-            }
-            result_dict |= self.test_ood_metrics.compute() | {
-                "shift/Entropy": self.test_shift_entropy.compute()
+                "shift/Entropy": self.test_shift_entropy.compute(),
             }
 
             if self.is_ensemble:
