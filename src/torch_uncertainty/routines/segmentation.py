@@ -415,7 +415,7 @@ class SegmentationRoutine(LightningModule):
     def _plot_results(self):
         """Plot uncertainty quantification metrics and segmentation figures."""
         self.logger.experiment.add_figure(
-            "Calibration/Reliabity diagram",
+            "Calibration/Reliability diagram",
             self.test_sbsmpl_seg_metrics["cal/ECE"].plot()[0],
         )
         self.logger.experiment.add_figure(
