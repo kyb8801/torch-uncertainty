@@ -172,7 +172,7 @@ docstrings
 stated as such
 - If you implement a method, please add a reference to the corresponding paper in the
 ["References" page](https://torch-uncertainty.github.io/references.html)
-- * If you implement a metric that you add to one of the routines, add a reference in the 
+- If you implement a metric that you add to one of the routines, add a reference in the 
   [evaluation page](https://torch-uncertainty.github.io/evaluation.html).
 
 If you need help to implement a method, increase the coverage, or solve ruff-raised errors,
