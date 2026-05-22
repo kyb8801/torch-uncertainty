@@ -172,8 +172,8 @@ docstrings
 stated as such
 - If you implement a method, please add a reference to the corresponding paper in the
 ["References" page](https://torch-uncertainty.github.io/references.html)
-- Also, remember to add TorchUncertainty to the list of libraries implementing this reference
-on [PapersWithCode](https://paperswithcode.com)
+- * If you implement a metric that you add to one of the routines, add a reference in the 
+  [evaluation page](https://torch-uncertainty.github.io/evaluation.html).
 
 If you need help to implement a method, increase the coverage, or solve ruff-raised errors,
 create the PR with the `need-help` flag and explain your problems in the comments. A maintainer

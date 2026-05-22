@@ -58,7 +58,8 @@ set:
 - ``cal/SmECE`` — :class:`~torch_uncertainty.metrics.classification.SmoothCalibrationError`,
   a kernel-smoothed, bin-free estimator of the calibration error.
 
-The number of bins is controlled by ``num_bins_calibration_error`` (default ``15``).
+The number of bins is controlled by ``num_bins_calibration_error`` (default ``15``). It is 
+an argument of the routine itself.
 
 **Selective Classification**
 
@@ -91,7 +92,9 @@ uncertainty estimators that exploit the diversity between estimators:
 - ``test/ens_Disagreement`` — :class:`~torch_uncertainty.metrics.classification.Disagreement`,
 - ``test/ens_MI`` — :class:`~torch_uncertainty.metrics.classification.MutualInformation`
   between the prediction and the model parameters,
-- ``test/ens_Entropy`` — entropy of the per-estimator predictions.
+- ``test/ens_Entropy`` — entropy of the **per-estimator** predictions. When ``is_ensemble=True``,
+  ``test/Entropy`` corresponds to the final (average) distribution's entropy over all 
+  test samples. It follows that ``test/Entropy`` = ``test/ens_MI`` + ``test/ens_Entropy``
 
 **Post-processing & conformal prediction**
 
@@ -110,7 +113,7 @@ for end-to-end examples.
 Setting ``eval_grouping_loss=True`` enables
 :class:`~torch_uncertainty.metrics.classification.GroupingLoss`, a finer-grained calibration
 metric that quantifies how much information is *lost* by reducing predictions to their
-confidence — see Perez-Lebel et al., ICLR 2023.
+confidence: see Perez-Lebel et al., ICLR 2023.
 
 OOD detection metrics
 ^^^^^^^^^^^^^^^^^^^^^
