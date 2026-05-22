@@ -53,7 +53,7 @@ To build the documentation on Linux, navigate to ``./docs`` and build the docume
 
 .. parsed-literal::
 
-    uv run make html
+    make html
 
 Optionally, specify ``html-noplot`` instead of ``html`` to avoid running the tutorials.
 This option is necessary if you only have a CPU on your machine.

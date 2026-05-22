@@ -37,11 +37,12 @@ class SmoothCalibrationError(Metric):
 
         Args:
             kernel_type: The kernel to use. Choose between:
-                - ``'logit'``: Applies a Gaussian kernel in log-odds space. This
-                    effectively uses an adaptive bandwidth that is narrower near 1.0,
-                    making it ideal for modern overconfident models. (Default)
-                - ``'reflected'``: Applies a Gaussian kernel in probability space
-                    with reflections at 0 and 1 to prevent boundary bias.
+            - ``'logit'``: Applies a Gaussian kernel in log-odds space. This
+                effectively uses an adaptive bandwidth that is narrower near 1.0,
+                making it ideal for modern overconfident models. (Default)
+            - ``'reflected'``: Applies a Gaussian kernel in probability space
+                with reflections at 0 and 1 to prevent boundary bias.
+
                 Note that relplot's original implementation uses ``'reflected'`` by default.
             bandwidth: The kernel bandwidth :math:`h`. If set to
                 ``'auto'``, it uses a fixed-point binary search to find a bandwidth
@@ -91,9 +92,10 @@ class SmoothCalibrationError(Metric):
             preds: Predictions from the model.
                 - Multiclass: Shape ``(N, C)`` (logits or probabilities).
                 - Binary: Shape ``(N,)`` or ``(N, 1)`` (logits or probabilities).
+
             target: Ground truth labels.
                 - Multiclass: Shape ``(N,)`` containing class indices.
-                - Binary: Shape ``(N,)`` containing 0 or 1.
+                - Binary: Shape ``(N,)`` containing 0 or 1.         
         """
         if preds.ndim == 1 or (preds.ndim == 2 and preds.shape[1] == 1):
             preds = preds.view(-1)

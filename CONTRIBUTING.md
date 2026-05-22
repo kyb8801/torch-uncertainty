@@ -44,7 +44,7 @@ uv run pre-commit install
 Navigate to `./docs` and build the documentation with:
 
 ```sh
-uv run make html
+make html
 ```
 
 Optionally, specify `html-noplot` instead of `html` to avoid running the tutorials.
