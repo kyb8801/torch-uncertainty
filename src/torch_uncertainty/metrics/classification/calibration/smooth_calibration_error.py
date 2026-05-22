@@ -95,7 +95,7 @@ class SmoothCalibrationError(Metric):
 
             target: Ground truth labels.
                 - Multiclass: Shape ``(N,)`` containing class indices.
-                - Binary: Shape ``(N,)`` containing 0 or 1.         
+                - Binary: Shape ``(N,)`` containing 0 or 1.
         """
         if preds.ndim == 1 or (preds.ndim == 2 and preds.shape[1] == 1):
             preds = preds.view(-1)
