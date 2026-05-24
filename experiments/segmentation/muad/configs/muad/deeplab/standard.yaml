@@ -9,7 +9,7 @@ trainer:
     class_path: lightning.pytorch.loggers.MLFlowLogger
     init_args:
       experiment_name: deeplabv3+
-      tracking_uri: mlruns
+      tracking_uri: logs/muad/deeplab
   callbacks:
     - class_path: torch_uncertainty.callbacks.TUSegCheckpoint
     - class_path: lightning.pytorch.callbacks.LearningRateMonitor

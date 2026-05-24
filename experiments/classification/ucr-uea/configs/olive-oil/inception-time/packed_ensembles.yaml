@@ -9,7 +9,7 @@ trainer:
     class_path: lightning.pytorch.loggers.MLFlowLogger
     init_args:
       experiment_name: packed-ensembles
-      tracking_uri: mlruns
+      tracking_uri: logs/olive-oil/inception-time
   callbacks:
     - class_path: torch_uncertainty.callbacks.TUClsCheckpoint
 routine:
