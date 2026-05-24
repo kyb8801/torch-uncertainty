@@ -407,7 +407,7 @@ class PixelRegressionRoutine(LightningModule):
                 all_imgs.extend([img, pred, tgt])
 
             grid = make_grid(torch.stack(all_imgs, dim=0), nrow=3)
-            grid_np = (grid.permute(1, 2, 0).numpy() * 255).astype("uint8")
+            grid_np = (grid.cpu().permute(1, 2, 0).numpy() * 255).astype("uint8")
             self.logger.experiment.log_image(
                 self.logger.run_id,
                 grid_np,
