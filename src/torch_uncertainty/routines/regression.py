@@ -1,6 +1,5 @@
 import warnings
 from collections.abc import Callable
-from pathlib import Path
 
 from einops import rearrange
 from lightning.pytorch import LightningModule
@@ -23,7 +22,7 @@ from torch_uncertainty.metrics import (
     DistributionNLL,
     QuantileCalibrationError,
 )
-from torch_uncertainty.utils import csv_writer
+from torch_uncertainty.utils import csv_writer, get_logger_dir
 from torch_uncertainty.utils.distributions import (
     DistEstimate,
     get_dist_class,
@@ -381,10 +380,10 @@ class RegressionRoutine(LightningModule):
             self.test_prob_metrics.reset()
 
         if self.save_to_csv and self.logger is not None:
-            csv_writer(
-                Path(self.logger.log_dir) / self.csv_filename,
-                result_dict,
-            )
+            log_dir = get_logger_dir(self.logger)
+            if log_dir is not None:
+                log_dir.mkdir(parents=True, exist_ok=True)
+                csv_writer(log_dir / self.csv_filename, result_dict)
 
 
 def _regression_routine_checks(output_dim: int) -> None:

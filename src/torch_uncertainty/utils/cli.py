@@ -13,6 +13,7 @@ from lightning.pytorch.cli import (
 )
 from typing_extensions import override
 
+from torch_uncertainty.utils.misc import get_logger_dir
 from torch_uncertainty.utils.trainer import TUTrainer
 
 
@@ -23,7 +24,10 @@ class TUSaveConfigCallback(SaveConfigCallback):
             return
 
         if self.save_to_log_dir and stage == "fit":
-            log_dir = trainer.log_dir  # this broadcasts the directory
+            # Prefer the per-run artifact dir (MLFlow returns the tracking root via
+            # `trainer.log_dir`, which would dump the config alongside every run).
+            resolved = get_logger_dir(trainer.logger) if trainer.logger is not None else None
+            log_dir = str(resolved) if resolved is not None else trainer.log_dir
             assert log_dir is not None
             config_path = Path(log_dir) / self.config_filename
             fs = get_filesystem(log_dir)

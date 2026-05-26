@@ -10,7 +10,7 @@ trainer:
     class_path: lightning.pytorch.loggers.MLFlowLogger
     init_args:
       experiment_name: mimo
-      tracking_uri: logs/boston/mlp/normal
+      tracking_uri: file:logs/boston/mlp/normal
   callbacks:
     - class_path: torch_uncertainty.callbacks.TURegCheckpoint
       init_args:

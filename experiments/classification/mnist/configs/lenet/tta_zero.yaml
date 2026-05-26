@@ -10,7 +10,7 @@ trainer:
     class_path: lightning.pytorch.loggers.MLFlowLogger
     init_args:
       experiment_name: standard
-      tracking_uri: logs/lenet_tta_zero
+      tracking_uri: file:logs/lenet_tta_zero
   callbacks:
     - class_path: lightning.pytorch.callbacks.ModelCheckpoint
       init_args:

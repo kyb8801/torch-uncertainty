@@ -70,9 +70,9 @@ while keeping accurate predictions.
   Risk-Coverage curve.
 - ``sc/AUGRC`` — :class:`~torch_uncertainty.metrics.classification.AUGRC`, Area Under the
   *Generalized* Risk-Coverage curve.
-- ``sc/Cov@5Risk`` — :class:`~torch_uncertainty.metrics.classification.CovAt5Risk`, maximum
+- ``sc/Cov_5Risk`` — :class:`~torch_uncertainty.metrics.classification.CovAt5Risk`, maximum
   coverage at which the selective risk stays below 5%.
-- ``sc/Risk@80Cov`` — :class:`~torch_uncertainty.metrics.classification.RiskAt80Cov`,
+- ``sc/Risk_80Cov`` — :class:`~torch_uncertainty.metrics.classification.RiskAt80Cov`,
   selective risk at 80% coverage.
 
 **Complexity**
@@ -182,8 +182,8 @@ are evaluated on a uniformly subsampled subset of pixels:
   ``cal/SmECE`` (:class:`~torch_uncertainty.metrics.classification.SmoothCalibrationError`)
 - ``sc/AURC`` (:class:`~torch_uncertainty.metrics.classification.AURC`),
   ``sc/AUGRC`` (:class:`~torch_uncertainty.metrics.classification.AUGRC`),
-  ``sc/Cov@5Risk`` (:class:`~torch_uncertainty.metrics.classification.CovAt5Risk`),
-  ``sc/Risk@80Cov`` (:class:`~torch_uncertainty.metrics.classification.RiskAt80Cov`).
+  ``sc/Cov_5Risk`` (:class:`~torch_uncertainty.metrics.classification.CovAt5Risk`),
+  ``sc/Risk_80Cov`` (:class:`~torch_uncertainty.metrics.classification.RiskAt80Cov`).
 
 OOD detection metrics
 ^^^^^^^^^^^^^^^^^^^^^

@@ -10,7 +10,7 @@ trainer:
     class_path: lightning.pytorch.loggers.MLFlowLogger
     init_args:
       experiment_name: standard
-      tracking_uri: logs/boston/mlp/cauchy
+      tracking_uri: file:logs/boston/mlp/cauchy
   callbacks:
     - class_path: torch_uncertainty.callbacks.TURegCheckpoint
       init_args:

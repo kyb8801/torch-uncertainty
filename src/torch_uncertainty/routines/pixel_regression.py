@@ -1,5 +1,4 @@
 from collections.abc import Callable
-from pathlib import Path
 from typing import Literal
 
 import matplotlib.cm as cm
@@ -35,7 +34,7 @@ from torch_uncertainty.metrics import (
     SILog,
     ThresholdAccuracy,
 )
-from torch_uncertainty.utils import csv_writer
+from torch_uncertainty.utils import csv_writer, get_logger_dir
 from torch_uncertainty.utils.distributions import (
     get_dist_class,
     get_dist_estimate,
@@ -382,10 +381,10 @@ class PixelRegressionRoutine(LightningModule):
             self.test_prob_metrics.reset()
 
         if self.save_to_csv and self.logger is not None:
-            csv_writer(
-                Path(self.logger.log_dir) / self.csv_filename,
-                result_dict,
-            )
+            log_dir = get_logger_dir(self.logger)
+            if log_dir is not None:
+                log_dir.mkdir(parents=True, exist_ok=True)
+                csv_writer(log_dir / self.csv_filename, result_dict)
 
     def _plot_pixel_regression(
         self,
@@ -394,11 +393,7 @@ class PixelRegressionRoutine(LightningModule):
         target: Tensor,
         stage: Literal["val", "test"],
     ) -> None:
-        if (
-            self.logger is not None
-            and isinstance(self.logger, MLFlowLogger)
-            and self.one_dim_depth
-        ):
+        if self.logger is not None and isinstance(self.logger, MLFlowLogger) and self.one_dim_depth:
             all_imgs = []
             for i in range(inputs.size(0)):
                 img = F.normalize(inputs[i, ...].cpu(), **self.inv_norm_params)
