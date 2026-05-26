@@ -37,7 +37,7 @@ from torch_uncertainty.ood_criteria import (
     get_ood_criterion,
 )
 from torch_uncertainty.post_processing import PostProcessing
-from torch_uncertainty.utils import csv_writer, get_logger_dir
+from torch_uncertainty.utils import csv_writer, get_logger_dir, log_figure
 from torch_uncertainty.utils.plotting import show_segmentation_predictions
 
 
@@ -413,15 +413,18 @@ class SegmentationRoutine(LightningModule):
 
     def _plot_results(self):
         """Plot uncertainty quantification metrics and segmentation figures."""
-        self.logger.experiment.add_figure(
+        log_figure(
+            self.logger,
             "Calibration/Reliability diagram",
             self.test_sbsmpl_seg_metrics["cal/ECE"].plot()[0],
         )
-        self.logger.experiment.add_figure(
+        log_figure(
+            self.logger,
             "Selective Classification/Risk-Coverage curve",
             self.test_sbsmpl_seg_metrics["sc/AURC"].plot()[0],
         )
-        self.logger.experiment.add_figure(
+        log_figure(
+            self.logger,
             "Selective Classification/Generalized Risk-Coverage curve",
             self.test_sbsmpl_seg_metrics["sc/AUGRC"].plot()[0],
         )
@@ -448,7 +451,8 @@ class SegmentationRoutine(LightningModule):
             pred_mask = draw_segmentation_masks(img, pred, alpha=0.7, colors=color_palette)
             gt_mask = draw_segmentation_masks(img, tgt, alpha=0.7, colors=color_palette)
 
-            self.logger.experiment.add_figure(
+            log_figure(
+                self.logger,
                 f"Segmentation results/{i}",
                 show_segmentation_predictions(pred_mask, gt_mask),
             )

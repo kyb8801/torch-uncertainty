@@ -5,7 +5,6 @@ import matplotlib.cm as cm
 import torch
 from einops import rearrange
 from lightning.pytorch import LightningModule
-from lightning.pytorch.loggers import MLFlowLogger
 from lightning.pytorch.utilities.types import STEP_OUTPUT, OptimizerLRScheduler
 from torch import Tensor, nn
 from torch.distributions import (
@@ -34,7 +33,7 @@ from torch_uncertainty.metrics import (
     SILog,
     ThresholdAccuracy,
 )
-from torch_uncertainty.utils import csv_writer, get_logger_dir
+from torch_uncertainty.utils import csv_writer, get_logger_dir, log_image_array
 from torch_uncertainty.utils.distributions import (
     get_dist_class,
     get_dist_estimate,
@@ -393,7 +392,7 @@ class PixelRegressionRoutine(LightningModule):
         target: Tensor,
         stage: Literal["val", "test"],
     ) -> None:
-        if self.logger is not None and isinstance(self.logger, MLFlowLogger) and self.one_dim_depth:
+        if self.logger is not None and self.one_dim_depth:
             all_imgs = []
             for i in range(inputs.size(0)):
                 img = F.normalize(inputs[i, ...].cpu(), **self.inv_norm_params)
@@ -403,10 +402,11 @@ class PixelRegressionRoutine(LightningModule):
 
             grid = make_grid(torch.stack(all_imgs, dim=0), nrow=3)
             grid_np = (grid.cpu().permute(1, 2, 0).numpy() * 255).astype("uint8")
-            self.logger.experiment.log_image(
-                self.logger.run_id,
+            log_image_array(
+                self.logger,
+                f"{stage}/samples_{self.current_epoch}",
                 grid_np,
-                f"{stage}/samples_{self.current_epoch}.png",
+                step=self.current_epoch,
             )
 
 

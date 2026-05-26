@@ -22,7 +22,7 @@ from torch_uncertainty.metrics import (
     DistributionNLL,
     QuantileCalibrationError,
 )
-from torch_uncertainty.utils import csv_writer, get_logger_dir
+from torch_uncertainty.utils import csv_writer, get_logger_dir, log_figure
 from torch_uncertainty.utils.distributions import (
     DistEstimate,
     get_dist_class,
@@ -360,7 +360,8 @@ class RegressionRoutine(LightningModule):
 
             if isinstance(self.logger, Logger) and self.log_plots:
                 try:
-                    self.logger.experiment.add_figure(
+                    log_figure(
+                        self.logger,
                         "Calibration/Reliability diagram",
                         self.test_prob_metrics["cal/QCE"].plot()[0],
                     )

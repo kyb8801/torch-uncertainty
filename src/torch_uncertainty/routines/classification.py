@@ -44,7 +44,7 @@ from torch_uncertainty.ood_criteria import (
 )
 from torch_uncertainty.post_processing import Conformal, LaplaceApprox, PostProcessing
 from torch_uncertainty.transforms import MIXUP_PARAMS, RepeatTarget, build_mixup
-from torch_uncertainty.utils import csv_writer, get_logger_dir, plot_hist
+from torch_uncertainty.utils import csv_writer, get_logger_dir, log_figure, plot_hist
 
 
 class ClassificationRoutine(LightningModule):
@@ -610,20 +610,17 @@ class ClassificationRoutine(LightningModule):
 
     def _plot_results(self):
         """Plot uncertainty quantification metrics."""
-        self.logger.experiment.add_figure(
-            "Reliability diagram", self.test_cls_metrics["cal/ECE"].plot()[0]
-        )
-        self.logger.experiment.add_figure(
-            "Risk-Coverage curve",
-            self.test_cls_metrics["sc/AURC"].plot()[0],
-        )
-        self.logger.experiment.add_figure(
+        log_figure(self.logger, "Reliability diagram", self.test_cls_metrics["cal/ECE"].plot()[0])
+        log_figure(self.logger, "Risk-Coverage curve", self.test_cls_metrics["sc/AURC"].plot()[0])
+        log_figure(
+            self.logger,
             "Generalized Risk-Coverage curve",
             self.test_cls_metrics["sc/AUGRC"].plot()[0],
         )
 
         if self.post_processing is not None and not isinstance(self.post_processing, Conformal):
-            self.logger.experiment.add_figure(
+            log_figure(
+                self.logger,
                 "Reliability diagram after calibration",
                 self.post_cls_metrics["cal/ECE"].plot()[0],
             )
@@ -638,7 +635,7 @@ class ClassificationRoutine(LightningModule):
                 20,
                 "Histogram of the OOD scores",
             )[0]
-            self.logger.experiment.add_figure("OOD Score Histogram", score_fig)
+            log_figure(self.logger, "OOD Score Histogram", score_fig)
 
 
 def _classification_routine_checks(
