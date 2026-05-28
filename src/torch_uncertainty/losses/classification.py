@@ -11,7 +11,17 @@ class DECLoss(nn.Module):
         loss_type: str = "log",
         reduction: str | None = "mean",
     ) -> None:
-        """The Deep Evidential Classification loss.
+        r"""The Deep Evidential Classification (DEC) loss.
+
+        Trains a classifier to output Dirichlet evidence :math:`\mathbf{e} \in
+        \mathbb{R}_{\geq 0}^C` instead of class probabilities. The Dirichlet parameters
+        are :math:`\boldsymbol{\alpha} = \mathbf{e} + 1` and the total evidence
+        :math:`S = \sum_c \alpha_c` controls the predictive uncertainty (smaller
+        :math:`S` ⇒ more uncertainty). The full loss is the sum of an expected
+        cross-entropy term (selected by :attr:`loss_type`) and a KL regulariser that
+        pushes evidence on incorrect classes towards zero, annealed by either a
+        constant :attr:`reg_weight` or a linear schedule of length
+        :attr:`annealing_step`.
 
         Args:
             annealing_step: Annealing step for the weight of the
@@ -20,7 +30,7 @@ class DECLoss(nn.Module):
             loss_type: Specifies the loss type to apply to the
                 Dirichlet parameters: ``'mse'`` | ``'log'`` | ``'digamma'``.
             reduction: Specifies the reduction to apply to the
-                output:``'none'`` | ``'mean'`` | ``'sum'``.
+                output: ``'none'`` | ``'mean'`` | ``'sum'``.
 
         References:
             [1] `Sensoy, M., Kaplan, L., & Kandemir, M. (2018). Evidential deep learning to quantify classification uncertainty. NeurIPS 2018
@@ -171,19 +181,30 @@ class ConfidencePenaltyLoss(nn.Module):
         reduction: str | None = "mean",
         eps: float = 1e-6,
     ) -> None:
-        """The Confidence Penalty Loss.
+        r"""The Confidence Penalty loss.
+
+        Augments the standard cross-entropy loss with a regulariser that penalises
+        low-entropy (over-confident) predictive distributions:
+
+        .. math::
+            \mathcal{L} = \text{CE}(\mathbf{z}, y)
+            + \lambda \left( \log C + \sum_{i=1}^{C} p_i \log(p_i + \varepsilon) \right),
+
+        where :math:`\mathbf{p} = \mathrm{softmax}(\mathbf{z})`, :math:`C` is the number
+        of classes, :math:`\lambda` is :attr:`reg_weight`, and :math:`\varepsilon` is
+        :attr:`eps`. The regulariser equals the negative entropy of :math:`\mathbf{p}`
+        shifted by :math:`\log C` so that it is non-negative.
 
         Args:
-            reg_weight: The weight of the regularization term.
-            reduction: specifies the reduction to apply to the
-                output:``'none'`` | ``'mean'`` | ``'sum'``. Defaults to "mean".
+            reg_weight: The weight :math:`\lambda` of the regularization term.
+            reduction: Specifies the reduction to apply to the output:
+                ``'none'`` | ``'mean'`` | ``'sum'``. Defaults to ``'mean'``.
             eps: A small value to avoid numerical instability.
-                Defaults to ``1e-6.``
+                Defaults to ``1e-6``.
 
         References:
-            [1] `Gabriel Pereyra: Regularizing neural networks by penalizing confident output distributions
-            <https://arxiv.org/pdf/1701.06548>`_.
-
+            [1] `Pereyra, G., et al. (2017). Regularizing neural networks by penalizing
+            confident output distributions <https://arxiv.org/pdf/1701.06548>`_.
         """
         super().__init__()
         if reduction is None:
@@ -231,15 +252,27 @@ class ConflictualLoss(nn.Module):
     ) -> None:
         r"""The Conflictual Loss.
 
+        Combines the standard cross-entropy with a *conflictual* regulariser that
+        encourages the model to assign non-negligible probability to a uniformly random
+        class :math:`c^\star`:
+
+        .. math::
+            \mathcal{L} = \text{CE}(\mathbf{z}, y)
+            - \lambda \log p_{c^\star}, \quad c^\star \sim \mathrm{Uniform}(1, C).
+
+        This counteracts the natural tendency of cross-entropy to collapse all
+        probability mass on a single class and improves the calibration of epistemic
+        uncertainty estimates.
+
         Args:
-            reg_weight: The weight of the regularization term.
-            reduction: specifies the reduction to apply to the
-                output:``'none'`` | ``'mean'`` | ``'sum'``.
+            reg_weight: The weight :math:`\lambda` of the regularization term.
+            reduction: Specifies the reduction to apply to the output:
+                ``'none'`` | ``'mean'`` | ``'sum'``.
 
         References:
-            [1] `Mohammed Fellaji et al. On the Calibration of Epistemic Uncertainty: Principles, Paradoxes and Conflictual Loss
+            [1] `Fellaji, M., et al. (2024). On the Calibration of Epistemic Uncertainty:
+            Principles, Paradoxes and Conflictual Loss
             <https://arxiv.org/pdf/2407.12211>`_.
-
         """
         super().__init__()
         if reduction is None:
@@ -282,19 +315,29 @@ class FocalLoss(nn.Module):
         alpha: Tensor | None = None,
         reduction: str = "mean",
     ) -> None:
-        """Focal-Loss for classification tasks.
+        r"""Focal Loss for classification tasks.
+
+        Down-weights the contribution of well-classified samples to the cross-entropy
+        loss, focusing training on hard examples. For a target class :math:`y` with
+        predicted probability :math:`p_y`,
+
+        .. math::
+            \text{FL}(p_y) = -\alpha_y \, (1 - p_y)^\gamma \, \log p_y,
+
+        where :math:`\gamma \geq 0` is :attr:`gamma` (a larger :math:`\gamma`
+        suppresses easy examples more aggressively) and :math:`\alpha_y` is the
+        per-class weight from :attr:`alpha` (defaulting to ``1``).
 
         Args:
-            gamma: A constant, as described in the paper.
-            alpha: Weights for each class. Defaults to ``None``.
+            gamma: The focusing parameter :math:`\gamma`, as described in the paper.
+            alpha: Per-class rescaling weights. Defaults to ``None``.
             reduction: ``'mean'``, ``'sum'`` or ``'none'``. Defaults to ``'mean'``.
 
         References:
-            [1] `Lin, T.-Y., Goyal, P., Girshick, R., He, K., & Dollár, P. (2017). Focal Loss for Dense Object Detection.
+            [1] `Lin, T.-Y., Goyal, P., Girshick, R., He, K., & Dollár, P. (2017). Focal Loss for Dense Object Detection
             <https://openaccess.thecvf.com/content_ICCV_2017/papers/Lin_Focal_Loss_for_ICCV_2017_paper.pdf>`_.
 
-            [2] Inspired by https://github.com/AdeelH/pytorch-multi-class-focal-loss .
-
+            [2] Inspired by https://github.com/AdeelH/pytorch-multi-class-focal-loss.
         """
         if reduction not in ("none", "mean", "sum") and reduction is not None:
             raise ValueError(f"{reduction} is not a valid value for reduction.")
@@ -437,69 +480,84 @@ class MixupMPLoss(nn.CrossEntropyLoss):
         """MixupMP loss from Wu & Williamson.
 
         When using the MixupMP transform, the batch returned to the model
-        consists of **mixup-augmented samples** and **original samples** concatenated.
-        The `mixup_ratio` (r) controls the number of mixup samples relative to normal samples
-        produced by the transform:
+        consists of **mixup-augmented samples** followed by **original samples**.
+        The `mixup_ratio` (r) controls the number of mixup samples relative to
+        normal samples produced by the transform:
 
           - r <= 1.0: selects fewer mixup samples,
           - r > 1.0: selects more mixup samples.
 
-        Both mixup and normal samples use cross-entropy but should be **weighted** according to the
-        ratio r.
+        Both branches use cross-entropy (or KL divergence for soft targets)
+        weighted according to the ratio r.
 
         Args:
             mixup_ratio: Ratio of number of mixup samples vs normal samples
                 output by the MixupMP transform. This should match the transform's
-                :attr:`mixup_ratio` hyperparameter. Defaults to ``1.0`` (equal weighting).
+                :attr:`mixup_ratio` hyperparameter. Defaults to ``1.0`` (equal
+                weighting).
             weight: a manual rescaling weight given to each class.
-            ignore_index: Specifies a target value that is ignored
-                and does not contribute to the input gradient. Defaults to ``-100``.
-            reduction: Specifies the reduction to apply to the output: 'none'|'mean'|'sum'.
+            ignore_index: Specifies a target value that is ignored and does not
+                contribute to the input gradient. Only applies to class-index
+                (long) targets. Defaults to ``-100``.
+            reduction: Specifies the reduction to apply to the output:
+                ``'none'`` | ``'mean'`` | ``'sum'``.
+
+        Raises:
+            ValueError: if ``mixup_ratio`` is not strictly positive.
 
         See Also:
             torch_uncertainty/transforms/mixup.py — MixupMP transform implementation.
 
         Reference:
-            "Posterior Uncertainty Quantification in Neural Networks using Data Augmentation"
-            (AISTATS 2024) by Luhuan Wu & Sinead Williamson.
+            "Posterior Uncertainty Quantification in Neural Networks using Data
+            Augmentation" (AISTATS 2024) by Luhuan Wu & Sinead Williamson.
         """
-        super().__init__(weight=weight, ignore_index=ignore_index, reduction=reduction)
         if mixup_ratio <= 0:
-            raise ValueError(f"mixup_ratio must be > 0. Got {mixup_ratio} < 0.")
+            raise ValueError(f"mixup_ratio must be > 0. Got {mixup_ratio}.")
+        super().__init__(weight=weight, ignore_index=ignore_index, reduction=reduction)
         self.mixup_ratio = mixup_ratio
 
-    def forward(self, input: Tensor, target: Tensor) -> Tensor:  # noqa: A002
-        """The mixup transform should arrange outputs as `[mixup, normal]` or
-        `[normal, mixup]` depending on r; this splits them accordingly.
+    def _branch_loss(self, preds: Tensor, targets: Tensor) -> Tensor:
+        """Per-branch loss with empty-slice short-circuit and soft-label dispatch.
 
-        Mixup targets may be soft labels (one-hot float tensor), so we handle
-        that case by manually using F.kl_div if needed.
+        An empty slice contributes a 0-D zero so that whichever branch is empty
+        (depending on ``mixup_ratio``) does not invoke the underlying
+        cross-entropy. torch >= 2.12 validates target dtype even on zero-row
+        inputs, which would otherwise raise ``RuntimeError`` for soft-label
+        batches that fall entirely on the opposite branch.
 
-        Args:
-            input: model logits shape (N_total, num_classes)
-            target: target labels (one-hot or class indices) shape (N_total, ...)
+        Soft (float) targets use KL divergence to match the paper's formulation;
+        class-index (long) targets use the parent class' cross-entropy.
         """
-        # determine how many samples correspond to mixup vs normal
-        mixup_count = round((self.mixup_ratio / (self.mixup_ratio + 1)) * input.size(0))
-
-        # slices: assume mixup first, then normal
-        mixup_preds, mixup_targets = input[:mixup_count], target[:mixup_count]
-        norm_preds, norm_targets = input[mixup_count:], target[mixup_count:]
-
-        # standard cross entropy for normal samples
-        loss_norm = super().forward(norm_preds, norm_targets)
-
-        # mixup may have soft labels
-        if mixup_targets.dtype.is_floating_point:
-            # use KL divergence for soft labels
-            log_prob = F.log_softmax(mixup_preds, dim=-1)
-            loss_mixup = F.kl_div(
+        if preds.size(0) == 0:
+            return preds.new_zeros(())
+        if targets.dtype.is_floating_point:
+            log_prob = F.log_softmax(preds, dim=-1)
+            return F.kl_div(
                 log_prob,
-                mixup_targets,
+                targets,
                 reduction="batchmean" if self.reduction == "mean" else self.reduction,
             )
-        else:
-            loss_mixup = super().forward(mixup_preds, mixup_targets)
+        return super().forward(preds, targets)
+
+    def forward(self, input: Tensor, target: Tensor) -> Tensor:  # noqa: A002
+        """Compute the MixupMP loss.
+
+        The MixupMP transform concatenates ``mixup_count`` mixup-augmented
+        samples followed by the remaining original samples. This loss splits
+        the batch at that boundary and weights the mixup branch by
+        ``mixup_ratio``.
+
+        Args:
+            input: model logits of shape ``(N_total, num_classes)``.
+            target: target labels — either class indices (``long``, shape
+                ``(N_total,)``) or soft labels (``float``, shape
+                ``(N_total, num_classes)``).
+        """
+        mixup_count = round((self.mixup_ratio / (self.mixup_ratio + 1)) * input.size(0))
+
+        loss_mixup = self._branch_loss(input[:mixup_count], target[:mixup_count])
+        loss_norm = self._branch_loss(input[mixup_count:], target[mixup_count:])
 
         # unnormalized as in the paper's implementation
         return self.mixup_ratio * loss_mixup + loss_norm

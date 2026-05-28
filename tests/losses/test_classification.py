@@ -160,14 +160,78 @@ class TestCrossEntropyMaxSupLoss:
 class TestMixupMPLoss:
     """Testing the MixupMPLoss class."""
 
-    def test_main(self) -> None:
-        loss = MixupMPLoss(mixup_ratio=2, reduction="mean")
-        loss(torch.tensor([[0.0, 0.0]]), torch.tensor([0], dtype=torch.long))
-        loss(torch.tensor([[0.0, 0.0]]), torch.tensor([0], dtype=torch.float32))
+    @pytest.mark.parametrize("mixup_ratio", [0.5, 1.0, 2.0])
+    @pytest.mark.parametrize("reduction", ["mean", "sum"])
+    def test_hard_labels(self, mixup_ratio: float, reduction: str) -> None:
+        """Class-index targets produce a finite scalar with a usable gradient."""
+        loss = MixupMPLoss(mixup_ratio=mixup_ratio, reduction=reduction)
+        logits = torch.randn(8, 3, requires_grad=True)
+        targets = torch.tensor([0, 1, 2, 0, 1, 2, 0, 1])
+
+        out = loss(logits, targets)
+
+        assert out.ndim == 0
+        assert torch.isfinite(out)
+        out.backward()
+        assert logits.grad is not None
+        assert torch.isfinite(logits.grad).all()
+
+    @pytest.mark.parametrize("mixup_ratio", [0.5, 1.0, 2.0])
+    @pytest.mark.parametrize("reduction", ["mean", "sum"])
+    def test_soft_labels(self, mixup_ratio: float, reduction: str) -> None:
+        """Soft (float) targets route through KL-div on both branches."""
+        loss = MixupMPLoss(mixup_ratio=mixup_ratio, reduction=reduction)
+        logits = torch.randn(8, 3, requires_grad=True)
+        targets = torch.softmax(torch.randn(8, 3), dim=-1)
+
+        out = loss(logits, targets)
+
+        assert out.ndim == 0
+        assert torch.isfinite(out)
+        out.backward()
+        assert logits.grad is not None
+        assert torch.isfinite(logits.grad).all()
+
+    def test_empty_norm_branch(self) -> None:
+        """When ``mixup_ratio`` consumes the whole batch, the normal slice is
+        empty and must contribute zero without invoking cross-entropy.
+
+        Regression test for the torch >= 2.12 strict dtype validation on empty
+        batches (previously raised ``RuntimeError: expected target dtype to be
+        Long or Byte, but got Float``).
+        """
+        loss = MixupMPLoss(mixup_ratio=2.0)
+        out_hard = loss(torch.tensor([[0.0, 0.0]]), torch.tensor([0], dtype=torch.long))
+        out_soft = loss(torch.tensor([[0.0, 0.0]]), torch.tensor([[1.0, 0.0]]))
+
+        assert torch.isfinite(out_hard)
+        assert torch.isfinite(out_soft)
+
+    def test_empty_mixup_branch(self) -> None:
+        """A small ``mixup_ratio`` leaves the mixup slice empty; the normal
+        branch alone must still produce a finite loss.
+        """
+        loss = MixupMPLoss(mixup_ratio=0.01)
+        out = loss(torch.randn(4, 3), torch.tensor([0, 1, 2, 0]))
+
+        assert torch.isfinite(out)
+
+    def test_equivalent_to_ce_when_all_normal(self) -> None:
+        """With a vanishingly small ratio the whole batch lands on the normal
+        branch, so the loss should match plain cross-entropy (up to the mixup
+        weighting on an empty branch, which is 0).
+        """
+        loss = MixupMPLoss(mixup_ratio=1e-6, reduction="mean")
+        logits = torch.randn(16, 5)
+        targets = torch.randint(0, 5, (16,))
+
+        ours = loss(logits, targets)
+        reference = torch.nn.functional.cross_entropy(logits, targets, reduction="mean")
+
+        assert torch.allclose(ours, reference)
 
     def test_failures(self) -> None:
-        with pytest.raises(
-            ValueError,
-            match=r"mixup_ratio must be > 0. Got ",
-        ):
+        with pytest.raises(ValueError, match=r"mixup_ratio must be > 0\. Got "):
             MixupMPLoss(mixup_ratio=-1)
+        with pytest.raises(ValueError, match=r"mixup_ratio must be > 0\. Got "):
+            MixupMPLoss(mixup_ratio=0)

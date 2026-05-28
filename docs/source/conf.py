@@ -15,7 +15,7 @@ sys.path.insert(0, str(Path("../../").resolve()))
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = "TorchUncertainty"
+project = "TorchUncertaint"
 
 copyright = (  # noqa: A001
     f"{datetime.now().year!s}, Adrien Lafage and Olivier Laurent"
@@ -141,6 +141,7 @@ html_sidebars = {
     "installation": [],
     "quickstart": [],
     "references": [],
+    "evaluation": ["page-toc"],
     "index": [],
     "**": ["sidebar-nav-bs", "sidebar-ethical-ads"],
 }

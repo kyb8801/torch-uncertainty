@@ -223,9 +223,9 @@ class ClassificationRoutine(LightningModule):
             metrics_dict |= {
                 "cls/AUROC": BinaryAUROC(),
                 "cls/AUPR": BinaryAveragePrecision(),
-                "cls/FRP95": FPR95(pos_label=1),
+                "cls/FPR95": FPR95(pos_label=1),
             }
-            groups.extend([["cls/AUROC", "cls/AUPR"], ["cls/FRP95"]])
+            groups.extend([["cls/AUROC", "cls/AUPR"], ["cls/FPR95"]])
 
         cls_metrics = MetricCollection(metrics_dict, compute_groups=groups)
         self.val_cls_metrics = cls_metrics.clone(prefix="val/")
@@ -258,6 +258,7 @@ class ClassificationRoutine(LightningModule):
 
         if self.eval_shift:
             self.test_shift_metrics = cls_metrics.clone(prefix="shift/")
+            self.test_shift_entropy = Entropy()
 
         # metrics for ensembles only
         if self.is_ensemble:
@@ -502,7 +503,6 @@ class ClassificationRoutine(LightningModule):
                 self.test_id_ens_metrics.update(probs_per_est)
 
             if self.eval_ood:
-                self.test_ood_entropy.update(probs)
                 self.test_ood_metrics.update(ood_scores, torch.zeros_like(targets))
 
             if self.id_score_storage is not None:
@@ -512,6 +512,7 @@ class ClassificationRoutine(LightningModule):
                 self.post_cls_metrics.update(pp_probs, targets)
 
         if self.eval_ood and dataloader_idx == 1:
+            self.test_ood_entropy.update(probs)
             self.test_ood_metrics.update(ood_scores, torch.ones_like(targets))
 
             if self.is_ensemble:
@@ -521,7 +522,9 @@ class ClassificationRoutine(LightningModule):
                 self.ood_score_storage.append(ood_scores.detach().cpu())
 
         if self.eval_shift and dataloader_idx == (2 if self.eval_ood else 1):
+            self.test_shift_entropy.update(probs)
             self.test_shift_metrics.update(probs, targets)
+
             if self.is_ensemble:
                 self.test_shift_ens_metrics.update(probs_per_est)
 
@@ -570,6 +573,7 @@ class ClassificationRoutine(LightningModule):
         if self.eval_shift:
             result_dict |= self.test_shift_metrics.compute() | {
                 "shift/severity": self.trainer.datamodule.shift_severity,
+                "shift/Entropy": self.test_shift_entropy.compute(),
             }
 
             if self.is_ensemble:
@@ -608,7 +612,7 @@ class ClassificationRoutine(LightningModule):
     def _plot_results(self):
         """Plot uncertainty quantification metrics."""
         self.logger.experiment.add_figure(
-            "Reliabity diagram", self.test_cls_metrics["cal/ECE"].plot()[0]
+            "Reliability diagram", self.test_cls_metrics["cal/ECE"].plot()[0]
         )
         self.logger.experiment.add_figure(
             "Risk-Coverage curve",
@@ -621,7 +625,7 @@ class ClassificationRoutine(LightningModule):
 
         if self.post_processing is not None and not isinstance(self.post_processing, Conformal):
             self.logger.experiment.add_figure(
-                "Reliabity diagram after calibration",
+                "Reliability diagram after calibration",
                 self.post_cls_metrics["cal/ECE"].plot()[0],
             )
 
