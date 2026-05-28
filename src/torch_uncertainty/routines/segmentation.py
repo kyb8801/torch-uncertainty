@@ -26,6 +26,7 @@ from torch_uncertainty.metrics import (
     CategoricalNLL,
     CovAt5Risk,
     MeanIntersectionOverUnion,
+    PAvPU,
     RiskAt80Cov,
     SegmentationBinaryAUROC,
     SegmentationBinaryAveragePrecision,
@@ -65,6 +66,9 @@ class SegmentationRoutine(LightningModule):
         log_plots: bool = False,
         num_samples_to_plot: int = 3,
         num_bins_calibration_error: int = 15,
+        patch_size: int = 16,
+        acc_threshold: float = 0.5,
+        unc_threshold: float = 0.5,
         save_to_csv: bool = False,
         csv_filename: str = "results.csv",
     ) -> None:
@@ -91,6 +95,9 @@ class SegmentationRoutine(LightningModule):
                 is only used if :attr:`log_plots` is set to ``True``. Defaults to ``3``.
             num_bins_calibration_error: Number of bins to compute calibration error metrics.
                 Defaults to ``15``.
+            patch_size: The size of the patches to compute the PAvPU metric. Defaults to ``16``.
+            acc_threshold: The accuracy threshold to consider a patch as accurate for the PAvPU metric. Defaults to ``0.5``.
+            unc_threshold: The uncertainty threshold to consider a patch as uncertain for the PAvPU metric. Defaults to ``0.5``.
             save_to_csv: Save the results in csv. Defaults to ``False``.
             csv_filename: The name of the csv file to save the results in. Defaults to ``"results.csv"``.
 
@@ -116,6 +123,9 @@ class SegmentationRoutine(LightningModule):
         self.model = model
         self.num_classes = num_classes
         self.num_bins_calibration_error = num_bins_calibration_error
+        self.patch_size = patch_size
+        self.acc_threshold = acc_threshold
+        self.unc_threshold = unc_threshold
         self.loss = loss
         self.needs_epoch_update = isinstance(model, EPOCH_UPDATE_MODEL)
         self.needs_step_update = isinstance(model, STEP_UPDATE_MODEL)
@@ -153,6 +163,16 @@ class SegmentationRoutine(LightningModule):
                 "seg/pixAcc": Accuracy(task="multiclass", num_classes=self.num_classes),
             },
             compute_groups=[["seg/mIoU", "seg/mAcc", "seg/pixAcc"]],
+        )
+        patch_seg_metrics = MetricCollection(
+            {
+                "cal/PAvPU": PAvPU(
+                    patch_size=self.patch_size,
+                    acc_threshold=self.acc_threshold,
+                    unc_threshold=self.unc_threshold,
+                ),
+            },
+            compute_groups=[["cal/PAvPU"]],
         )
         sbsmpl_seg_metrics = MetricCollection(
             {
@@ -194,6 +214,7 @@ class SegmentationRoutine(LightningModule):
             sbsmpl_seg_metrics.clone(prefix="val/"), subsampling_rate=self.metric_subsampling_rate
         )
         self.test_seg_metrics = SegmentationMetric(seg_metrics.clone(prefix="test/"))
+        self.test_patch_seg_metrics = patch_seg_metrics.clone(prefix="test/")
         self.test_sbsmpl_seg_metrics = SegmentationMetric(
             sbsmpl_seg_metrics.clone(prefix="test/"), subsampling_rate=self.metric_subsampling_rate
         )
@@ -348,6 +369,7 @@ class SegmentationRoutine(LightningModule):
 
         if dataloader_idx == 0:
             self.test_seg_metrics.update(probs, targets, ignore_mask=(ignore_mask | ood_mask))
+            self.test_patch_seg_metrics.update(probs, targets, ignore_mask=(ignore_mask | ood_mask))
             self.test_sbsmpl_seg_metrics.update(
                 probs, targets, ignore_mask=(ignore_mask | ood_mask)
             )
@@ -386,6 +408,7 @@ class SegmentationRoutine(LightningModule):
         """Compute, log, and plot the values of the collected metrics in `test_step`."""
         result_dict = self.test_seg_metrics.compute()
         result_dict |= self.test_sbsmpl_seg_metrics.compute()
+        result_dict |= self.test_patch_seg_metrics.compute()
         result_dict |= {
             "test/cplx/flops": self.test_num_flops,
             "test/cplx/params": self.num_params,

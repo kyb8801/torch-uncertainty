@@ -37,6 +37,7 @@ from .segmentation import (
     MeanIntersectionOverUnion,
     PatchedBinaryCalibrationError,
     PatchedMulticlassCalibrationError,
+    PAvPU,
     SegmentationBinaryAUROC,
     SegmentationBinaryAveragePrecision,
     SegmentationFPR95,

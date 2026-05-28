@@ -18,18 +18,23 @@ class PAvPU(Metric):
         self.add_state("inaccurate_certain", default=torch.tensor(0), dist_reduce_fx="sum")
         self.add_state("inaccurate_uncertain", default=torch.tensor(0), dist_reduce_fx="sum")
 
-    def update(self, preds: Tensor, target: Tensor, ignore_mask: Tensor | None = None) -> None:
-        """Update the metric with new predictions and targets.
+    @staticmethod
+    def _squeeze_channel_dim(x: Tensor, name: str) -> Tensor:
+        if x.ndim == 4:
+            if x.size(1) == 1:
+                return x.squeeze(1)
+            raise ValueError(
+                f"Expected {name} to have shape (N, H, W) or (N, 1, H, W), but got {x.shape}"
+            )
+        return x
 
-        Args:
-            preds: Tensor of shape (N, C, H, W) containing the predicted probabilities or logits.
-            target: Tensor of shape (N, H, W) containing the ground truth labels.
-            ignore_mask: Optional tensor of shape (N, H, W) indicating which pixels to ignore.
-        """
+    def _validate_shapes(
+        self, preds: Tensor, target: Tensor, ignore_mask: Tensor | None
+    ) -> tuple[Tensor, Tensor, Tensor]:
         if preds.ndim != 4:
             raise ValueError(f"Expected preds to have shape (N, C, H, W), but got {preds.shape}.")
-        if target.ndim != 3:
-            raise ValueError(f"Expected target to have shape (N, H, W), but got {target.shape}.")
+
+        target = self._squeeze_channel_dim(target, "target")
         if preds.shape[0] != target.shape[0] or preds.shape[-2:] != target.shape[-2:]:
             raise ValueError(
                 "Expected preds and target to have matching batch and spatial dimensions, "
@@ -39,12 +44,25 @@ class PAvPU(Metric):
         if ignore_mask is None:
             valid = torch.ones_like(target, dtype=torch.bool)
         else:
+            ignore_mask = self._squeeze_channel_dim(ignore_mask, "ignore_mask")
             if ignore_mask.shape != target.shape:
                 raise ValueError(
                     "Expected ignore_mask to have shape (N, H, W) matching target, "
                     f"but got ignore_mask={ignore_mask.shape} and target={target.shape}."
                 )
             valid = ~ignore_mask.bool()
+
+        return preds, target, valid
+
+    def update(self, preds: Tensor, target: Tensor, ignore_mask: Tensor | None = None) -> None:
+        """Update the metric with new predictions and targets.
+
+        Args:
+            preds: Tensor of shape (N, C, H, W) containing the predicted probabilities or logits.
+            target: Tensor of shape (N, H, W) or (N, 1, H, W) containing the ground truth labels.
+            ignore_mask: Optional tensor of shape (N, H, W) or (N, 1, H, W) indicating which pixels to ignore.
+        """
+        preds, target, valid = self._validate_shapes(preds, target, ignore_mask)
 
         if not torch.all((preds >= 0) & (preds <= 1)):
             preds = F.softmax(preds, dim=1)
