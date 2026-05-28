@@ -35,8 +35,6 @@ from .regression import (
 )
 from .segmentation import (
     MeanIntersectionOverUnion,
-    PatchedBinaryCalibrationError,
-    PatchedMulticlassCalibrationError,
     PAvPU,
     SegmentationBinaryAUROC,
     SegmentationBinaryAveragePrecision,
