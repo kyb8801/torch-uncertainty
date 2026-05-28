@@ -125,6 +125,61 @@ class TestPAvPU:
         result = metric.compute()
         assert result == torch.tensor(0.75)
 
+    def test_preds_not_4d_raises(self) -> None:
+        metric = PAvPU(patch_size=2)
+        preds = torch.rand(2, 3, 4)  # 3-D, not (N, C, H, W)
+        target = torch.randint(0, 3, (2, 4))
+        with pytest.raises(ValueError, match="preds"):
+            metric.update(preds, target)
+
+    def test_target_4d_multichannel_raises(self) -> None:
+        metric = PAvPU(patch_size=2)
+        preds = torch.rand(2, 3, 4, 4)
+        target = torch.randint(0, 3, (2, 3, 4, 4))  # multi-channel, not squeezable
+        with pytest.raises(ValueError, match="target"):
+            metric.update(preds, target)
+
+    def test_spatial_mismatch_raises(self) -> None:
+        metric = PAvPU(patch_size=2)
+        preds = torch.rand(2, 3, 4, 4)
+        target = torch.randint(0, 3, (2, 8, 8))  # wrong spatial dims
+        with pytest.raises(ValueError, match="matching batch and spatial"):
+            metric.update(preds, target)
+
+    def test_ignore_mask_multichannel_raises(self) -> None:
+        metric = PAvPU(patch_size=2)
+        preds = torch.rand(2, 3, 4, 4)
+        target = torch.randint(0, 3, (2, 4, 4))
+        ignore_mask = torch.zeros(2, 3, 4, 4, dtype=torch.bool)
+        with pytest.raises(ValueError, match="ignore_mask"):
+            metric.update(preds, target, ignore_mask=ignore_mask)
+
+    def test_ignore_mask_shape_mismatch_raises(self) -> None:
+        metric = PAvPU(patch_size=2)
+        preds = torch.rand(2, 3, 4, 4)
+        target = torch.randint(0, 3, (2, 4, 4))
+        ignore_mask = torch.zeros(2, 8, 8, dtype=torch.bool)  # wrong spatial dims
+        with pytest.raises(ValueError, match="ignore_mask"):
+            metric.update(preds, target, ignore_mask=ignore_mask)
+
+    def test_logits_input_applies_softmax(self) -> None:
+        """Logits (containing negatives) should be converted via softmax."""
+        metric = PAvPU(patch_size=2)
+        preds = torch.randn(2, 3, 4, 4)  # may contain values outside [0, 1]
+        target = torch.randint(0, 3, (2, 4, 4))
+        metric.update(preds, target)
+        result = metric.compute()
+        assert result.ndim == 0
+
+    def test_probs_not_summing_to_one(self) -> None:
+        """Probs in [0, 1] but not summing to 1 are used as-is (no softmax applied)."""
+        metric = PAvPU(patch_size=2)
+        preds = torch.full((2, 3, 4, 4), 0.2)  # each channel 0.2, sum=0.6 ≠ 1
+        target = torch.randint(0, 3, (2, 4, 4))
+        metric.update(preds, target)
+        result = metric.compute()
+        assert result.ndim == 0
+
 
 class TestSegmentationMetric:
     def _inner(self, num_classes: int = 3) -> MeanIntersectionOverUnion:
