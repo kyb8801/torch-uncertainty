@@ -1,6 +1,11 @@
+import pytest
 import torch
 
-from torch_uncertainty.metrics.segmentation import PAvPU
+from torch_uncertainty.metrics.segmentation import (
+    MeanIntersectionOverUnion,
+    PAvPU,
+    SegmentationMetric,
+)
 from torch_uncertainty.metrics.segmentation.seg_binary_auroc import SegmentationBinaryAUROC
 from torch_uncertainty.metrics.segmentation.seg_binary_average_precision import (
     SegmentationBinaryAveragePrecision,
@@ -119,3 +124,134 @@ class TestPAvPU:
         metric.update(preds, target)
         result = metric.compute()
         assert result == torch.tensor(0.75)
+
+
+class TestSegmentationMetric:
+    def _inner(self, num_classes: int = 3) -> MeanIntersectionOverUnion:
+        return MeanIntersectionOverUnion(num_classes=num_classes)
+
+    # --- constructor ---
+
+    def test_invalid_subsampling_rate_zero(self) -> None:
+        with pytest.raises(ValueError, match="subsampling_rate"):
+            SegmentationMetric(self._inner(), subsampling_rate=0.0)
+
+    def test_invalid_subsampling_rate_negative(self) -> None:
+        with pytest.raises(ValueError, match="subsampling_rate"):
+            SegmentationMetric(self._inner(), subsampling_rate=-0.5)
+
+    def test_invalid_subsampling_rate_above_one(self) -> None:
+        with pytest.raises(ValueError, match="subsampling_rate"):
+            SegmentationMetric(self._inner(), subsampling_rate=1.1)
+
+    def test_valid_subsampling_rate_boundary(self) -> None:
+        metric = SegmentationMetric(self._inner(), subsampling_rate=1.0)
+        assert metric.subsampling_rate == 1.0
+
+    def test_valid_subsampling_rate_none(self) -> None:
+        metric = SegmentationMetric(self._inner(), subsampling_rate=None)
+        assert metric.subsampling_rate is None
+
+    # --- update: target shapes ---
+
+    def test_update_target_3d(self) -> None:
+        metric = SegmentationMetric(self._inner())
+        preds = torch.rand(2, 3, 4, 4)
+        target = torch.randint(0, 3, (2, 4, 4))
+        metric.update(preds, target)
+        result = metric.compute()
+        assert result.ndim == 0
+
+    def test_update_target_4d_single_channel(self) -> None:
+        metric = SegmentationMetric(self._inner())
+        preds = torch.rand(2, 3, 4, 4)
+        target = torch.randint(0, 3, (2, 1, 4, 4))
+        metric.update(preds, target)
+        result = metric.compute()
+        assert result.ndim == 0
+
+    def test_update_target_4d_multichannel_raises(self) -> None:
+        metric = SegmentationMetric(self._inner())
+        preds = torch.rand(2, 3, 4, 4)
+        target = torch.randint(0, 3, (2, 3, 4, 4))
+        with pytest.raises(ValueError, match="Expected target"):
+            metric.update(preds, target)
+
+    # --- update: ignore_mask shapes ---
+
+    def test_update_with_ignore_mask_3d(self) -> None:
+        metric = SegmentationMetric(self._inner())
+        preds = torch.rand(2, 3, 4, 4)
+        target = torch.randint(0, 3, (2, 4, 4))
+        ignore_mask = torch.zeros(2, 4, 4, dtype=torch.bool)
+        ignore_mask[:, :2, :] = True
+        metric.update(preds, target, ignore_mask=ignore_mask)
+        result = metric.compute()
+        assert result.ndim == 0
+
+    def test_update_with_ignore_mask_4d_single_channel(self) -> None:
+        metric = SegmentationMetric(self._inner())
+        preds = torch.rand(2, 3, 4, 4)
+        target = torch.randint(0, 3, (2, 4, 4))
+        ignore_mask = torch.zeros(2, 1, 4, 4, dtype=torch.bool)
+        metric.update(preds, target, ignore_mask=ignore_mask)
+        result = metric.compute()
+        assert result.ndim == 0
+
+    def test_update_with_ignore_mask_4d_multichannel_raises(self) -> None:
+        metric = SegmentationMetric(self._inner())
+        preds = torch.rand(2, 3, 4, 4)
+        target = torch.randint(0, 3, (2, 4, 4))
+        ignore_mask = torch.zeros(2, 3, 4, 4, dtype=torch.bool)
+        with pytest.raises(ValueError, match="Expected ignore_mask"):
+            metric.update(preds, target, ignore_mask=ignore_mask)
+
+    # --- subsampling ---
+
+    def test_update_with_subsampling(self) -> None:
+        metric = SegmentationMetric(self._inner(), subsampling_rate=0.5)
+        preds = torch.rand(2, 3, 8, 8)
+        target = torch.randint(0, 3, (2, 8, 8))
+        metric.update(preds, target)
+        result = metric.compute()
+        assert result.ndim == 0
+
+    def test_update_with_subsampling_and_ignore_mask(self) -> None:
+        metric = SegmentationMetric(self._inner(), subsampling_rate=0.5)
+        preds = torch.rand(2, 3, 8, 8)
+        target = torch.randint(0, 3, (2, 8, 8))
+        ignore_mask = torch.zeros(2, 8, 8, dtype=torch.bool)
+        ignore_mask[:, :4, :] = True
+        metric.update(preds, target, ignore_mask=ignore_mask)
+        result = metric.compute()
+        assert result.ndim == 0
+
+    # --- compute / reset delegation ---
+
+    def test_compute_delegates_to_inner_metric(self) -> None:
+        inner = self._inner()
+        metric = SegmentationMetric(inner)
+        preds = torch.rand(2, 3, 4, 4)
+        target = torch.randint(0, 3, (2, 4, 4))
+        metric.update(preds, target)
+        assert torch.equal(metric.compute(), inner.compute())
+
+    def test_reset_clears_inner_metric(self) -> None:
+        metric = SegmentationMetric(self._inner())
+        preds = torch.rand(2, 3, 4, 4)
+        target = torch.randint(0, 3, (2, 4, 4))
+        metric.update(preds, target)
+        result_before = metric.compute()
+        metric.reset()
+        metric.update(preds, target)
+        result_after = metric.compute()
+        assert torch.isclose(result_before, result_after)
+
+    def test_multiple_updates(self) -> None:
+        metric = SegmentationMetric(self._inner())
+        for _ in range(3):
+            preds = torch.rand(2, 3, 4, 4)
+            target = torch.randint(0, 3, (2, 4, 4))
+            metric.update(preds, target)
+        result = metric.compute()
+        assert 0.0 <= result.item() <= 1.0
