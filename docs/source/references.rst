@@ -276,6 +276,18 @@ For ZERO, consider citing:
 Post-Processing Methods
 -----------------------
 
+DEUP (Direct Epistemic Uncertainty Prediction)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+For DEUP post-processing, consider citing:
+
+**DEUP: Direct Epistemic Uncertainty Prediction**
+
+* Authors: *Salem Lahlou, Moksh Jain, Hadi Nekoei, Victor Ion Butoi, Paul Bertin, Jarrid Rector-Brooks, Maksym Korablyov, and Yoshua Bengio*
+* Paper: `TMLR 2023 <https://openreview.net/forum?id=eGLdVRvvfQ>`__.
+
+For the standalone sklearn/time-series implementation, see `deup <https://github.com/ursinasanderink/deup>`__.
+
 Temperature, Vector, & Matrix scaling
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

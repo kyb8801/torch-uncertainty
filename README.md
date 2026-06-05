@@ -88,6 +88,7 @@ To date, the following post-processing methods have been implemented:
 - [Temperature, Vector, Matrix scaling, & Dirichlet calibration](https://torch-uncertainty.github.io/auto_tutorials/Post_Hoc_Methods/tutorial_temperature.html)
 - [Histogram binning, isotonic regression, and Bayesian binning into quantiles](https://torch-uncertainty.github.io/auto_tutorials/Post_Hoc_Methods/tutorial_scalers.html)
 - [Conformal Predictions](https://torch-uncertainty.github.io/auto_tutorials/Post_Hoc_Methods/tutorial_conformal.html) with APS and RAPS
+- [DEUP (Direct Epistemic Uncertainty Prediction)](https://github.com/ursinasanderink/deup) — error-predictor post-hoc epistemic scores
 - [Monte Carlo Batch Normalization](https://torch-uncertainty.github.io/auto_tutorials/Bayesian_Methods/tutorial_mc_batch_norm.html)
 - Laplace approximation through the [Laplace library](https://github.com/aleximmer/Laplace)
 
