@@ -40,7 +40,6 @@ routine:
 data:
   root: ./data
   batch_size: 128
-  dataset_name: boston
 optimizer:
   class_path: torch.optim.Adam
   init_args:
