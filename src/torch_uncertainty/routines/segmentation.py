@@ -1,6 +1,5 @@
 import logging
 from collections.abc import Callable
-from pathlib import Path
 
 import torch
 from einops import rearrange
@@ -38,7 +37,7 @@ from torch_uncertainty.ood_criteria import (
     get_ood_criterion,
 )
 from torch_uncertainty.post_processing import PostProcessing
-from torch_uncertainty.utils import csv_writer
+from torch_uncertainty.utils import csv_writer, get_logger_dir, log_figure
 from torch_uncertainty.utils.plotting import show_segmentation_predictions
 
 
@@ -177,14 +176,14 @@ class SegmentationRoutine(LightningModule):
                 "cal/SmECE": SmoothCalibrationError(),
                 "sc/AURC": AURC(),
                 "sc/AUGRC": AUGRC(),
-                "sc/Cov@5Risk": CovAt5Risk(),
-                "sc/Risk@80Cov": RiskAt80Cov(),
+                "sc/Cov_5Risk": CovAt5Risk(),
+                "sc/Risk_80Cov": RiskAt80Cov(),
             },
             compute_groups=[
                 ["seg/Brier"],
                 ["seg/NLL"],
                 ["cal/ECE", "cal/SmECE", "cal/MCE", "cal/aECE"],
-                ["sc/AURC", "sc/AUGRC", "sc/Cov@5Risk", "sc/Risk@80Cov"],
+                ["sc/AURC", "sc/AUGRC", "sc/Cov_5Risk", "sc/Risk_80Cov"],
             ],
         )
 
@@ -407,22 +406,25 @@ class SegmentationRoutine(LightningModule):
             self.test_ood_metrics.reset()
 
         if self.save_to_csv and self.logger is not None:
-            csv_writer(
-                Path(self.logger.log_dir) / self.csv_filename,
-                result_dict,
-            )
+            log_dir = get_logger_dir(self.logger)
+            if log_dir is not None:
+                log_dir.mkdir(parents=True, exist_ok=True)
+                csv_writer(log_dir / self.csv_filename, result_dict)
 
     def _plot_results(self):
         """Plot uncertainty quantification metrics and segmentation figures."""
-        self.logger.experiment.add_figure(
+        log_figure(
+            self.logger,
             "Calibration/Reliability diagram",
             self.test_sbsmpl_seg_metrics["cal/ECE"].plot()[0],
         )
-        self.logger.experiment.add_figure(
+        log_figure(
+            self.logger,
             "Selective Classification/Risk-Coverage curve",
             self.test_sbsmpl_seg_metrics["sc/AURC"].plot()[0],
         )
-        self.logger.experiment.add_figure(
+        log_figure(
+            self.logger,
             "Selective Classification/Generalized Risk-Coverage curve",
             self.test_sbsmpl_seg_metrics["sc/AUGRC"].plot()[0],
         )
@@ -449,7 +451,8 @@ class SegmentationRoutine(LightningModule):
             pred_mask = draw_segmentation_masks(img, pred, alpha=0.7, colors=color_palette)
             gt_mask = draw_segmentation_masks(img, tgt, alpha=0.7, colors=color_palette)
 
-            self.logger.experiment.add_figure(
+            log_figure(
+                self.logger,
                 f"Segmentation results/{i}",
                 show_segmentation_predictions(pred_mask, gt_mask),
             )
