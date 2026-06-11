@@ -9,7 +9,7 @@ trainer:
     class_path: lightning.pytorch.loggers.MLFlowLogger
     init_args:
       experiment_name: standard
-      tracking_uri: file:logs/muad-small/unet
+      tracking_uri: sqlite:///logs/muad-small/unet
   callbacks:
     - class_path: torch_uncertainty.callbacks.TUSegCheckpoint
     - class_path: lightning.pytorch.callbacks.LearningRateMonitor

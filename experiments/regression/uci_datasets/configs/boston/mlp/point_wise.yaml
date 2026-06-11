@@ -10,7 +10,7 @@ trainer:
     class_path: lightning.pytorch.loggers.MLFlowLogger
     init_args:
       experiment_name: standard
-      tracking_uri: file:logs/boston/mlp/point_wise
+      tracking_uri: sqlite:///logs/boston/mlp/point_wise
   callbacks:
     - class_path: torch_uncertainty.callbacks.TURegCheckpoint
     - class_path: lightning.pytorch.callbacks.LearningRateMonitor

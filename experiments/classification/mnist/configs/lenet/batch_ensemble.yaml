@@ -11,7 +11,7 @@ trainer:
     class_path: lightning.pytorch.loggers.MLFlowLogger
     init_args:
       experiment_name: batch_ensemble
-      tracking_uri: file:logs/lenet_trajectory
+      tracking_uri: sqlite:///logs/lenet_trajectory
   callbacks:
     - class_path: torch_uncertainty.callbacks.TUClsCheckpoint
     - class_path: lightning.pytorch.callbacks.LearningRateMonitor
