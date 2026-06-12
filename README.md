@@ -97,6 +97,7 @@ The following metrics have been implemented (see the [Evaluating Models](https:/
 
 - proper scores: Brier score, Categorical NLL, distribution NLL
 - out-of-distribution detection: AUROC, AUPR, FPR95
+- selective classification with OOD: SCOD-AURC, SCOD-AUGRC, SCOD-CovAt5%Risk, SCOD-RiskAt80%Cov
 - calibration: ECE with improved reliability diagrams, SmoothECE, Adaptive ECE, Classwise ECE, and QuantileCalibrationError for regression
 - selective classification: AURC, AUGRC, CovAt5%Risk, RiskAt80%Cov
 - conformal predictions: CoverageRate, SetSize

@@ -89,6 +89,18 @@ class TestSegmentation:
         model(dm.get_test_set()[0][0])
 
     def test_segmentation_errors(self) -> None:
+        routine = SegmentationRoutine(
+            model=nn.Identity(),
+            num_classes=2,
+            loss=nn.CrossEntropyLoss(),
+            eval_ood=True,
+        )
+        assert routine.test_ood_metrics.prefix == "ood/"
+        assert "scod/AURC" in routine.test_ood_metrics
+        assert "scod/AUGRC" in routine.test_ood_metrics
+        assert "scod/Cov_5Risk" in routine.test_ood_metrics
+        assert "scod/Risk_80Cov" in routine.test_ood_metrics
+
         with pytest.raises(ValueError, match=r"num_classes must be at least 2, got"):
             SegmentationRoutine(model=nn.Identity(), num_classes=1, loss=nn.CrossEntropyLoss())
 
