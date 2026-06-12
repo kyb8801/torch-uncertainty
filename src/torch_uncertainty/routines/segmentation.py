@@ -66,9 +66,9 @@ class SegmentationRoutine(LightningModule):
         log_plots: bool = False,
         num_samples_to_plot: int = 3,
         num_bins_calibration_error: int = 15,
-        patch_size: int = 16,
-        acc_threshold: float = 0.5,
-        unc_threshold: float = 0.5,
+        pavpu_patch_size: int = 16,
+        pavpu_acc_threshold: float = 0.5,
+        pavpu_unc_threshold: float = 0.5,
         save_to_csv: bool = False,
         csv_filename: str = "results.csv",
     ) -> None:
@@ -95,9 +95,9 @@ class SegmentationRoutine(LightningModule):
                 is only used if :attr:`log_plots` is set to ``True``. Defaults to ``3``.
             num_bins_calibration_error: Number of bins to compute calibration error metrics.
                 Defaults to ``15``.
-            patch_size: The size of the patches to compute the PAvPU metric. Defaults to ``16``.
-            acc_threshold: The accuracy threshold to consider a patch as accurate for the PAvPU metric. Defaults to ``0.5``.
-            unc_threshold: The uncertainty threshold to consider a patch as uncertain for the PAvPU metric. Defaults to ``0.5``.
+            pavpu_patch_size: The size of the patches to compute the PAvPU metric. Defaults to ``16``.
+            pavpu_acc_threshold: The accuracy threshold to consider a patch as accurate for the PAvPU metric. Defaults to ``0.5``.
+            pavpu_unc_threshold: The uncertainty threshold to consider a patch as uncertain for the PAvPU metric. Defaults to ``0.5``.
             save_to_csv: Save the results in csv. Defaults to ``False``.
             csv_filename: The name of the csv file to save the results in. Defaults to ``"results.csv"``.
 
@@ -123,9 +123,9 @@ class SegmentationRoutine(LightningModule):
         self.model = model
         self.num_classes = num_classes
         self.num_bins_calibration_error = num_bins_calibration_error
-        self.patch_size = patch_size
-        self.acc_threshold = acc_threshold
-        self.unc_threshold = unc_threshold
+        self.pavpu_patch_size = pavpu_patch_size
+        self.pavpu_acc_threshold = pavpu_acc_threshold
+        self.pavpu_unc_threshold = pavpu_unc_threshold
         self.loss = loss
         self.needs_epoch_update = isinstance(model, EPOCH_UPDATE_MODEL)
         self.needs_step_update = isinstance(model, STEP_UPDATE_MODEL)
@@ -167,9 +167,9 @@ class SegmentationRoutine(LightningModule):
         patch_seg_metrics = MetricCollection(
             {
                 "cal/PAvPU": PAvPU(
-                    patch_size=self.patch_size,
-                    acc_threshold=self.acc_threshold,
-                    unc_threshold=self.unc_threshold,
+                    patch_size=self.pavpu_patch_size,
+                    acc_threshold=self.pavpu_acc_threshold,
+                    unc_threshold=self.pavpu_unc_threshold,
                 ),
             },
             compute_groups=[["cal/PAvPU"]],
@@ -227,7 +227,7 @@ class SegmentationRoutine(LightningModule):
                     "FPR95": SegmentationFPR95(pos_label=1),
                 }
             )
-            self.test_ood_metrics = SegmentationMetric(ood_metrics.clone(prefix="ood/"))
+            self.test_ood_metrics = ood_metrics.clone(prefix="ood/")
 
     def configure_optimizers(self) -> OptimizerLRScheduler:
         return self.optim_recipe
@@ -337,6 +337,9 @@ class SegmentationRoutine(LightningModule):
         """
         img, targets = batch
 
+        if targets.ndim == 4 and targets.size(1) == 1:
+            targets = targets.squeeze(1)
+
         if self.test_num_flops is None:
             flop_counter = FlopCounterMode(display=False)
             with flop_counter:
@@ -376,9 +379,13 @@ class SegmentationRoutine(LightningModule):
 
         if self.eval_ood and dataloader_idx == 1:
             if self.ood_criterion.input_type == OODCriterionInputType.PROB:
-                ood_scores = self.ood_criterion(probs)
+                ood_scores = self.ood_criterion(
+                    rearrange(probs, "b c h w -> b h w c")[~ignore_mask]
+                )
             elif self.ood_criterion.input_type == OODCriterionInputType.ESTIMATOR_PROB:
-                ood_scores = self.ood_criterion(probs_per_est)
+                ood_scores = self.ood_criterion(
+                    rearrange(probs_per_est, "b m c h w -> b h w m c")[~ignore_mask]
+                )
             else:
                 raise ValueError(
                     f"Unsupported input type for OOD criterion: {self.ood_criterion.input_type}"
@@ -388,7 +395,7 @@ class SegmentationRoutine(LightningModule):
             labels[id_mask] = 0  # ID examples
             labels[ood_mask] = 1  # OOD examples
 
-            self.test_ood_metrics.update(ood_scores, labels, ignore_mask=ignore_mask)
+            self.test_ood_metrics.update(ood_scores, labels[~ignore_mask])
 
     def on_validation_epoch_end(self) -> None:
         """Compute and log the values of the collected metrics in `validation_step`."""
@@ -423,6 +430,7 @@ class SegmentationRoutine(LightningModule):
 
         self.test_seg_metrics.reset()
         self.test_sbsmpl_seg_metrics.reset()
+        self.test_patch_seg_metrics.reset()
         if self.eval_ood:
             self.test_ood_metrics.reset()
 

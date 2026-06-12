@@ -48,7 +48,7 @@ class SegmentationMetric(Metric):
             # Subsample the pixels to speed up the computation of the metric
             total_size = target.numel()
             subsample_size = int(total_size * self.subsampling_rate)
-            subsample_indices = torch.randperm(total_size)[:subsample_size]
+            subsample_indices = torch.randperm(total_size, device=target.device)[:subsample_size]
             subsample_mask = torch.zeros_like(target, dtype=torch.bool).view(-1)
             subsample_mask[subsample_indices] = True
             subsample_mask = subsample_mask.view_as(target)

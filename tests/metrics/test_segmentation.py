@@ -165,7 +165,7 @@ class TestPAvPU:
     def test_logits_input_applies_softmax(self) -> None:
         """Logits (containing negatives) should be converted via softmax."""
         metric = PAvPU(patch_size=2)
-        preds = torch.randn(2, 3, 4, 4)  # may contain values outside [0, 1]
+        preds = torch.randn(2, 3, 4, 4)  # may contain values not in [0, 1]
         target = torch.randint(0, 3, (2, 4, 4))
         metric.update(preds, target)
         result = metric.compute()

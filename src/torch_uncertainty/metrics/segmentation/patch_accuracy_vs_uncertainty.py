@@ -2,9 +2,19 @@ import torch
 import torch.nn.functional as F
 from torch import Tensor
 from torchmetrics import Metric
+from torchmetrics.utilities import rank_zero_warn
 
 
 class PAvPU(Metric):
+    is_differentiable = False
+    higher_is_better = True
+    full_state_update = False
+
+    accurate_certain: Tensor
+    accurate_uncertain: Tensor
+    inaccurate_certain: Tensor
+    inaccurate_uncertain: Tensor
+
     def __init__(
         self, patch_size: int, acc_threshold: float = 0.5, unc_threshold: float = 0.5
     ) -> None:
@@ -66,6 +76,10 @@ class PAvPU(Metric):
 
         if not torch.all((preds >= 0) & (preds <= 1)):
             preds = F.softmax(preds, dim=1)
+            rank_zero_warn(
+                "Preds do not seem to be probabilities in the range [0, 1]."
+                " Applying softmax to convert logits to probabilities."
+            )
 
         hard_preds = preds.argmax(dim=1)
         acc_map = (hard_preds == target).float()
@@ -73,6 +87,7 @@ class PAvPU(Metric):
 
         ps = self.patch_size
         valid_f = valid.float().unsqueeze(1)
+        # Compute patch statistics
         pooled_valid = F.avg_pool2d(
             valid_f,
             kernel_size=ps,
