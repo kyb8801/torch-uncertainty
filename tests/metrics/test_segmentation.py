@@ -125,6 +125,16 @@ class TestPAvPU:
         result = metric.compute()
         assert result == torch.tensor(0.75)
 
+    def test_single_channel_target_and_mask_squeezed(self) -> None:
+        """Single-channel (N, 1, H, W) target and ignore_mask should be squeezed."""
+        metric = PAvPU(patch_size=2)
+        preds = torch.rand(2, 3, 4, 4)
+        target = torch.randint(0, 3, (2, 1, 4, 4))
+        ignore_mask = torch.zeros(2, 1, 4, 4, dtype=torch.bool)
+        metric.update(preds, target, ignore_mask=ignore_mask)
+        result = metric.compute()
+        assert result.ndim == 0
+
     def test_preds_not_4d_raises(self) -> None:
         metric = PAvPU(patch_size=2)
         preds = torch.rand(2, 3, 4)  # 3-D, not (N, C, H, W)

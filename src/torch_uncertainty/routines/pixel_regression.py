@@ -396,8 +396,8 @@ class PixelRegressionRoutine(LightningModule):
             all_imgs = []
             for i in range(inputs.size(0)):
                 img = F.normalize(inputs[i, ...].cpu(), **self.inv_norm_params)
-                pred = colorize(preds[i, 0, ...].cpu(), vmin=0, vmax=self.model.max_depth)
-                tgt = colorize(target[i, 0, ...].cpu(), vmin=0, vmax=self.model.max_depth)
+                pred = colorize(preds[i, ..., 0].cpu(), vmin=0, vmax=self.model.max_depth)
+                tgt = colorize(target[i, ..., 0].cpu(), vmin=0, vmax=self.model.max_depth)
                 all_imgs.extend([img, pred, tgt])
 
             grid = make_grid(torch.stack(all_imgs, dim=0), nrow=3)
