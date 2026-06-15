@@ -97,6 +97,7 @@ The following metrics have been implemented (see the [Evaluating Models](https:/
 
 - proper scores: Brier score, Categorical NLL, distribution NLL
 - out-of-distribution detection: AUROC, AUPR, FPR95
+- selective classification with OOD: SCOD-AURC, SCOD-AUGRC, SCOD-CovAt5%Risk, SCOD-RiskAt80%Cov
 - calibration: ECE with improved reliability diagrams, SmoothECE, Adaptive ECE, Classwise ECE, and QuantileCalibrationError for regression
 - selective classification: AURC, AUGRC, CovAt5%Risk, RiskAt80%Cov
 - conformal predictions: CoverageRate, SetSize
@@ -119,6 +120,8 @@ Check out all our tutorials at [torch-uncertainty.github.io/auto_tutorials](http
 ## Experiments
 
 We provide some configuration files in the `experiments` folder. You may find more examples in other repositories related to the Torch-Uncertainty organization, such as the [Packed-Ensembles reproducibility repo.](https://github.com/torch-uncertainty/packed-ensembles-ICLR-experiments) or the [Torch-Uncertainty reproducibility repo](https://github.com/torch-uncertainty/torch-uncertainty-neurIPS-experiments).
+
+Experiment results are tracked with [MLflow](https://mlflow.org). After running an experiment, launch `mlflow ui` (or `mlflow ui --backend-store-uri sqlite:///logs/<name>` for the SQLite configs) and open `http://localhost:5000` to compare runs, inspect metric curves, and browse logged artifacts. See the [MLflow Guide](https://torch-uncertainty.github.io/mlflow_guide.html) for full details.
 
 ## :telescope: Projects using TorchUncertainty
 

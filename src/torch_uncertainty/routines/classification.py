@@ -1,5 +1,4 @@
 from collections.abc import Callable
-from pathlib import Path
 
 import torch
 import torch.nn.functional as F
@@ -24,6 +23,8 @@ from torch_uncertainty.metrics import (
     AUGRC,
     AURC,
     FPR95,
+    SCODAUGRC,
+    SCODAURC,
     BrierScore,
     CalibrationError,
     CategoricalNLL,
@@ -34,6 +35,8 @@ from torch_uncertainty.metrics import (
     GroupingLoss,
     MutualInformation,
     RiskAt80Cov,
+    SCODCovAt5Risk,
+    SCODRiskAt80Cov,
     SetSize,
     SmoothCalibrationError,
 )
@@ -45,7 +48,7 @@ from torch_uncertainty.ood_criteria import (
 )
 from torch_uncertainty.post_processing import Conformal, LaplaceApprox, PostProcessing
 from torch_uncertainty.transforms import MIXUP_PARAMS, RepeatTarget, build_mixup
-from torch_uncertainty.utils import csv_writer, plot_hist
+from torch_uncertainty.utils import csv_writer, get_logger_dir, log_figure, plot_hist
 
 
 class ClassificationRoutine(LightningModule):
@@ -208,15 +211,15 @@ class ClassificationRoutine(LightningModule):
             "cal/SmECE": SmoothCalibrationError(),
             "sc/AURC": AURC(),
             "sc/AUGRC": AUGRC(),
-            "sc/Cov@5Risk": CovAt5Risk(),
-            "sc/Risk@80Cov": RiskAt80Cov(),
+            "sc/Cov_5Risk": CovAt5Risk(),
+            "sc/Risk_80Cov": RiskAt80Cov(),
         }
         groups = [
             ["cls/Acc"],
             ["cls/Brier"],
             ["cls/NLL"],
             ["cal/ECE", "cal/SmECE", "cal/MCE", "cal/aECE"],
-            ["sc/AURC", "sc/AUGRC", "sc/Cov@5Risk", "sc/Risk@80Cov"],
+            ["sc/AURC", "sc/AUGRC", "sc/Cov_5Risk", "sc/Risk_80Cov"],
         ]
 
         if self.binary_cls:
@@ -250,8 +253,16 @@ class ClassificationRoutine(LightningModule):
                     "AUROC": BinaryAUROC(),
                     "AUPR": BinaryAveragePrecision(),
                     "FPR95": FPR95(pos_label=1),
+                    "SCOD_AURC": SCODAURC(),
+                    "SCOD_AUGRC": SCODAUGRC(),
+                    "SCOD_Cov_5Risk": SCODCovAt5Risk(),
+                    "SCOD_Risk_80Cov": SCODRiskAt80Cov(),
                 },
-                compute_groups=[["AUROC", "AUPR"], ["FPR95"]],
+                compute_groups=[
+                    ["AUROC", "AUPR"],
+                    ["FPR95"],
+                    ["SCOD_AURC", "SCOD_AUGRC", "SCOD_Cov_5Risk", "SCOD_Risk_80Cov"],
+                ],
             )
             self.test_ood_metrics = ood_metrics.clone(prefix="ood/")
             self.test_ood_entropy = Entropy()
@@ -321,7 +332,7 @@ class ClassificationRoutine(LightningModule):
         return self.optim_recipe
 
     def on_train_start(self) -> None:  # coverage: ignore
-        """Put the hyperparameters in tensorboard."""
+        """Log the hyperparameters."""
         if self.loss is None:
             raise ValueError(
                 "To train a model, you must specify the `loss` argument in the routine. Got None."
@@ -604,27 +615,24 @@ class ClassificationRoutine(LightningModule):
                 self.test_shift_ens_metrics.reset()
 
         if self.save_to_csv and self.logger is not None:
-            csv_writer(
-                Path(self.logger.log_dir) / self.csv_filename,
-                result_dict,
-            )
+            log_dir = get_logger_dir(self.logger)
+            if log_dir is not None:
+                log_dir.mkdir(parents=True, exist_ok=True)
+                csv_writer(log_dir / self.csv_filename, result_dict)
 
     def _plot_results(self):
         """Plot uncertainty quantification metrics."""
-        self.logger.experiment.add_figure(
-            "Reliability diagram", self.test_cls_metrics["cal/ECE"].plot()[0]
-        )
-        self.logger.experiment.add_figure(
-            "Risk-Coverage curve",
-            self.test_cls_metrics["sc/AURC"].plot()[0],
-        )
-        self.logger.experiment.add_figure(
+        log_figure(self.logger, "Reliability diagram", self.test_cls_metrics["cal/ECE"].plot()[0])
+        log_figure(self.logger, "Risk-Coverage curve", self.test_cls_metrics["sc/AURC"].plot()[0])
+        log_figure(
+            self.logger,
             "Generalized Risk-Coverage curve",
             self.test_cls_metrics["sc/AUGRC"].plot()[0],
         )
 
         if self.post_processing is not None and not isinstance(self.post_processing, Conformal):
-            self.logger.experiment.add_figure(
+            log_figure(
+                self.logger,
                 "Reliability diagram after calibration",
                 self.post_cls_metrics["cal/ECE"].plot()[0],
             )
@@ -639,7 +647,7 @@ class ClassificationRoutine(LightningModule):
                 20,
                 "Histogram of the OOD scores",
             )[0]
-            self.logger.experiment.add_figure("OOD Score Histogram", score_fig)
+            log_figure(self.logger, "OOD Score Histogram", score_fig)
 
 
 def _classification_routine_checks(
