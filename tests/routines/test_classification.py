@@ -440,7 +440,7 @@ class TestClassification:
             eval_ood=True,
         )
         assert routine.test_ood_metrics.prefix == "ood/"
-        assert "scod_AURC" in routine.test_ood_metrics
+        assert "SCOD_AURC" in routine.test_ood_metrics
         assert "SCOD_AUGRC" in routine.test_ood_metrics
         assert "SCOD_Cov_5Risk" in routine.test_ood_metrics
         assert "SCOD_Risk_80Cov" in routine.test_ood_metrics
