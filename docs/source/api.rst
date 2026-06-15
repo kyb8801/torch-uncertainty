@@ -519,7 +519,7 @@ Regression
     :nosignatures:
     :template: class.rst
 
-    UCIRegressionDataModule
+    TabularRegressionDataModule
 
 .. currentmodule:: torch_uncertainty.datamodules.segmentation
 
@@ -602,7 +602,7 @@ Regression
     :nosignatures:
     :template: class.rst
 
-    UCIRegression
+    TabularRegressionDataset
 
 Segmentation
 ^^^^^^^^^^^^
