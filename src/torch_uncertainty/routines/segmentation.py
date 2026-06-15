@@ -202,10 +202,10 @@ class SegmentationRoutine(LightningModule):
                     "AUROC": SegmentationBinaryAUROC(),
                     "AUPR": SegmentationBinaryAveragePrecision(),
                     "FPR95": SegmentationFPR95(pos_label=1),
-                    "scod/AURC": SCODAURC(),
-                    "scod/AUGRC": SCODAUGRC(),
-                    "scod/Cov_5Risk": SCODCovAt5Risk(),
-                    "scod/Risk_80Cov": SCODRiskAt80Cov(),
+                    "SCOD_AURC": SCODAURC(),
+                    "SCOD_AUGRC": SCODAUGRC(),
+                    "SCOD_Cov_5Risk": SCODCovAt5Risk(),
+                    "SCOD_Risk_80Cov": SCODRiskAt80Cov(),
                 }
             )
             self.test_ood_metrics = ood_metrics.clone(prefix="ood/")
