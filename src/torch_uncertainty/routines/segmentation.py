@@ -25,10 +25,12 @@ from torch_uncertainty.metrics import (
     CategoricalNLL,
     CovAt5Risk,
     MeanIntersectionOverUnion,
+    PAvPU,
     RiskAt80Cov,
     SegmentationBinaryAUROC,
     SegmentationBinaryAveragePrecision,
     SegmentationFPR95,
+    SegmentationMetric,
     SmoothCalibrationError,
 )
 from torch_uncertainty.ood_criteria import (
@@ -63,6 +65,9 @@ class SegmentationRoutine(LightningModule):
         log_plots: bool = False,
         num_samples_to_plot: int = 3,
         num_bins_calibration_error: int = 15,
+        pavpu_patch_size: int = 16,
+        pavpu_acc_threshold: float = 0.5,
+        pavpu_unc_threshold: float = 0.5,
         save_to_csv: bool = False,
         csv_filename: str = "results.csv",
     ) -> None:
@@ -89,6 +94,9 @@ class SegmentationRoutine(LightningModule):
                 is only used if :attr:`log_plots` is set to ``True``. Defaults to ``3``.
             num_bins_calibration_error: Number of bins to compute calibration error metrics.
                 Defaults to ``15``.
+            pavpu_patch_size: The size of the patches to compute the PAvPU metric. Defaults to ``16``.
+            pavpu_acc_threshold: The accuracy threshold to consider a patch as accurate for the PAvPU metric. Defaults to ``0.5``.
+            pavpu_unc_threshold: The uncertainty threshold to consider a patch as uncertain for the PAvPU metric. Defaults to ``0.5``.
             save_to_csv: Save the results in csv. Defaults to ``False``.
             csv_filename: The name of the csv file to save the results in. Defaults to ``"results.csv"``.
 
@@ -114,6 +122,9 @@ class SegmentationRoutine(LightningModule):
         self.model = model
         self.num_classes = num_classes
         self.num_bins_calibration_error = num_bins_calibration_error
+        self.pavpu_patch_size = pavpu_patch_size
+        self.pavpu_acc_threshold = pavpu_acc_threshold
+        self.pavpu_unc_threshold = pavpu_unc_threshold
         self.loss = loss
         self.needs_epoch_update = isinstance(model, EPOCH_UPDATE_MODEL)
         self.needs_step_update = isinstance(model, STEP_UPDATE_MODEL)
@@ -152,6 +163,16 @@ class SegmentationRoutine(LightningModule):
             },
             compute_groups=[["seg/mIoU", "seg/mAcc", "seg/pixAcc"]],
         )
+        patch_seg_metrics = MetricCollection(
+            {
+                "cal/PAvPU": PAvPU(
+                    patch_size=self.pavpu_patch_size,
+                    acc_threshold=self.pavpu_acc_threshold,
+                    unc_threshold=self.pavpu_unc_threshold,
+                ),
+            },
+            compute_groups=[["cal/PAvPU"]],
+        )
         sbsmpl_seg_metrics = MetricCollection(
             {
                 "seg/Brier": BrierScore(num_classes=self.num_classes),
@@ -187,10 +208,15 @@ class SegmentationRoutine(LightningModule):
             ],
         )
 
-        self.val_seg_metrics = seg_metrics.clone(prefix="val/")
-        self.val_sbsmpl_seg_metrics = sbsmpl_seg_metrics.clone(prefix="val/")
-        self.test_seg_metrics = seg_metrics.clone(prefix="test/")
-        self.test_sbsmpl_seg_metrics = sbsmpl_seg_metrics.clone(prefix="test/")
+        self.val_seg_metrics = SegmentationMetric(seg_metrics.clone(prefix="val/"))
+        self.val_sbsmpl_seg_metrics = SegmentationMetric(
+            sbsmpl_seg_metrics.clone(prefix="val/"), subsampling_rate=self.metric_subsampling_rate
+        )
+        self.test_seg_metrics = SegmentationMetric(seg_metrics.clone(prefix="test/"))
+        self.test_patch_seg_metrics = patch_seg_metrics.clone(prefix="test/")
+        self.test_sbsmpl_seg_metrics = SegmentationMetric(
+            sbsmpl_seg_metrics.clone(prefix="test/"), subsampling_rate=self.metric_subsampling_rate
+        )
 
         if self.eval_ood:
             ood_metrics = MetricCollection(
@@ -286,14 +312,12 @@ class SegmentationRoutine(LightningModule):
             logits.shape[-2:],
             interpolation=F.InterpolationMode.NEAREST,
         )
-        logits = rearrange(logits, "(m b) c h w -> (b h w) m c", b=targets.size(0))
-        probs_per_est = logits.softmax(dim=-1)
+        logits = rearrange(logits, "(m b) c h w -> b m c h w", b=targets.size(0))
+        probs_per_est = logits.softmax(dim=2)
         probs = probs_per_est.mean(dim=1)
-        targets = targets.flatten()
-        valid_mask = (targets != 255) * (targets < self.num_classes)
-        probs, targets = probs[valid_mask], targets[valid_mask]
-        self.val_seg_metrics.update(probs, targets)
-        self.val_sbsmpl_seg_metrics.update(*self._subsample(probs, targets))
+        ignore_mask = (targets == 255) | (targets >= self.num_classes)
+        self.val_seg_metrics.update(probs, targets, ignore_mask=ignore_mask)
+        self.val_sbsmpl_seg_metrics.update(probs, targets, ignore_mask=ignore_mask)
 
     def test_step(
         self,
@@ -312,13 +336,17 @@ class SegmentationRoutine(LightningModule):
         """
         img, targets = batch
 
+        if targets.ndim == 4 and targets.size(1) == 1:
+            targets = targets.squeeze(1)
+
         if self.test_num_flops is None:
             flop_counter = FlopCounterMode(display=False)
             with flop_counter:
-                self.forward(img)
+                logits = self.forward(img)
             self.test_num_flops = flop_counter.get_total_flops()
+        else:
+            logits = self.forward(img)
 
-        logits = self.forward(img)
         targets = F.resize(
             targets,
             logits.shape[-2:],
@@ -337,28 +365,26 @@ class SegmentationRoutine(LightningModule):
                 _pred = _prb.argmax(dim=0, keepdim=True)
                 self.sample_buffer.append((_img, _pred, _tgt))
 
-        probs_per_est = rearrange(probs_per_est, "b m c h w -> (b h w) m c")
-        probs = rearrange(probs, "b c h w -> (b h w) c")
-        targets = targets.flatten()
-        valid_mask = targets != 255
-        probs, probs_per_est, targets = (
-            probs[valid_mask],
-            probs_per_est[valid_mask],
-            targets[valid_mask],
-        )
+        ignore_mask = targets == 255
         id_mask = targets < self.num_classes
-        ood_mask = targets >= self.num_classes
+        ood_mask = ~id_mask
 
         if dataloader_idx == 0:
-            id_probs, _, id_targets = probs[id_mask], probs_per_est[id_mask], targets[id_mask]
-            self.test_seg_metrics.update(id_probs, id_targets)
-            self.test_sbsmpl_seg_metrics.update(*self._subsample(id_probs, id_targets))
+            self.test_seg_metrics.update(probs, targets, ignore_mask=(ignore_mask | ood_mask))
+            self.test_patch_seg_metrics.update(probs, targets, ignore_mask=(ignore_mask | ood_mask))
+            self.test_sbsmpl_seg_metrics.update(
+                probs, targets, ignore_mask=(ignore_mask | ood_mask)
+            )
 
         if self.eval_ood and dataloader_idx == 1:
             if self.ood_criterion.input_type == OODCriterionInputType.PROB:
-                ood_scores = self.ood_criterion(probs)
+                ood_scores = self.ood_criterion(
+                    rearrange(probs, "b c h w -> b h w c")[~ignore_mask]
+                )
             elif self.ood_criterion.input_type == OODCriterionInputType.ESTIMATOR_PROB:
-                ood_scores = self.ood_criterion(probs_per_est)
+                ood_scores = self.ood_criterion(
+                    rearrange(probs_per_est, "b m c h w -> b h w m c")[~ignore_mask]
+                )
             else:
                 raise ValueError(
                     f"Unsupported input type for OOD criterion: {self.ood_criterion.input_type}"
@@ -368,7 +394,7 @@ class SegmentationRoutine(LightningModule):
             labels[id_mask] = 0  # ID examples
             labels[ood_mask] = 1  # OOD examples
 
-            self.test_ood_metrics.update(ood_scores, labels)
+            self.test_ood_metrics.update(ood_scores, labels[~ignore_mask])
 
     def on_validation_epoch_end(self) -> None:
         """Compute and log the values of the collected metrics in `validation_step`."""
@@ -388,6 +414,7 @@ class SegmentationRoutine(LightningModule):
         """Compute, log, and plot the values of the collected metrics in `test_step`."""
         result_dict = self.test_seg_metrics.compute()
         result_dict |= self.test_sbsmpl_seg_metrics.compute()
+        result_dict |= self.test_patch_seg_metrics.compute()
         result_dict |= {
             "test/cplx/flops": self.test_num_flops,
             "test/cplx/params": self.num_params,
@@ -402,6 +429,7 @@ class SegmentationRoutine(LightningModule):
 
         self.test_seg_metrics.reset()
         self.test_sbsmpl_seg_metrics.reset()
+        self.test_patch_seg_metrics.reset()
         if self.eval_ood:
             self.test_ood_metrics.reset()
 
@@ -416,17 +444,17 @@ class SegmentationRoutine(LightningModule):
         log_figure(
             self.logger,
             "Calibration/Reliability diagram",
-            self.test_sbsmpl_seg_metrics["cal/ECE"].plot()[0],
+            self.test_sbsmpl_seg_metrics.metric["cal/ECE"].plot()[0],
         )
         log_figure(
             self.logger,
             "Selective Classification/Risk-Coverage curve",
-            self.test_sbsmpl_seg_metrics["sc/AURC"].plot()[0],
+            self.test_sbsmpl_seg_metrics.metric["sc/AURC"].plot()[0],
         )
         log_figure(
             self.logger,
             "Selective Classification/Generalized Risk-Coverage curve",
-            self.test_sbsmpl_seg_metrics["sc/AUGRC"].plot()[0],
+            self.test_sbsmpl_seg_metrics.metric["sc/AUGRC"].plot()[0],
         )
         if self.trainer.datamodule is not None:
             self._log_segmentation_plots()
@@ -456,21 +484,6 @@ class SegmentationRoutine(LightningModule):
                 f"Segmentation results/{i}",
                 show_segmentation_predictions(pred_mask, gt_mask),
             )
-
-    def _subsample(self, pred: Tensor, target: Tensor) -> tuple[Tensor, Tensor]:
-        """Select a random sample of the data to compute the loss onto.
-
-        Args:
-            pred: the prediction tensor.
-            target: the target tensor.
-
-        Returns:
-            Tuple[Tensor, Tensor]: the subsampled prediction and target tensors.
-        """
-        total_size = target.size(0)
-        num_samples = max(1, int(total_size * self.metric_subsampling_rate))
-        indices = torch.randperm(total_size, device=pred.device)[:num_samples]
-        return pred[indices], target[indices]
 
 
 def _segmentation_routine_checks(

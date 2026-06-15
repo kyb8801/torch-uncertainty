@@ -35,8 +35,10 @@ from .regression import (
 )
 from .segmentation import (
     MeanIntersectionOverUnion,
+    PAvPU,
     SegmentationBinaryAUROC,
     SegmentationBinaryAveragePrecision,
     SegmentationFPR95,
+    SegmentationMetric,
 )
 from .sparsification import AUSE
