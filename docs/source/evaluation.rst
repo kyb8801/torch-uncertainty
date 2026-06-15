@@ -129,13 +129,13 @@ post-processing-based, etc.). The following metrics are logged under the ``ood/`
 - ``ood/FPR95`` — :class:`~torch_uncertainty.metrics.classification.FPR95`,
   false-positive rate at 95% true-positive rate, the standard OOD-detection threshold
   metric.
-- ``ood/scod/AURC`` — :class:`~torch_uncertainty.metrics.classification.SCODAURC`,
+- ``ood/SCOD_AURC`` — :class:`~torch_uncertainty.metrics.classification.SCODAURC`,
   SCOD Area Under the Risk-Coverage curve.
-- ``ood/scod/AUGRC`` — :class:`~torch_uncertainty.metrics.classification.SCODAUGRC`,
+- ``ood/SCOD_AUGRC`` — :class:`~torch_uncertainty.metrics.classification.SCODAUGRC`,
   SCOD Area Under the Generalized Risk-Coverage curve.
-- ``ood/scod/Cov_5Risk`` —
+- ``ood/SCOD_Cov_5Risk`` —
   :class:`~torch_uncertainty.metrics.classification.SCODCovAt5Risk`.
-- ``ood/scod/Risk_80Cov`` —
+- ``ood/SCOD_Risk_80Cov`` —
   :class:`~torch_uncertainty.metrics.classification.SCODRiskAt80Cov`.
 - ``ood/Entropy`` — average entropy of the predictive distribution over OOD samples.
 - For ensembles, the diversity metrics above are also recomputed under the
@@ -206,11 +206,11 @@ datamodule). Three dense, segmentation-specific binary metrics are then computed
   :class:`~torch_uncertainty.metrics.segmentation.SegmentationBinaryAveragePrecision`.
 - ``ood/FPR95`` —
   :class:`~torch_uncertainty.metrics.segmentation.SegmentationFPR95`.
-- ``ood/scod/AURC`` — :class:`~torch_uncertainty.metrics.classification.SCODAURC`.
-- ``ood/scod/AUGRC`` — :class:`~torch_uncertainty.metrics.classification.SCODAUGRC`.
-- ``ood/scod/Cov_5Risk`` —
+- ``ood/SCOD_AURC`` — :class:`~torch_uncertainty.metrics.classification.SCODAURC`.
+- ``ood/SCOD_AUGRC`` — :class:`~torch_uncertainty.metrics.classification.SCODAUGRC`.
+- ``ood/SCOD_Cov_5Risk`` —
   :class:`~torch_uncertainty.metrics.classification.SCODCovAt5Risk`.
-- ``ood/scod/Risk_80Cov`` —
+- ``ood/SCOD_Risk_80Cov`` —
   :class:`~torch_uncertainty.metrics.classification.SCODRiskAt80Cov`.
 
 The OOD score is again controlled by ``ood_criterion``. See the

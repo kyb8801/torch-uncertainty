@@ -440,10 +440,10 @@ class TestClassification:
             eval_ood=True,
         )
         assert routine.test_ood_metrics.prefix == "ood/"
-        assert "scod/AURC" in routine.test_ood_metrics
-        assert "scod/AUGRC" in routine.test_ood_metrics
-        assert "scod/Cov_5Risk" in routine.test_ood_metrics
-        assert "scod/Risk_80Cov" in routine.test_ood_metrics
+        assert "scod_AURC" in routine.test_ood_metrics
+        assert "SCOD_AUGRC" in routine.test_ood_metrics
+        assert "SCOD_Cov_5Risk" in routine.test_ood_metrics
+        assert "SCOD_Risk_80Cov" in routine.test_ood_metrics
 
         # num_classes
         with pytest.raises(ValueError):
