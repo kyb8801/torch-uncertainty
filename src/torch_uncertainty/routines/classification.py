@@ -23,6 +23,8 @@ from torch_uncertainty.metrics import (
     AUGRC,
     AURC,
     FPR95,
+    SCODAUGRC,
+    SCODAURC,
     BrierScore,
     CalibrationError,
     CategoricalNLL,
@@ -33,6 +35,8 @@ from torch_uncertainty.metrics import (
     GroupingLoss,
     MutualInformation,
     RiskAt80Cov,
+    SCODCovAt5Risk,
+    SCODRiskAt80Cov,
     SetSize,
     SmoothCalibrationError,
 )
@@ -249,8 +253,16 @@ class ClassificationRoutine(LightningModule):
                     "AUROC": BinaryAUROC(),
                     "AUPR": BinaryAveragePrecision(),
                     "FPR95": FPR95(pos_label=1),
+                    "SCOD_AURC": SCODAURC(),
+                    "SCOD_AUGRC": SCODAUGRC(),
+                    "SCOD_Cov_5Risk": SCODCovAt5Risk(),
+                    "SCOD_Risk_80Cov": SCODRiskAt80Cov(),
                 },
-                compute_groups=[["AUROC", "AUPR"], ["FPR95"]],
+                compute_groups=[
+                    ["AUROC", "AUPR"],
+                    ["FPR95"],
+                    ["SCOD_AURC", "SCOD_AUGRC", "SCOD_Cov_5Risk", "SCOD_Risk_80Cov"],
+                ],
             )
             self.test_ood_metrics = ood_metrics.clone(prefix="ood/")
             self.test_ood_entropy = Entropy()

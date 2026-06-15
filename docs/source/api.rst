@@ -270,6 +270,21 @@ Selective Classification
     RiskAtxCov
     RiskAt80Cov
 
+Selective Classification with OOD
+"""""""""""""""""""""""""""""""""
+
+.. autosummary::
+    :toctree: generated/
+    :nosignatures:
+    :template: class.rst
+
+    SCODAUGRC
+    SCODAURC
+    SCODCovAtxRisk
+    SCODCovAt5Risk
+    SCODRiskAtxCov
+    SCODRiskAt80Cov
+
 Calibration
 """""""""""
 
