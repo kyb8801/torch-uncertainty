@@ -34,6 +34,8 @@ Reference:
 # 1. Imports
 # ~~~~~~~~~~
 
+import os
+
 import torch
 from torch import nn
 from torch.utils.data import DataLoader, TensorDataset
@@ -142,7 +144,7 @@ cifar_model = cifar_model.cuda().eval()
 # DEUP, so no manual ``setup`` call is needed.
 
 datamodule = CIFAR10DataModule(
-    root="./data",
+    root=os.environ.get("TU_DATA_DIR", "data"),
     batch_size=256,
     num_workers=4,
     eval_ood=True,
