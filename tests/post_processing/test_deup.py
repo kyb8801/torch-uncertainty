@@ -67,8 +67,8 @@ class TestDEUP:
         half = n // 2
 
         x = torch.randn(n, in_dim)
-        x[:half, 0] = x[:half, 0].abs() + 3.0   # confident: first feature >> 0
-        x[half:, 0] = x[half:, 0] * 0.05         # uncertain: first feature ≈ 0
+        x[:half, 0] = x[:half, 0].abs() + 3.0  # confident: first feature >> 0
+        x[half:, 0] = x[half:, 0] * 0.05  # uncertain: first feature ≈ 0
 
         y = torch.zeros(n, dtype=torch.long)
         y[half:] = torch.randint(1, n_classes, (half,))  # uncertain group: wrong label

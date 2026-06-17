@@ -12,7 +12,6 @@ import torch
 import torch.nn.functional as F
 from torch import Tensor, nn
 from torch.utils.data import DataLoader
-from tqdm import tqdm
 
 from .abstract import PostProcessing
 

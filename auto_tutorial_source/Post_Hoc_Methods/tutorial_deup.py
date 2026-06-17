@@ -10,8 +10,8 @@ a non-negative score: higher means "the base model is more likely to be wrong he
 
 This tutorial has two parts:
 
-1. **Synthetic walkthrough** – illustrates the DEUP API on random tabular data.
-2. **CIFAR-10 + ClassificationRoutine** – integrates DEUP with a pretrained ResNet-18
+1. **Synthetic walkthrough** - illustrates the DEUP API on random tabular data.
+2. **CIFAR-10 + ClassificationRoutine** - integrates DEUP with a pretrained ResNet-18
    for OOD detection against SVHN, the standard CIFAR-10 OOD benchmark.
 
 How DEUP works:
@@ -116,9 +116,9 @@ from torch_uncertainty.routines import ClassificationRoutine
 # 6. Load a pretrained ResNet-18 from Hugging Face
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 #
-# We use a CIFAR-style ResNet-18 (3×3 first convolution, no max-pooling) from
+# We use a CIFAR-style ResNet-18 (3x3 first convolution, no max-pooling) from
 # TorchUncertainty's HuggingFace hub. The CIFAR-style variant preserves more
-# spatial information on small 32×32 images than the standard ImageNet variant.
+# spatial information on small 32x32 images than the standard ImageNet variant.
 
 cifar_model = resnet(in_channels=3, num_classes=10, arch=18, style="cifar", conv_bias=False)
 
