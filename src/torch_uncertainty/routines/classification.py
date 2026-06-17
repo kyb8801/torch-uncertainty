@@ -239,6 +239,8 @@ class ClassificationRoutine(LightningModule):
                     "test/post/SetSize": SetSize(),
                 },
             )
+        
+        # DEUP is a post-processing method that does not change predictions, no need for more metrics
         elif self.post_processing is not None and not isinstance(self.post_processing, DEUP):
             self.post_cls_metrics = cls_metrics.clone(prefix="test/post/")
 
@@ -597,7 +599,7 @@ class ClassificationRoutine(LightningModule):
         # reset metrics
         self.test_cls_metrics.reset()
         self.test_id_entropy.reset()
-        if self.post_processing is not None:
+        if self.post_processing is not None and not isinstance(self.post_processing, DEUP):
             self.post_cls_metrics.reset()
         if self.eval_grouping_loss:
             self.test_grouping_loss.reset()

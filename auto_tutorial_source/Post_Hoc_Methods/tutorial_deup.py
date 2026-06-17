@@ -138,11 +138,8 @@ cifar_model = cifar_model.cuda().eval()
 # The key argument here is ``postprocess_set="val"``: it tells the routine to fit
 # the DEUP error predictor on the *validation* split rather than the test set,
 # avoiding any data leakage. We reserve 10% of the training set as validation via
-# ``val_split=0.1``.
-#
-# Because ``trainer.test()`` only triggers ``setup("test")`` (which builds the test
-# and OOD sets), we explicitly call ``setup("fit")`` here so that the validation
-# split used to fit DEUP actually exists.
+# ``val_split=0.1``. The routine automatically builds this split before fitting
+# DEUP, so no manual ``setup`` call is needed.
 
 datamodule = CIFAR10DataModule(
     root="./data",
@@ -152,8 +149,6 @@ datamodule = CIFAR10DataModule(
     val_split=0.1,
     postprocess_set="val",
 )
-datamodule.prepare_data()
-datamodule.setup("fit")
 
 trainer = TUTrainer(
     accelerator="gpu",

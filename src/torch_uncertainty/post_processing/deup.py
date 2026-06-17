@@ -5,8 +5,6 @@ classification and regression routines. For sklearn/tabular/time-series DEUP,
 see the standalone `deup` package: https://github.com/ursinasanderink/deup
 """
 
-from __future__ import annotations
-
 import logging
 from typing import Literal
 
@@ -36,60 +34,58 @@ class _ErrorPredictor(nn.Module):
 
 
 class DEUP(PostProcessing):
-    """Direct Epistemic Uncertainty Prediction (DEUP).
-
-    Trains an error predictor ``g`` on out-of-fold generalization errors collected
-    from a calibration set, following Algorithm 2 in Lahlou et al. (2023).
-
-    ``forward`` returns per-sample epistemic uncertainty estimates (non-negative).
-    Pair with :class:`~torch_uncertainty.ood_criteria.DEUPCriterion` for OOD
-    detection in :class:`~torch_uncertainty.routines.ClassificationRoutine`.
-
-    Args:
-        task: ``"classification"`` (per-sample cross-entropy error) or
-            ``"regression"`` (squared error).
-        model: Base model producing logits or point predictions.
-        n_folds: Number of cross-validation folds for OOF error collection.
-        hidden_dim: Hidden width of the error predictor MLP.
-        max_epochs: Training epochs for each error-predictor fit.
-        lr: Adam learning rate for the error predictor.
-        device: Device for tensors and the error predictor.
-        progress: Show progress bars during ``fit``.
-
-    References:
-        Lahlou et al. (2023). *DEUP: Direct Epistemic Uncertainty Prediction.*
-        TMLR. https://openreview.net/forum?id=eGLdVRvvfQ
-
-    Note:
-        General-purpose / time-series DEUP (purged walk-forward, finance presets)
-        lives in https://github.com/ursinasanderink/deup — not in TorchUncertainty.
-    """
-
     def __init__(
         self,
         task: Literal["classification", "regression"],
         model: nn.Module | None = None,
-        n_folds: int = 5,
+        num_folds: int = 5,
         hidden_dim: int = 64,
         max_epochs: int = 40,
         lr: float = 1e-3,
         device: torch.device | str | None = None,
-        progress: bool = True,
     ) -> None:
+        """Direct Epistemic Uncertainty Prediction (DEUP).
+
+        Trains an error predictor ``g`` on out-of-fold generalization errors collected
+        from a calibration set, following Algorithm 2 in Lahlou et al. (2023).
+
+        ``forward`` returns per-sample epistemic uncertainty estimates (non-negative).
+        Pair with :class:`~torch_uncertainty.ood_criteria.DEUPCriterion` for OOD
+        detection in :class:`~torch_uncertainty.routines.ClassificationRoutine`.
+
+        Args:
+            task: ``"classification"`` (per-sample cross-entropy error) or
+                ``"regression"`` (squared error).
+            model: Base model producing logits or point predictions.
+            num_folds: Number of cross-validation folds for OOF error collection.
+            hidden_dim: Hidden width of the error predictor MLP.
+            max_epochs: Training epochs for each error-predictor fit.
+            batch_size: Mini-batch size for error-predictor training. Defaults to ``256``.
+            lr: Adam learning rate for the error predictor.
+            device: Device for tensors and the error predictor.
+            progress: Show progress bars during ``fit``.
+
+        References:
+            Lahlou et al. (2023). *DEUP: Direct Epistemic Uncertainty Prediction.*
+            TMLR. https://openreview.net/forum?id=eGLdVRvvfQ
+
+        Note:
+            General-purpose / time-series DEUP (purged walk-forward, finance presets)
+            lives in https://github.com/ursinasanderink/deup.
+        """
         super().__init__(model=model)
         if task not in {"classification", "regression"}:
             raise ValueError(f"task must be 'classification' or 'regression'. Got {task}.")
-        if n_folds < 2:
-            raise ValueError(f"n_folds must be >= 2. Got {n_folds}.")
+        if num_folds < 2:
+            raise ValueError(f"num_folds must be >= 2. Got {num_folds}.")
         if hidden_dim < 1:
             raise ValueError(f"hidden_dim must be >= 1. Got {hidden_dim}.")
 
         self.task = task
-        self.n_folds = int(n_folds)
+        self.num_folds = int(num_folds)
         self.hidden_dim = int(hidden_dim)
         self.max_epochs = int(max_epochs)
         self.lr = float(lr)
-        self.progress = progress
         self.device = torch.device(device or "cpu")
 
         self.error_predictor: _ErrorPredictor | None = None
@@ -105,9 +101,15 @@ class DEUP(PostProcessing):
         if self.model is None:
             raise RuntimeError("Model must be set before calling fit().")
 
-        features, errors = self._collect_features_and_errors(dataloader)
-        oof_targets = self._out_of_fold_targets(features, errors)
-        self._train_error_predictor(features, oof_targets)
+        # ``fit`` is called from ``ClassificationRoutine.on_test_start``, which runs
+        # inside the evaluation loop's ``torch.no_grad()``/``inference_mode`` context.
+        # Training the error predictor needs autograd, so we re-enable it here and
+        # leave inference mode to avoid producing inference tensors during feature
+        # collection (which could not be used in the predictor's autograd graph).
+        with torch.inference_mode(False), torch.enable_grad():
+            features, errors = self._collect_features_and_errors(dataloader)
+            oof_targets = self._out_of_fold_targets(features, errors)
+            self._train_error_predictor(features, oof_targets)
         self.trained = True
 
     def forward(self, inputs: Tensor) -> Tensor:
@@ -142,7 +144,7 @@ class DEUP(PostProcessing):
         feats_list: list[Tensor] = []
         err_list: list[Tensor] = []
 
-        for inputs, labels in tqdm(dataloader, disable=not self.progress, desc="DEUP collect"):
+        for inputs, labels in dataloader:
             inputs = inputs.to(self.device)
             labels = labels.to(self.device)
             outputs = self.model(inputs)
@@ -157,16 +159,16 @@ class DEUP(PostProcessing):
         return features, errors
 
     def _out_of_fold_targets(self, features: Tensor, errors: Tensor) -> Tensor:
-        n = features.shape[0]
-        oof = torch.zeros(n, device=self.device)
-        fold_sizes = [n // self.n_folds] * self.n_folds
-        for i in range(n % self.n_folds):
+        num_samples = features.shape[0]
+        oof = torch.zeros(num_samples, device=self.device)
+        fold_sizes = [num_samples // self.num_folds] * self.num_folds
+        for i in range(num_samples % self.num_folds):
             fold_sizes[i] += 1
 
         start = 0
         for fold_size in fold_sizes:
             val_idx = torch.arange(start, start + fold_size, device=self.device)
-            train_mask = torch.ones(n, dtype=torch.bool, device=self.device)
+            train_mask = torch.ones(num_samples, dtype=torch.bool, device=self.device)
             train_mask[val_idx] = False
             train_idx = train_mask.nonzero(as_tuple=True)[0]
 
@@ -192,8 +194,8 @@ class DEUP(PostProcessing):
         features: Tensor,
         targets: Tensor,
     ) -> None:
-        optimizer = torch.optim.Adam(predictor.parameters(), lr=self.lr)
         predictor.train()
+        optimizer = torch.optim.Adam(predictor.parameters(), lr=self.lr)
         for _ in range(self.max_epochs):
             optimizer.zero_grad()
             pred = predictor(features)

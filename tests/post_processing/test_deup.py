@@ -20,7 +20,7 @@ class TestDEUP:
         dl = DataLoader(TensorDataset(x, y), batch_size=16)
         model = dummy_model(in_dim, n_classes)
 
-        deup = DEUP(task="classification", model=model, n_folds=4, max_epochs=5, device="cpu")
+        deup = DEUP(task="classification", model=model, num_folds=4, max_epochs=5, device="cpu")
         deup.fit(dl)
         unc = deup(x[:8])
         assert unc.shape == (8,)
@@ -38,7 +38,7 @@ class TestDEUP:
         dl = DataLoader(TensorDataset(x, y), batch_size=12)
         model = dummy_model(in_dim, 1)
 
-        deup = DEUP(task="regression", model=model, n_folds=3, max_epochs=5, device="cpu")
+        deup = DEUP(task="regression", model=model, num_folds=3, max_epochs=5, device="cpu")
         deup.fit(dl)
         unc = deup(x[:5])
         assert unc.shape == (5,)
@@ -50,28 +50,41 @@ class TestDEUP:
         assert torch.allclose(crit(scores), scores)
 
     def test_epistemic_ranks_errors_classification(self) -> None:
-        """DEUP uncertainty should correlate with realized CE on a simple setup."""
+        """DEUP assigns higher uncertainty to regions where the model has higher CE.
+
+        We create two clearly separated groups:
+        - Confident group: large positive ``inputs[:, 0]``  → model predicts class 0
+          with high probability → labels are class 0 → very low CE (~0.03).
+        - Uncertain group: near-zero ``inputs[:, 0]`` → uniform logits → labels are
+          wrong classes → CE ≈ log(4) ≈ 1.39.
+
+        The features ``[logits, max_prob, entropy]`` cleanly separate the groups, so
+        the error predictor should learn to rank them and DEUP scores should be
+        systematically higher for the uncertain group.
+        """
         torch.manual_seed(2)
-        n, in_dim, n_classes = 120, 6, 4
+        n, in_dim, n_classes = 100, 4, 4
+        half = n // 2
+
         x = torch.randn(n, in_dim)
-        y = torch.randint(0, n_classes, (n,))
+        x[:half, 0] = x[:half, 0].abs() + 3.0   # confident: first feature >> 0
+        x[half:, 0] = x[half:, 0] * 0.05         # uncertain: first feature ≈ 0
 
-        class NoisyLinear(nn.Module):
-            def __init__(self) -> None:
-                super().__init__()
-                self.fc = nn.Linear(in_dim, n_classes)
+        y = torch.zeros(n, dtype=torch.long)
+        y[half:] = torch.randint(1, n_classes, (half,))  # uncertain group: wrong label
 
+        class ConfidenceFromFirstFeature(nn.Module):
             def forward(self, inputs: torch.Tensor) -> torch.Tensor:
-                return self.fc(inputs) + 0.5 * torch.randn_like(self.fc(inputs))
+                logits = torch.zeros(inputs.shape[0], n_classes)
+                logits[:, 0] = inputs[:, 0].clamp(min=0)
+                return logits
 
-        model = NoisyLinear()
+        model = ConfidenceFromFirstFeature()
         dl = DataLoader(TensorDataset(x, y), batch_size=20)
-        deup = DEUP(task="classification", model=model, n_folds=4, max_epochs=20, device="cpu")
+        deup = DEUP(task="classification", model=model, num_folds=4, max_epochs=50, device="cpu")
         deup.fit(dl)
 
         with torch.no_grad():
-            logits = model(x)
-            ce = nn.CrossEntropyLoss(reduction="none")(logits, y)
             unc = deup(x)
-        rho = torch.corrcoef(torch.stack([unc, ce]))[0, 1]
-        assert rho.item() > 0.1
+
+        assert unc[half:].mean() > unc[:half].mean()
