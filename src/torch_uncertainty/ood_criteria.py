@@ -154,6 +154,19 @@ class PostProcessingCriterion(MaxSoftmaxCriterion):
     input_type = OODCriterionInputType.POST_PROCESSING
 
 
+class DEUPCriterion(TUOODCriterion):
+    """OOD criterion from DEUP epistemic uncertainty scores.
+
+    Higher values indicate greater epistemic uncertainty (likely OOD or unreliable).
+    Use with :class:`~torch_uncertainty.post_processing.DEUP`.
+    """
+
+    input_type = OODCriterionInputType.POST_PROCESSING
+
+    def forward(self, inputs: Tensor) -> Tensor:
+        return inputs
+
+
 class EntropyCriterion(TUOODCriterion):
     input_type = OODCriterionInputType.ESTIMATOR_PROB
 
@@ -283,6 +296,8 @@ def get_ood_criterion(ood_criterion: type[TUOODCriterion] | TUOODCriterion | str
             return MaxSoftmaxCriterion()
         if ood_criterion == "post_processing":
             return PostProcessingCriterion()
+        if ood_criterion == "deup":
+            return DEUPCriterion()
         if ood_criterion == "entropy":
             return EntropyCriterion()
         if ood_criterion == "mutual_information":
@@ -291,8 +306,8 @@ def get_ood_criterion(ood_criterion: type[TUOODCriterion] | TUOODCriterion | str
             return VariationRatioCriterion()
         raise ValueError(
             "The OOD criterion must be one of 'msp', 'logit', 'energy', 'entropy',"
-            " 'mutual_information', 'variation_ratio', or 'post_processing'. "
-            f"Got {ood_criterion}."
+            " 'mutual_information', 'variation_ratio', or 'post_processing', or 'deup'. "
+            f"Got {ood_criterion=}."
         )
     if isinstance(ood_criterion, type):
         return ood_criterion()

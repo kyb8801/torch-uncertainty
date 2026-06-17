@@ -423,6 +423,7 @@ Post-Processing Methods
     
     LaplaceApprox
     MCBatchNorm
+    DEUP
 
 
 Scaling Methods
