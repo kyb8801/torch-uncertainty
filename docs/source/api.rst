@@ -410,6 +410,7 @@ Losses
     ELBOLoss
     FocalLoss
     KLDiv
+    PinballLoss
 
 Post-Processing Methods
 -----------------------
