@@ -6,7 +6,7 @@ from torch import nn
 from torch.utils.data import DataLoader, TensorDataset
 
 from tests._dummies.model import dummy_model
-from torch_uncertainty.ood_criteria import DEUPCriterion
+from torch_uncertainty.ood_criteria import DEUPCriterion, get_ood_criterion
 from torch_uncertainty.post_processing import DEUP
 from torch_uncertainty.post_processing.deup import _ErrorPredictor
 
@@ -50,6 +50,9 @@ class TestDEUP:
         crit = DEUPCriterion()
         scores = torch.tensor([0.1, 2.0, 0.5])
         assert torch.allclose(crit(scores), scores)
+
+    def test_get_ood_criterion_deup(self) -> None:
+        assert isinstance(get_ood_criterion("deup"), DEUPCriterion)
 
     def test_epistemic_ranks_errors_classification(self) -> None:
         """DEUP assigns higher uncertainty to regions where the model has higher CE.
@@ -144,7 +147,8 @@ class TestDEUP:
         dl = DataLoader(TensorDataset(x, y), batch_size=10)
         model = dummy_model(in_dim, 1)
 
-        deup = DEUP(task="classification", model=model, num_folds=2, max_epochs=3, device="cpu")
+        # num_folds=3 with n=40 leaves a remainder, exercising the uneven-fold path.
+        deup = DEUP(task="classification", model=model, num_folds=3, max_epochs=3, device="cpu")
         deup.fit(dl)
 
         unc = deup(x[:5])
