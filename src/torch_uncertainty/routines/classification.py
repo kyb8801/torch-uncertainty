@@ -46,7 +46,7 @@ from torch_uncertainty.ood_criteria import (
     TUOODCriterion,
     get_ood_criterion,
 )
-from torch_uncertainty.post_processing import Conformal, LaplaceApprox, PostProcessing
+from torch_uncertainty.post_processing import DEUP, Conformal, LaplaceApprox, PostProcessing
 from torch_uncertainty.transforms import MIXUP_PARAMS, RepeatTarget, build_mixup
 from torch_uncertainty.utils import csv_writer, get_logger_dir, log_figure, plot_hist
 
@@ -242,7 +242,9 @@ class ClassificationRoutine(LightningModule):
                     "test/post/SetSize": SetSize(),
                 },
             )
-        elif self.post_processing is not None:
+
+        # DEUP is a post-processing method that does not change predictions, no need for more metrics
+        elif self.post_processing is not None and not isinstance(self.post_processing, DEUP):
             self.post_cls_metrics = cls_metrics.clone(prefix="test/post/")
 
         self.test_id_entropy = Entropy()
@@ -483,12 +485,19 @@ class ClassificationRoutine(LightningModule):
         probs_per_est = torch.sigmoid(logits) if self.binary_cls else F.softmax(logits, dim=-1)
         probs = probs_per_est.mean(dim=1)
 
+        pp_probs: Tensor | None = None
+        pp_epistemic: Tensor | None = None
         if self.post_processing is not None:
-            pp_logits = self.post_processing(inputs)
-            if isinstance(self.post_processing, LaplaceApprox | Conformal):
-                pp_probs = pp_logits
+            pp_out = self.post_processing(inputs)
+            if isinstance(self.post_processing, DEUP):
+                pp_probs = None
+                pp_epistemic = pp_out
+            elif isinstance(self.post_processing, LaplaceApprox | Conformal):
+                pp_probs = pp_out
+                pp_epistemic = None
             else:
-                pp_probs = F.softmax(pp_logits, dim=-1)
+                pp_probs = F.softmax(pp_out, dim=-1)
+                pp_epistemic = None
 
         if self.ood_criterion.input_type == OODCriterionInputType.LOGIT:
             ood_scores = self.ood_criterion(logits)
@@ -497,7 +506,10 @@ class ClassificationRoutine(LightningModule):
         elif self.ood_criterion.input_type == OODCriterionInputType.ESTIMATOR_PROB:
             ood_scores = self.ood_criterion(probs_per_est)
         elif self.ood_criterion.input_type == OODCriterionInputType.POST_PROCESSING:
-            ood_scores = self.ood_criterion(pp_probs)
+            if isinstance(self.post_processing, DEUP):
+                ood_scores = self.ood_criterion(pp_epistemic)
+            else:
+                ood_scores = self.ood_criterion(pp_probs)
 
         if dataloader_idx == 0:
             # squeeze if binary classification only for binary metrics
@@ -519,7 +531,7 @@ class ClassificationRoutine(LightningModule):
             if self.id_score_storage is not None:
                 self.id_score_storage.append(ood_scores.detach().cpu())
 
-            if self.post_processing is not None:
+            if self.post_processing is not None and pp_probs is not None:
                 self.post_cls_metrics.update(pp_probs, targets)
 
         if self.eval_ood and dataloader_idx == 1:
@@ -565,7 +577,7 @@ class ClassificationRoutine(LightningModule):
             "test/cplx/params": self.num_params,
         }
 
-        if self.post_processing is not None:
+        if hasattr(self, "post_cls_metrics"):
             result_dict |= self.post_cls_metrics.compute()
 
         if self.eval_grouping_loss:
@@ -598,7 +610,7 @@ class ClassificationRoutine(LightningModule):
         # reset metrics
         self.test_cls_metrics.reset()
         self.test_id_entropy.reset()
-        if self.post_processing is not None:
+        if self.post_processing is not None and not isinstance(self.post_processing, DEUP):
             self.post_cls_metrics.reset()
         if self.eval_grouping_loss:
             self.test_grouping_loss.reset()

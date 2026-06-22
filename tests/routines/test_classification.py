@@ -15,7 +15,7 @@ from torch_uncertainty.ood_criteria import (
     EntropyCriterion,
     PostProcessingCriterion,
 )
-from torch_uncertainty.post_processing import ConformalClsTHR
+from torch_uncertainty.post_processing import DEUP, ConformalClsTHR
 from torch_uncertainty.routines import ClassificationRoutine
 from torch_uncertainty.transforms import RepeatTarget
 
@@ -429,6 +429,31 @@ class TestClassification:
             loss=None,
             num_classes=3,
             post_processing=None,
+        )
+        trainer.test(routine, dm)
+
+    def test_one_estimator_deup(self) -> None:
+        trainer = TUTrainer(accelerator="cpu", fast_dev_run=True)
+
+        dm = DummyClassificationDataModule(
+            root=Path(),
+            batch_size=16,
+            num_classes=3,
+            num_images=100,
+            eval_ood=True,
+        )
+
+        model = dummy_model(
+            in_channels=dm.num_channels,
+            num_classes=dm.num_classes,
+        )
+        routine = ClassificationRoutine(
+            model=model,
+            loss=None,
+            num_classes=3,
+            post_processing=DEUP(task="classification", num_folds=2, max_epochs=2),
+            ood_criterion="deup",
+            eval_ood=True,
         )
         trainer.test(routine, dm)
 

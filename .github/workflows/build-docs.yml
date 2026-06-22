@@ -12,6 +12,9 @@ on:
 env:
   PYTHON_VERSION: "3.13.9"
   BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
+  # Persistent dataset cache on the self-hosted runner (outside the workspace,
+  # which is wiped on each checkout) to avoid re-downloading datasets every build.
+  TU_DATA_DIR: /opt/tu-data
 
 jobs:
   documentation:

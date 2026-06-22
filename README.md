@@ -72,6 +72,7 @@ To date, the following deep-learning uncertainty quantification methods have bee
 - Stochastic Weight Averaging & Stochastic Weight Averaging Gaussian
 - [Deep Evidential Classification](https://torch-uncertainty.github.io/auto_tutorials/Classification/tutorial_evidential_classification.html) & [Regression](https://torch-uncertainty.github.io/auto_tutorials/Regression/tutorial_der_cubic.html)
 - Regression with Beta Gaussian NLL Loss
+- Quantile Regression with Pinball Loss
 - Test-time adaptation with Zero
 
 ### Augmentation methods
@@ -87,7 +88,8 @@ To date, the following post-processing methods have been implemented:
 
 - [Temperature, vector, and matrix scaling, & Dirichlet calibration](https://torch-uncertainty.github.io/auto_tutorials/Post_Hoc_Methods/tutorial_temperature.html)
 - [Histogram binning, isotonic regression, and Bayesian binning into quantiles](https://torch-uncertainty.github.io/auto_tutorials/Post_Hoc_Methods/tutorial_scalers.html)
-- [Conformal predictions](https://torch-uncertainty.github.io/auto_tutorials/Post_Hoc_Methods/tutorial_conformal.html) with APS and RAPS
+- [Conformal Predictions](https://torch-uncertainty.github.io/auto_tutorials/Post_Hoc_Methods/tutorial_conformal.html) with APS and RAPS
+- [DEUP (Direct Epistemic Uncertainty Prediction)](https://github.com/ursinasanderink/deup) — error-predictor post-hoc epistemic scores
 - [Monte Carlo Batch Normalization](https://torch-uncertainty.github.io/auto_tutorials/Bayesian_Methods/tutorial_mc_batch_norm.html)
 - Laplace approximation through the [Laplace library](https://github.com/aleximmer/Laplace)
 
