@@ -30,6 +30,17 @@ For Beta NLL in Deep Regression, consider citing:
 * Paper: `ICLR 2022 <https://arxiv.org/abs/2203.09168>`__.
 
 
+Pinball / Quantile Regression
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+For Pinball / Quantile Regression, consider citing:
+
+**Regression Quantiles**
+
+* Authors: *Roger Koenker and Gilbert Bassett Jr.*
+* Paper: `Econometrica 1978 <https://www.jstor.org/stable/1913643>`__.
+
+
 Deep Evidential Regression
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
