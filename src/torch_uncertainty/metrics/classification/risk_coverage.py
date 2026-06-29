@@ -11,7 +11,7 @@ from torchmetrics.utilities.compute import _auc_compute
 from torchmetrics.utilities.data import dim_zero_cat
 from torchmetrics.utilities.plot import _AX_TYPE
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # coverage: ignore
     from matplotlib.axes import Axes as MplAxes
 
 
