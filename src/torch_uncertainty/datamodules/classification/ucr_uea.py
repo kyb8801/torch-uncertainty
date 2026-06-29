@@ -63,7 +63,7 @@ class UCRUEADataModule(TUDataModule):
         if stage == "fit" or stage is None:
             full_dataset = self.dataset(split="train", create_ood=True)
 
-            if self.val_split is not None:
+            if self.val_split:
                 self.train, self.val = create_train_val_split(
                     full_dataset, self.val_split, generator=self.gen
                 )
