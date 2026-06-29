@@ -67,7 +67,8 @@ class TemperatureScaler(Scaler):
         super().fit(dataloader=dataloader, save_logits=save_logits, progress=progress)
         if self.inv_temp.item() <= 0:  # coverage: ignore
             logging.error(
-                "TemperatureScaler converged to a negative temperature %.3f.", 1 / self.inv_temp
+                "TemperatureScaler converged to a negative temperature %.3f.",
+                (1 / self.inv_temp).item(),
             )
 
     def set_temperature(self, val: float | Tensor) -> None:
