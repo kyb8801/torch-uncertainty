@@ -232,7 +232,15 @@ filterwarnings = [
     "ignore:Metric.*will save all.*buffer.*:UserWarning",
     # Python multiprocessing fork in multi-threaded process
     "ignore:This process.*is multi-threaded, use of fork.*:DeprecationWarning",
-]
+    # Computing segmentation metrics without .update
+    "ignore:The.*method of metric.*was called before.*:UserWarning",
+    # Applying softmax if PAvPU is given logits
+    "ignore:Preds do not seem to be probabilities.*:UserWarning",
+    # 0 variance dataset when plotting
+    "ignore:Dataset has 0 variance; skipping density estimate.*:UserWarning",
+    # jsonargparse v4.49+ deprecations inside lightning itself (add_instantiator)
+    "ignore::jsonargparse._deprecated.JsonargparseDeprecationWarning",
+    ]
 
 [tool.coverage.run]
 branch = true
