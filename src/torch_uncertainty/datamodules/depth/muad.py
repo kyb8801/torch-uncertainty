@@ -106,7 +106,7 @@ class MUADDataModule(DepthDataModule):
                 transforms=self.train_transform,
             )
 
-            if self.val_split is not None:
+            if self.val_split:
                 self.train, self.val = create_train_val_split(
                     full,
                     self.val_split,
