@@ -94,7 +94,7 @@ class Scaler(PostProcessing):
             loss = self.criterion(self._scale(all_logits), all_labels)
             loss.backward()
             logging.debug("scaler loss: %f", loss.item())
-            return loss
+            return loss.detach()
 
         optimizer.step(calib_eval)
         self.trained = True

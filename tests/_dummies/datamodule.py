@@ -28,7 +28,7 @@ class DummyClassificationDataModule(TUDataModule):
         batch_size: int,
         eval_batch_size: int | None = None,
         num_classes: int = 2,
-        num_workers: int = 1,
+        num_workers: int = 2,
         eval_ood: bool = False,
         eval_shift: bool = False,
         pin_memory: bool = True,
@@ -55,8 +55,8 @@ class DummyClassificationDataModule(TUDataModule):
         self.ood_dataset = DummyClassificationDataset
         self.shift_dataset = DummyClassificationDataset
 
-        self.train_transform = v2.ToTensor()
-        self.test_transform = v2.ToTensor()
+        self.train_transform = v2.Compose([v2.ToImage(), v2.ToDtype(torch.float32, scale=True)])
+        self.test_transform = v2.Compose([v2.ToImage(), v2.ToDtype(torch.float32, scale=True)])
 
     def prepare_data(self) -> None:
         pass
@@ -133,7 +133,7 @@ class DummyRegressionDataModule(TUDataModule):
         batch_size: int,
         eval_batch_size: int | None = None,
         out_features: int = 2,
-        num_workers: int = 1,
+        num_workers: int = 2,
         pin_memory: bool = True,
         persistent_workers: bool = True,
     ) -> None:
@@ -193,7 +193,7 @@ class DummySegmentationDataModule(TUDataModule):
         batch_size: int,
         eval_batch_size: int | None = None,
         num_classes: int = 2,
-        num_workers: int = 1,
+        num_workers: int = 2,
         image_size: int = 4,
         pin_memory: bool = True,
         persistent_workers: bool = True,
@@ -300,7 +300,7 @@ class DummyPixelRegressionDataModule(TUDataModule):
         batch_size: int,
         eval_batch_size: int | None = None,
         output_dim: int = 2,
-        num_workers: int = 1,
+        num_workers: int = 2,
         image_size: int = 4,
         pin_memory: bool = True,
         persistent_workers: bool = True,

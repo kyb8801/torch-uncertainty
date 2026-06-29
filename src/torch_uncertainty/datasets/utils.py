@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any
 
 import pandas as pd
+from torch import Generator
 from torch.utils.data import Dataset, random_split
 
 
@@ -61,19 +62,28 @@ def create_train_val_split(
     dataset: Dataset,
     val_split_rate: float,
     val_transforms: Callable | None = None,
+    generator: Generator | None = None,
 ) -> tuple[Dataset, Dataset]:
     """Split a dataset for training and validation.
 
     Args:
         dataset: The dataset to be split.
         val_split_rate: The amount of the original dataset to use as validation split.
+            Expected to be non-zero.
         val_transforms: The transformations to apply on the validation set.
             Defaults to ``None``.
+        generator: Generator for reproducible splits. Defaults to ``None``.
 
     Returns:
         tuple[Dataset, Dataset]: The training and the validation splits.
     """
-    train, val = random_split(dataset, [1 - val_split_rate, val_split_rate])
+    if val_split_rate <= 0:
+        raise ValueError(
+            f"val_split_rate is expected to be strictly greater than zero. Got {val_split_rate} <=0 ."
+        )
+    n = len(dataset)
+    val_size = max(1, round(n * val_split_rate))
+    train, val = random_split(dataset, [n - val_size, val_size], generator=generator)
     val = copy.deepcopy(val)  # Ensure train.dataset.transform is not modified next line
     val.dataset.transform = val_transforms
     return train, val

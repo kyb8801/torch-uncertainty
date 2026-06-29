@@ -204,7 +204,7 @@ class CityscapesDataModule(TUDataModule):
                 transforms=self.train_transform,
             )
 
-            if self.val_split is not None:
+            if self.val_split:
                 self.train, self.val = create_train_val_split(
                     full,
                     self.val_split,
@@ -229,5 +229,5 @@ class CityscapesDataModule(TUDataModule):
                 transforms=self.test_transform,
             )
 
-        if stage not in ["fit", "test", None]:
+        if stage not in ("fit", "test", None):
             raise ValueError(f"Stage {stage} is not supported.")

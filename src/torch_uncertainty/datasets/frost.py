@@ -1,6 +1,5 @@
 from collections.abc import Callable
 from importlib import util
-from importlib.abc import Traversable
 from importlib.resources import files
 from pathlib import Path
 from typing import Any
@@ -12,7 +11,7 @@ FROST_ASSETS_MOD = "torch_uncertainty_assets.frost"
 tu_assets_installed = util.find_spec("torch_uncertainty_assets")
 
 
-def pil_loader(path: Path | Traversable) -> Image.Image:
+def pil_loader(path: Path) -> Image.Image:
     with path.open("rb") as f:
         img = Image.open(f)
         return img.convert("RGB")

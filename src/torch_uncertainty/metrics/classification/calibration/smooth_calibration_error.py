@@ -178,8 +178,8 @@ class SmoothCalibrationError(Metric):
         Returns:
             Tensor: The scalar SmECE value.
         """
-        conf = dim_zero_cat(self.confidences)
-        acc = dim_zero_cat(self.accuracies)
+        conf = dim_zero_cat(self.confidences).detach()
+        acc = dim_zero_cat(self.accuracies).detach()
 
         if isinstance(self.bandwidth, float):
             self.final_bandwidth = self.bandwidth

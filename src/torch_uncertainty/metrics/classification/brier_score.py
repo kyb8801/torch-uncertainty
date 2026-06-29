@@ -139,6 +139,8 @@ class BrierScore(Metric):
             target: A tensor of ground truth labels of shape
                 (batch, num_classes) or (batch)
         """
+        if target.ndim == 2 and target.shape[-1] == 1:
+            target = target.squeeze(-1)
         if target.ndim == 1 and self.num_classes > 1:
             target = F.one_hot(target, self.num_classes)
 

@@ -210,6 +210,38 @@ pydocstyle.convention = "google"
 docstring-code-format = true
 docstring-code-line-length = 80
 
+[tool.pytest.ini_options]
+filterwarnings = [
+    # Lightning: GPU available but not used in CPU tests
+    "ignore:GPU available but not used.*:UserWarning",
+    # Lightning: 1-batch fast_dev_run < log_every_n_steps=50
+    "ignore:The number of training batches.*is smaller than the logging interval.*:UserWarning",
+    # Lightning: self.log() called before Trainer is attached
+    "ignore:.*self\\.log.*trainer.*reference is not registered.*:UserWarning",
+    # Lightning: _pytree LeafSpec deprecation
+    "ignore:.*LeafSpec.*is deprecated.*:FutureWarning",
+    # torch.jit.script deprecated (used internally by some third-party libs)
+    "ignore:`torch.jit.script` is deprecated.*:DeprecationWarning",
+    # laplace-torch unconditional reminder for classification
+    "ignore:By default `link_approx` is `probit`.*:UserWarning",
+    # sklearn: k-fold on tiny datasets
+    "ignore:The least populated class.*:UserWarning",
+    # torchmetrics: distribution missing icdf()
+    "ignore:The distribution does not support the.*icdf.*:UserWarning",
+    # torchmetrics: FPR95 / VariationRatio / GroupingLoss buffer size notice
+    "ignore:Metric.*will save all.*buffer.*:UserWarning",
+    # Python multiprocessing fork in multi-threaded process
+    "ignore:This process.*is multi-threaded, use of fork.*:DeprecationWarning",
+    # Computing segmentation metrics without .update
+    "ignore:The.*method of metric.*was called before.*:UserWarning",
+    # Applying softmax if PAvPU is given logits
+    "ignore:Preds do not seem to be probabilities.*:UserWarning",
+    # 0 variance dataset when plotting
+    "ignore:Dataset has 0 variance; skipping density estimate.*:UserWarning",
+    # jsonargparse v4.49+ deprecations inside lightning itself (add_instantiator)
+    "ignore::jsonargparse._deprecated.JsonargparseDeprecationWarning",
+    ]
+
 [tool.coverage.run]
 branch = true
 include = ["*/torch-uncertainty/*"]
