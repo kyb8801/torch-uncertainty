@@ -76,7 +76,7 @@ class UCRUEADataModule(TUDataModule):
             if self.eval_ood:
                 self.ood = self.dataset(split="ood", create_ood=True)
 
-        if stage not in ("fit", "test", None):
+        if stage not in ("fit", "test", None):  # coverage: ignore
             raise ValueError(f"Stage {stage} is not supported.")
 
     def test_dataloader(self) -> list[DataLoader]:
