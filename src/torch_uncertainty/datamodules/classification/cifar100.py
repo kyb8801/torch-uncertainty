@@ -222,7 +222,7 @@ class CIFAR100DataModule(TUDataModule):
                     shift_severity=self.shift_severity,
                     transform=self.test_transform,
                 )
-        if stage not in ["fit", "test", None]:
+        if stage not in ("fit", "test", None):
             raise ValueError(f"Stage {stage} is not supported.")
 
     def train_dataloader(self) -> DataLoader:

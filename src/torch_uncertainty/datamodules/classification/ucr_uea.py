@@ -1,10 +1,11 @@
 from functools import partial
 
 from torch import Generator
-from torch.utils.data import DataLoader, random_split
+from torch.utils.data import DataLoader
 
 from torch_uncertainty.datamodules.abstract import TUDataModule
 from torch_uncertainty.datasets.classification.ucr_uea import UCRUEADataset
+from torch_uncertainty.datasets.utils import create_train_val_split
 
 
 class UCRUEADataModule(TUDataModule):
@@ -63,10 +64,8 @@ class UCRUEADataModule(TUDataModule):
             full_dataset = self.dataset(split="train", create_ood=True)
 
             if self.val_split is not None:
-                n = len(full_dataset)
-                val_size = max(1, round(n * self.val_split))
-                self.train, self.val = random_split(
-                    full_dataset, [n - val_size, val_size], generator=self.gen
+                self.train, self.val = create_train_val_split(
+                    full_dataset, self.val_split, generator=self.gen
                 )
             else:
                 self.train = full_dataset
@@ -76,6 +75,9 @@ class UCRUEADataModule(TUDataModule):
             self.test = self.dataset(split="test", create_ood=True)
             if self.eval_ood:
                 self.ood = self.dataset(split="ood", create_ood=True)
+
+        if stage not in ("fit", "test", None):
+            raise ValueError(f"Stage {stage} is not supported.")
 
     def test_dataloader(self) -> list[DataLoader]:
         r"""Get test dataloaders.

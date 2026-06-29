@@ -189,21 +189,20 @@ class MNISTDataModule(TUDataModule):
                 download=False,
                 transform=self.test_transform,
             )
-        if stage not in ["fit", "test", None]:
+            if self.eval_ood:
+                self.ood = self.ood_dataset(
+                    self.root,
+                    download=False,
+                    transform=self.ood_transform,
+                )
+            if self.eval_shift:
+                self.shift = self.shift_dataset(
+                    self.root,
+                    download=False,
+                    transform=self.test_transform,
+                )
+        if stage not in ("fit", "test", None):
             raise ValueError(f"Stage {stage} is not supported.")
-
-        if self.eval_ood:
-            self.ood = self.ood_dataset(
-                self.root,
-                download=False,
-                transform=self.ood_transform,
-            )
-        if self.eval_shift:
-            self.shift = self.shift_dataset(
-                self.root,
-                download=False,
-                transform=self.test_transform,
-            )
 
     def test_dataloader(self) -> list[DataLoader]:
         """Get the test dataloaders for MNIST.

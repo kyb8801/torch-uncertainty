@@ -134,5 +134,5 @@ class MUADDataModule(DepthDataModule):
                 transforms=self.test_transform,
             )
 
-        if stage not in ["fit", "test", None]:
+        if stage not in ("fit", "test", None):
             raise ValueError(f"Stage {stage} is not supported.")
