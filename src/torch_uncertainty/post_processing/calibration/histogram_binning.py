@@ -85,7 +85,7 @@ class HistogramBinningScaler(PostProcessing):
         bin_centers = (self.bin_edges[:-1] + self.bin_edges[1:]) / 2.0
 
         # Extract internal boundaries for `torch.bucketize`
-        boundaries = self.bin_edges[1:-1]
+        boundaries = self.bin_edges[1:-1].contiguous()
 
         if self.num_classes == 1:
             self.bin_values = torch.zeros(self.num_bins, device=self.device)
@@ -101,7 +101,7 @@ class HistogramBinningScaler(PostProcessing):
             labels_one_hot = F.one_hot(labels.long(), self.num_classes).float()
 
             for c in range(self.num_classes):
-                class_probs = probs[:, c]
+                class_probs = probs[:, c].contiguous()
                 class_labels = labels_one_hot[:, c]
                 indices = torch.bucketize(class_probs, boundaries)
                 for b in range(self.num_bins):
@@ -123,7 +123,7 @@ class HistogramBinningScaler(PostProcessing):
             return self.model(inputs)
 
         logits = self.model(inputs)
-        boundaries = self.bin_edges[1:-1]
+        boundaries = self.bin_edges[1:-1].contiguous()
 
         if self.num_classes == 1:
             probs = torch.sigmoid(logits)

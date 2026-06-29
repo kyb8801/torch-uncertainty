@@ -108,7 +108,7 @@ class BBQScaler(PostProcessing):
         )
 
         for c in range(self.num_classes):
-            class_probs = probs[:, c] if self.num_classes > 1 else probs
+            class_probs = (probs[:, c] if self.num_classes > 1 else probs).contiguous()
             class_labels = labels_one_hot[:, c] if labels_one_hot is not None else labels
 
             class_models, log_scores, seen_edges = [], [], set()
@@ -222,7 +222,7 @@ class BBQScaler(PostProcessing):
         )
         # Vectorized evaluation per class
         for c in range(self.num_classes):
-            class_probs = probs[:, c] if self.num_classes != 1 else probs
+            class_probs = (probs[:, c] if self.num_classes != 1 else probs).contiguous()
             class_calib = torch.zeros_like(class_probs)
 
             class_models, weights = self.bbq_models[c]

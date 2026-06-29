@@ -1,4 +1,3 @@
-import matplotlib.pyplot as plt
 import numpy as np
 import torch
 import torchvision.transforms.functional as F
@@ -9,7 +8,8 @@ from torch import Tensor
 
 def show_segmentation_predictions(prediction: Tensor, target: Tensor) -> Figure:
     imgs = [prediction, target]
-    fig, axs = plt.subplots(ncols=2, figsize=(12, 6), dpi=300)
+    fig = Figure(figsize=(12, 6), dpi=300)
+    axs = fig.subplots(ncols=2)
     for i, img in enumerate(imgs):
         img = img.detach()
         img = F.to_pil_image(img)
@@ -38,8 +38,9 @@ def plot_hist(
     Returns:
         Tuple[Figure, Axes]: The figure and axes of the plot.
     """
-    plt.rc("axes", axisbelow=True)
-    fig, ax = plt.subplots(1, figsize=(7, 5), dpi=dpi)
+    fig = Figure(figsize=(7, 5), dpi=dpi)
+    ax = fig.add_subplot()
+    ax.set_axisbelow(True)
     for i in [1, 0]:
         ax.hist(
             conf[i],
@@ -53,7 +54,7 @@ def plot_hist(
         )
 
     ax.set_title(title)
-    plt.grid(True, linestyle="--", alpha=0.7, zorder=0)
-    plt.legend()
+    ax.grid(True, linestyle="--", alpha=0.7, zorder=0)
+    ax.legend()
     fig.tight_layout()
     return fig, ax

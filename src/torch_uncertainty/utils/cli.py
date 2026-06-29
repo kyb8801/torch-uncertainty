@@ -163,7 +163,7 @@ class TULightningCLI(LightningCLI):
 
     def instantiate_classes(self) -> None:
         """Instantiates the classes and sets their attributes."""
-        self.config_init = self.parser.instantiate_classes(self.config)
+        self.config_init = self.parser.instantiate(self.config)
         self.datamodule = self._get(self.config_init, "data")
         self.routine = self._get(self.config_init, "routine")
         self._add_configure_optimizers_method_to_model(self.subcommand)

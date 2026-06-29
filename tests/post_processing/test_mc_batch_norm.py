@@ -2,7 +2,7 @@ from functools import partial
 
 import pytest
 import torch
-import torchvision.transforms as T
+import torchvision.transforms.v2 as T
 from torch import nn
 from torch.utils.data import DataLoader
 
@@ -30,7 +30,7 @@ class TestMCBatchNorm:
             image_size=16,
             num_classes=1,
             num_images=2,
-            transform=T.ToTensor(),
+            transform=T.Compose([T.ToImage(), T.ToDtype(torch.float32, scale=True)]),
         )
         stoch_model.fit(dataloader=DataLoader(dataset, batch_size=6, shuffle=True))
         stoch_model.train()
@@ -58,7 +58,7 @@ class TestMCBatchNorm:
             image_size=16,
             num_classes=1,
             num_images=2,
-            transform=T.ToTensor(),
+            transform=T.Compose([T.ToImage(), T.ToDtype(torch.float32, scale=True)]),
         )
         dl = DataLoader(dataset, batch_size=2, shuffle=True)
         stoch_model.eval()

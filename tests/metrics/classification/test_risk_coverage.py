@@ -3,6 +3,7 @@ import pytest
 import torch
 
 from torch_uncertainty.metrics.classification import (
+    AUGRC,
     AURC,
     CovAtxRisk,
     RiskAtxCov,
@@ -70,6 +71,38 @@ class TestAURC:
         assert ax.get_xlabel() == "Coverage (%)"
         assert ax.get_ylabel() == "Risk - Error Rate (%)"
         plt.close(fig)
+
+        # existing ax: fig should be None
+        metric = AURC()
+        metric.update(scores, values)
+        _, existing_ax = plt.subplots()
+        fig, ax = metric.plot(ax=existing_ax)
+        assert fig is None
+        assert ax is existing_ax
+        plt.close("all")
+
+
+class TestAUGRC:
+    """Testing the AUGRC metric class."""
+
+    def test_plot(self) -> None:
+        scores = torch.Tensor([0.2, 0.1, 0.5, 0.3, 0.4])
+        values = torch.Tensor([0.1, 0.2, 0.3, 0.4, 0.5])
+        metric = AUGRC()
+        metric.update(scores, values)
+        fig, ax = metric.plot()
+        assert isinstance(fig, plt.Figure)
+        assert isinstance(ax, plt.Axes)
+        plt.close(fig)
+
+        # existing ax: fig should be None
+        metric = AUGRC()
+        metric.update(scores, values)
+        _, existing_ax = plt.subplots()
+        fig, ax = metric.plot(ax=existing_ax)
+        assert fig is None
+        assert ax is existing_ax
+        plt.close("all")
 
 
 class TestCovAtxRisk:

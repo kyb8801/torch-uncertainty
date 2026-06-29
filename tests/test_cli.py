@@ -29,6 +29,8 @@ class TestCLI:
         "--trainer.callbacks+=ModelCheckpoint",
         "--trainer.callbacks.monitor=val/cls/Acc",
         "--trainer.callbacks.mode=max",
+        "--seed_everything",
+        "42",
     ]
 
     def test_cli_init(self) -> None:
