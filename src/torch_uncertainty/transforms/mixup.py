@@ -36,8 +36,7 @@ def beta_warping(x, alpha_cdf: float = 1.0, eps: float = 1e-12) -> float:
 
 def sim_gauss_kernel(dist, tau_max: float = 1.0, tau_std: float = 0.5) -> float:
     denom = np.mean(dist) * 2 * (tau_std**2)
-    if denom == 0:
-        return np.ones_like(dist) / (tau_max + 1e-12)
+    denom = np.maximum(denom, 1e-12)
     dist_rate = tau_max * np.exp(-(dist - 1) / denom)
     return 1 / (dist_rate + 1e-12)
 
