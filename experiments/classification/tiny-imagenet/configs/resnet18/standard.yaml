@@ -28,7 +28,7 @@ routine:
       in_channels: 3
       num_classes: 100
       arch: 18
-      style: cifar
+      style: CIFAR
   num_classes: 100
   loss: CrossEntropyLoss
 data:
