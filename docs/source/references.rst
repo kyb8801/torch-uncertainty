@@ -493,6 +493,17 @@ For the grouping loss, consider citing:
 * Paper: `ICLR 2023 <https://arxiv.org/pdf/2210.16315.pdf>`__.
 
 
+Interval (Winkler) Score
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+For the interval (Winkler) score, consider citing:
+
+**Strictly Proper Scoring Rules, Prediction, and Estimation**
+
+* Authors: *Tilman Gneiting and Adrian E. Raftery*
+* Paper: `JASA 2007 <https://doi.org/10.1198/016214506000001437>`__.
+
+
 Datasets
 --------
 
