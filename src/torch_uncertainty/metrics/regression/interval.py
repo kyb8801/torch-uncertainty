@@ -3,20 +3,7 @@ from typing import Any
 import torch
 from torch import Tensor
 from torchmetrics import Metric
-
-
-def _check_interval_shapes(lower: Tensor, upper: Tensor, target: Tensor | None = None) -> None:
-    if lower.shape != upper.shape:
-        raise ValueError(
-            f"Expected `lower` and `upper` to have the same shape, got {lower.shape} and "
-            f"{upper.shape}."
-        )
-    if target is not None and target.shape != lower.shape:
-        raise ValueError(
-            f"Expected `target` to have the same shape as the interval bounds, got "
-            f"{target.shape} and {lower.shape}."
-        )
-
+from torch_uncertainty.utils import check_interval_shapes
 
 class IntervalCoverage(Metric):
     is_differentiable: bool = False
@@ -68,7 +55,7 @@ class IntervalCoverage(Metric):
             # tensor(0.7500)
         """
         super().__init__(**kwargs)
-        self.add_state("covered", default=torch.tensor(0.0), dist_reduce_fx="sum")
+        self.add_state("covered", default=torch.tensor(0), dist_reduce_fx="sum")
         self.add_state("total", default=torch.tensor(0), dist_reduce_fx="sum")
 
     def update(self, lower: Tensor, upper: Tensor, target: Tensor) -> None:
@@ -79,7 +66,7 @@ class IntervalCoverage(Metric):
             upper: The predicted upper bounds of the interval.
             target: The ground-truth targets.
         """
-        _check_interval_shapes(lower, upper, target)
+        check_interval_shapes(lower, upper, target)
         inside = (target >= lower) & (target <= upper)
         self.covered += inside.sum()
         self.total += target.numel()
@@ -90,7 +77,7 @@ class IntervalCoverage(Metric):
 
 
 class MeanIntervalWidth(Metric):
-    is_differentiable: bool = True
+    is_differentiable: bool = False
     higher_is_better: bool = False
     full_state_update: bool = False
     width_sum: Tensor
@@ -143,7 +130,7 @@ class MeanIntervalWidth(Metric):
             lower: The predicted lower bounds of the interval.
             upper: The predicted upper bounds of the interval.
         """
-        _check_interval_shapes(lower, upper)
+        check_interval_shapes(lower, upper)
         self.width_sum += (upper - lower).sum()
         self.total += lower.numel()
 
@@ -153,7 +140,7 @@ class MeanIntervalWidth(Metric):
 
 
 class IntervalScore(Metric):
-    is_differentiable: bool = True
+    is_differentiable: bool = False
     higher_is_better: bool = False
     full_state_update: bool = False
     score_sum: Tensor
@@ -224,7 +211,7 @@ class IntervalScore(Metric):
             upper: The predicted upper bounds of the interval.
             target: The ground-truth targets.
         """
-        _check_interval_shapes(lower, upper, target)
+        check_interval_shapes(lower, upper, target)
         width = upper - lower
         below = (lower - target).clamp(min=0)
         above = (target - upper).clamp(min=0)

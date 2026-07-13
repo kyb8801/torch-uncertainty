@@ -68,6 +68,11 @@ class TestMeanIntervalWidth:
         )
         assert metric.compute() == pytest.approx(7 / 3)
 
+    def test_invalid_interval_order(self) -> None:
+        metric = MeanIntervalWidth()
+        with pytest.raises(ValueError, match="lower.*upper"):
+            metric.update(torch.tensor([1.0]), torch.tensor([0.0]))
+
     def test_shape_mismatch(self) -> None:
         metric = MeanIntervalWidth()
         with pytest.raises(ValueError, match="same shape"):
