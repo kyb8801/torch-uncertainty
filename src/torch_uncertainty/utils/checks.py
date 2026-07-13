@@ -1,6 +1,6 @@
-import torch 
-
+import torch
 from torch import Tensor
+
 
 def check_interval_shapes(lower: Tensor, upper: Tensor, target: Tensor | None = None) -> None:
     if lower.shape != upper.shape:

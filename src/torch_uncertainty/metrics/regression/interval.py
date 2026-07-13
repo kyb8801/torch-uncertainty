@@ -3,7 +3,9 @@ from typing import Any
 import torch
 from torch import Tensor
 from torchmetrics import Metric
+
 from torch_uncertainty.utils import check_interval_shapes
+
 
 class IntervalCoverage(Metric):
     is_differentiable: bool = False
