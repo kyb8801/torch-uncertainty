@@ -1,5 +1,6 @@
 # ruff: noqa: F401
 from .checkpoints import get_version
+from .checks import check_interval_shapes
 from .cli import TULightningCLI
 from .distributions import NormalInverseGamma, get_dist_class, get_dist_estimate
 from .evaluation_loop import TUEvaluationLoop
