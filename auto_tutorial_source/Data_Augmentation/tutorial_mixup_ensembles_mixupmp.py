@@ -140,7 +140,7 @@ trainer:
 
 routine:
   model:
-    class_path: torch_uncertainty.models.deep_ensembles
+    class_path: torch_uncertainty.methods.deep_ensembles
     init_args:
       core_models:
         class_path: torch_uncertainty.models.classification.wideresnet28x10
