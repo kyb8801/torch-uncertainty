@@ -1,13 +1,14 @@
 # ruff: noqa: F401
-from .interval import IntervalCoverage, IntervalScore, MeanIntervalWidth
-from .inverse import MeanAbsoluteErrorInverse, MeanSquaredErrorInverse
-from .log10 import Log10
-from .mse_log import MeanSquaredLogError
-from .nll import DistributionNLL
-from .quantile_calibration import QuantileCalibrationError
-from .relative_error import (
+from .depth import (
+    Log10,
+    MeanAbsoluteErrorInverse,
     MeanGTRelativeAbsoluteError,
     MeanGTRelativeSquaredError,
+    MeanSquaredErrorInverse,
+    MeanSquaredLogError,
+    SILog,
+    ThresholdAccuracy,
 )
-from .silog import SILog
-from .threshold_accuracy import ThresholdAccuracy
+from .interval import IntervalCoverage, IntervalScore, MeanIntervalWidth
+from .nll import DistributionNLL
+from .quantile_calibration import QuantileCalibrationError
