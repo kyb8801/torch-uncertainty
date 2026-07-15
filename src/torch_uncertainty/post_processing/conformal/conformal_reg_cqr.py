@@ -61,11 +61,11 @@ class ConformalRegCQR(PostProcessing):
 
     @torch.no_grad()
     def fit(self, dataloader: DataLoader) -> None:
-        """Calibrate the conformal correction on a held-out calibration set.
+        r"""Calibrate the conformal correction on a held-out calibration set.
 
         Runs the quantile model over the calibration dataloader, computes the
         two-sided conformity scores, and stores their finite-sample
-        :math:`(1-\\alpha)`-quantile in :attr:`q_hat`.
+        :math:`(1-\alpha)`-quantile in :attr:`q_hat`.
         """
         assert self.model is not None
         self.model.eval()
