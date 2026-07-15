@@ -14,6 +14,7 @@ from .conformal import (
     ConformalClsAPS,
     ConformalClsRAPS,
     ConformalClsTHR,
+    ConformalRegCQR,
 )
 from .deup import DEUP
 from .laplace import LaplaceApprox
