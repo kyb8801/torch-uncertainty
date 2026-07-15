@@ -6,6 +6,7 @@ from torch import Tensor, nn
 from torch.utils.data import DataLoader
 
 from torch_uncertainty.post_processing.abstract import PostProcessing
+from torch_uncertainty.utils.checks import check_interval_shapes
 
 
 class ConformalRegCQR(PostProcessing):
@@ -73,6 +74,7 @@ class ConformalRegCQR(PostProcessing):
         lowers, uppers, targets = [], [], []
         for inputs, target in dataloader:
             quantiles = self.model(inputs.to(self.device))
+            check_interval_shapes(quantiles[:, 0], quantiles[:, 1], target)
             lowers.append(quantiles[:, 0])
             uppers.append(quantiles[:, 1])
             targets.append(target.to(self.device).reshape(-1))
@@ -90,6 +92,8 @@ class ConformalRegCQR(PostProcessing):
     @torch.no_grad()
     def forward(self, inputs: Tensor) -> Tensor:
         """Return the calibrated ``(batch, 2)`` ``[lower, upper]`` interval."""
+        if self.model is None:  # coverage: ignore
+            raise RuntimeError("Model must be set before calling forward().")
         quantiles = self.model(inputs.to(self.device))
         lower = quantiles[:, 0] - self.quantile
         upper = quantiles[:, 1] + self.quantile
