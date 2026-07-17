@@ -29,10 +29,13 @@ from .classification import (
 )
 from .regression import (
     DistributionNLL,
+    IntervalCoverage,
+    IntervalScore,
     Log10,
     MeanAbsoluteErrorInverse,
     MeanGTRelativeAbsoluteError,
     MeanGTRelativeSquaredError,
+    MeanIntervalWidth,
     MeanSquaredErrorInverse,
     MeanSquaredLogError,
     QuantileCalibrationError,

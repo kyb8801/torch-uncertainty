@@ -27,31 +27,31 @@ class DistributionNLL(CategoricalNLL):
     Inputs:
         - :attr:`dist`: a :class:`torch.distributions.Distribution` over the targets.
         - :attr:`target`: ground-truth targets of compatible shape.
-        - :attr:`padding_mask`: optional boolean mask of positions to ignore (``True`` for padding).
+        - :attr:`ignore_mask`: optional boolean mask of positions to ignore (``True`` for padding).
     """
 
     def update(  # pyrefly: ignore[bad-override]
         self,
         dist: distributions.Distribution,
         target: Tensor,
-        padding_mask: Tensor | None = None,
+        ignore_mask: Tensor | None = None,
     ) -> None:
         """Update state with the predicted distributions and the targets.
 
         Args:
             dist: Predicted distributions.
             target: Ground truth labels.
-            padding_mask: Optional padding mask. Sets the loss to 0 for padded values. Defaults to
+            ignore_mask: Optional padding mask. Sets the loss to 0 for padded values. Defaults to
                 ``None``.
         """
         nlog_prob = -dist.log_prob(target)
-        if padding_mask is not None:
-            nlog_prob = nlog_prob.masked_fill(padding_mask, float("nan"))
+        if ignore_mask is not None:
+            nlog_prob = nlog_prob.masked_fill(ignore_mask, float("nan"))
         if self.reduction is None or self.reduction == "none":
             self.values.append(nlog_prob)
         else:
             self.values += nlog_prob.nansum()
-            self.total += padding_mask.sum() if padding_mask is not None else target.numel()
+            self.total += (~ignore_mask).sum() if ignore_mask is not None else target.numel()
 
     def compute(self) -> Tensor:
         """Compute NLL based on inputs passed to ``update``."""

@@ -225,17 +225,17 @@ class PixelRegressionRoutine(LightningModule):
         out_shape = out[next(iter(out))].shape[-2:] if self.probabilistic else out.shape[-2:]
         target = F.resize(target, out_shape, interpolation=F.InterpolationMode.NEAREST)
         target = rearrange(target, "b c h w -> b h w c")
-        padding_mask = torch.isnan(target).any(dim=-1)
+        nan_target_mask = torch.isnan(target).any(dim=-1)
         if self.probabilistic:
             dist_params = {k: rearrange(v, "b c h w -> b h w c") for k, v in out.items()}
             # Adding the Independent wrapper to the distribution to compute correctly the
             # log-likelihood given a target. Here the last dimension is the event dimension.
             # When computing the log-likelihood, the values are summed over the event dimension.
             dists = Independent(get_dist_class(self.dist_family)(**dist_params), 1)
-            loss = self.loss(dists, target, padding_mask)
+            loss = self.loss(dists, target, ignore_mask=nan_target_mask)
         else:
             out = rearrange(out, "b c h w -> b h w c")
-            loss = self.loss(out[padding_mask], target[padding_mask])
+            loss = self.loss(out[~nan_target_mask], target[~nan_target_mask])
 
         if self.needs_step_update:
             self.model.update_wrapper(self.current_epoch)
@@ -293,10 +293,10 @@ class PixelRegressionRoutine(LightningModule):
                 stage="val",
             )
 
-        padding_mask = torch.isnan(targets).any(dim=-1)
-        self.val_metrics.update(preds[padding_mask], targets[padding_mask])
+        nan_target_mask = torch.isnan(targets).any(dim=-1)
+        self.val_metrics.update(preds[~nan_target_mask], targets[~nan_target_mask])
         if isinstance(dist, Distribution):
-            self.val_prob_metrics.update(dist, targets, padding_mask)
+            self.val_prob_metrics.update(dist, targets, ignore_mask=nan_target_mask)
 
     def test_step(
         self,
@@ -338,10 +338,10 @@ class PixelRegressionRoutine(LightningModule):
                 stage="test",
             )
 
-        padding_mask = torch.isnan(targets).any(dim=-1)
-        self.test_metrics.update(preds[padding_mask], targets[padding_mask])
+        nan_target_mask = torch.isnan(targets).any(dim=-1)
+        self.test_metrics.update(preds[~nan_target_mask], targets[~nan_target_mask])
         if isinstance(dist, Distribution):
-            self.test_prob_metrics.update(dist, targets, padding_mask)
+            self.test_prob_metrics.update(dist, targets, ignore_mask=nan_target_mask)
 
     def on_validation_epoch_end(self) -> None:
         """Compute and log the values of the collected metrics in `validation_step`."""

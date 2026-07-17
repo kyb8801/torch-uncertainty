@@ -25,6 +25,6 @@ class TestQuantileCalibrationError:
         assert ax[1].get_ylabel() == "Density (%)"
 
         qce2 = QuantileCalibrationError()
-        qce2.update(dist, targets, padding_mask=torch.zeros(1000, dtype=torch.bool))
+        qce2.update(dist, targets, ignore_mask=torch.zeros(1000, dtype=torch.bool))
         res2 = qce2.compute()
         assert res2.item() < 0.02

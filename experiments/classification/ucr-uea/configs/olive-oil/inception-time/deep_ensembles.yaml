@@ -14,7 +14,7 @@ trainer:
     - class_path: torch_uncertainty.callbacks.TUClsCheckpoint
 routine:
   model:
-    class_path: torch_uncertainty.models.deep_ensembles
+    class_path: torch_uncertainty.methods.deep_ensembles
     init_args:
       models:
         class_path: torch_uncertainty.models.classification.inception_time

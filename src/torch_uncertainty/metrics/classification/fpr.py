@@ -96,7 +96,7 @@ class FPRx(Metric):
             Tensor: The value of the FPRx.
         """
         confidences = dim_zero_cat(self.confidences)
-        targets = dim_zero_cat(self.targets)
+        targets = dim_zero_cat(self.targets) == self.pos_label
 
         # map examples and labels to OOD first
         indx = torch.argsort(targets, descending=True)

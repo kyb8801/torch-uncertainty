@@ -80,7 +80,7 @@ class BatchLinear(nn.Module):
             In a BatchEnsemble architecture, the input is typically **repeated** `num_estimators`
             times along the batch dimension. Incorrect batch size may lead to unexpected results.
 
-            To simplify batch handling, wrap your model with `torch_uncertainty.wrappers.BatchEnsemble`,
+            To simplify batch handling, wrap your model with `torch_uncertainty.methods.BatchEnsemble`,
             which automatically repeats the batch before passing it through the network.
 
 

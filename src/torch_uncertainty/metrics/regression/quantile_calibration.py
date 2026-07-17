@@ -63,14 +63,14 @@ class QuantileCalibrationError(BinaryCalibrationError):
         self,
         dist: Distribution,
         target: Tensor,
-        padding_mask: Tensor | None = None,
+        ignore_mask: Tensor | None = None,
     ) -> None:
         """Update the metric with new predictions and targets.
 
         Args:
             dist: The predicted distribution.
             target: The ground truth values.
-            padding_mask: A mask to ignore certain values. Defaults to ``None``.
+            ignore_mask: A mask to ignore certain values. Defaults to ``None``.
         """
         reduce_event_dims = False
         if isinstance(dist, Independent):
@@ -108,9 +108,9 @@ class QuantileCalibrationError(BinaryCalibrationError):
 
             correct_mask[..., i] = (bound_log_prob <= target_log_prob).float()
 
-        if padding_mask is not None:
-            confidences = confidences[~padding_mask]
-            correct_mask = correct_mask[~padding_mask]
+        if ignore_mask is not None:
+            confidences = confidences[~ignore_mask]
+            correct_mask = correct_mask[~ignore_mask]
 
         super().update(confidences.flatten(), correct_mask.flatten())
 
