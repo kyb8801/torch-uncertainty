@@ -433,7 +433,7 @@ For the pinball loss, consider citing:
 **Quantile regression**
 
 * Authors: *Roger Koenker, and Kevin F. Hallock*
-* Paper: `Journal of Economic Perspectives, Fall 2021 <https://pubs.aeaweb.org/doi/pdfplus/10.1257/jep.15.4.143>`__
+* Paper: `Journal of Economic Perspectives, Fall 2001 <https://pubs.aeaweb.org/doi/pdfplus/10.1257/jep.15.4.143>`__
 
 Metrics
 -------

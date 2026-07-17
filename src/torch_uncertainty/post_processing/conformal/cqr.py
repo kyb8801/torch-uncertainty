@@ -74,10 +74,11 @@ class ConformalRegCQR(PostProcessing):
         lowers, uppers, targets = [], [], []
         for inputs, target in dataloader:
             quantiles = self.model(inputs.to(self.device))
+            target = target.to(self.device).reshape(-1)
             check_interval_shapes(quantiles[:, 0], quantiles[:, 1], target)
             lowers.append(quantiles[:, 0])
             uppers.append(quantiles[:, 1])
-            targets.append(target.to(self.device).reshape(-1))
+            targets.append(target)
 
         lower = torch.cat(lowers)
         upper = torch.cat(uppers)

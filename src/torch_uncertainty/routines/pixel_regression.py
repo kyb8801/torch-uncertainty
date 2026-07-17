@@ -339,9 +339,9 @@ class PixelRegressionRoutine(LightningModule):
             )
 
         nan_target_mask = torch.isnan(targets).any(dim=-1)
-        self.test_metrics.update(preds[nan_target_mask], targets[nan_target_mask])
+        self.test_metrics.update(preds[~nan_target_mask], targets[~nan_target_mask])
         if isinstance(dist, Distribution):
-            self.test_prob_metrics.update(dist, targets, nan_target_mask)
+            self.test_prob_metrics.update(dist, targets, ignore_mask=nan_target_mask)
 
     def on_validation_epoch_end(self) -> None:
         """Compute and log the values of the collected metrics in `validation_step`."""
