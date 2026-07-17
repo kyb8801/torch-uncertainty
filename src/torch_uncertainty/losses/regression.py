@@ -74,7 +74,7 @@ class DistributionNLLLoss(nn.Module):
             \mathcal{L}_i = -\log p_\theta(y_i \mid x_i),
 
         reduced over the batch according to :attr:`reduction`. Positions flagged by
-        :attr:`padding_mask` are excluded from the reduction (``nan``-safe).
+        :attr:`ignore_mask` are excluded from the reduction (``nan``-safe).
 
         Args:
             reduction: Specifies the reduction to apply to the output.
@@ -87,19 +87,19 @@ class DistributionNLLLoss(nn.Module):
         self,
         dist: Distribution,
         targets: Tensor,
-        padding_mask: Tensor | None = None,
+        ignore_mask: Tensor | None = None,
     ) -> Tensor:
         """Compute the NLL of the targets given predicted distributions.
 
         Args:
             dist: The predicted distributions.
             targets: The target values.
-            padding_mask: The padding mask. Sets the loss to ``0`` for padded values.
+            ignore_mask: The mask of the data to be ignored. Sets the loss to ``0`` for padded values.
                 Defaults to ``None``.
         """
         loss = -dist.log_prob(targets)
-        if padding_mask is not None:
-            loss = loss.masked_fill(padding_mask, float("nan"))
+        if ignore_mask is not None:
+            loss = loss.masked_fill(ignore_mask, float("nan"))
 
         if self.reduction == "mean":
             loss = loss.nanmean()
@@ -158,13 +158,13 @@ class DERLoss(DistributionNLLLoss):
         self,
         dist: Distribution,
         targets: Tensor,
-        padding_mask: Tensor | None = None,
+        ignore_mask: Tensor | None = None,
     ) -> Tensor:
         if not isinstance(dist, NormalInverseGamma | Independent):  # coverage: ignore
             raise TypeError(
                 f"DER only works for NormalInverseGamma or Independent[NormalInverseGamma] distributions. Got {type(dist)} instead."
             )
-        loss_nll = super().forward(dist, targets, padding_mask=padding_mask)
+        loss_nll = super().forward(dist, targets, ignore_mask=ignore_mask)
         loss_reg = self._reg(dist, targets)
         loss = loss_nll + self.reg_weight * loss_reg
 
