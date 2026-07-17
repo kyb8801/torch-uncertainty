@@ -51,7 +51,7 @@ class DistributionNLL(CategoricalNLL):
             self.values.append(nlog_prob)
         else:
             self.values += nlog_prob.nansum()
-            self.total += ignore_mask.sum() if ignore_mask is not None else target.numel()
+            self.total += (~ignore_mask).sum() if ignore_mask is not None else target.numel()
 
     def compute(self) -> Tensor:
         """Compute NLL based on inputs passed to ``update``."""

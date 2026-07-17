@@ -59,7 +59,7 @@ class StochasticModel(nn.Module):
         Returns:
             list[dict[str, Tensor]]: Sampled model states.
         """
-        sampled_models = [{}] * num_samples
+        sampled_models = [{} for _ in range(num_samples)]
         for module_name in self.core_model._modules:
             module = self.core_model._modules[module_name]
             if module is None:  # coverage: ignore
