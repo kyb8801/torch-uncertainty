@@ -3,7 +3,9 @@ from typing import Any
 import torch
 from torch import Tensor
 from torchmetrics import Metric
-from torchmetrics.classification import BinaryAveragePrecision
+from torchmetrics.functional.classification import binary_average_precision
+
+from ._binary import binary_images, binary_target_has_classes
 
 
 class SegmentationBinaryAveragePrecision(Metric):
@@ -38,6 +40,11 @@ class SegmentationBinaryAveragePrecision(Metric):
         As for :class:`SegmentationBinaryAUROC`, image-wise averaging is the convention
         used in the dense OOD-detection literature.
 
+        Images without positive pixels are excluded because their Average Precision is
+        undefined. The metric returns ``nan`` if no valid image was observed. A
+        one-dimensional input is treated as one image; otherwise, the first dimension
+        is the image batch dimension.
+
         Args:
             thresholds: Optional explicit thresholds for the PR curve, see
                 :class:`~torchmetrics.classification.BinaryAveragePrecision`.
@@ -47,19 +54,33 @@ class SegmentationBinaryAveragePrecision(Metric):
                 <https://torchmetrics.readthedocs.io/en/stable/pages/overview.html#metric-kwargs>`_.
         """
         super().__init__(**kwargs)
-        self.aupr_metric = BinaryAveragePrecision(
-            thresholds=thresholds, ignore_index=ignore_index, validate_args=validate_args, **kwargs
-        )
+        self.thresholds = thresholds
+        self.ignore_index = ignore_index
+        self.validate_args = validate_args
         self.add_state("binary_aupr", default=torch.tensor(0.0), dist_reduce_fx="sum")
         self.add_state("total", default=torch.tensor(0.0), dist_reduce_fx="sum")
 
     def update(self, preds: Tensor, target: Tensor) -> None:  # pyrefly: ignore[bad-override]
-        batch_size = preds.size(0)
-        aupr = self.aupr_metric(preds, target)
-        self.binary_aupr += aupr * batch_size
-        self.total += batch_size
+        for image_preds, image_target in binary_images(preds, target):
+            if not binary_target_has_classes(
+                image_target,
+                ignore_index=self.ignore_index,
+                require_negative=False,
+            ):
+                continue
+            thresholds = self.thresholds
+            if isinstance(thresholds, Tensor):
+                thresholds = thresholds.to(image_preds.device)
+            self.binary_aupr += binary_average_precision(
+                image_preds,
+                image_target,
+                thresholds=thresholds,
+                ignore_index=self.ignore_index,
+                validate_args=self.validate_args,
+            )
+            self.total += 1
 
     def compute(self) -> Tensor:
         if self.total == 0:
-            return torch.tensor(0.0, device=self.binary_aupr.device)
+            return torch.tensor(torch.nan, device=self.binary_aupr.device)
         return self.binary_aupr / self.total

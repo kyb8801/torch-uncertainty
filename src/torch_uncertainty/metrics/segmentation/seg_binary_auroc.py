@@ -3,7 +3,9 @@ from typing import Any
 import torch
 from torch import Tensor
 from torchmetrics import Metric
-from torchmetrics.classification import BinaryAUROC
+from torchmetrics.functional.classification import binary_auroc
+
+from ._binary import binary_images, binary_target_has_classes
 
 
 class SegmentationBinaryAUROC(Metric):
@@ -40,6 +42,11 @@ class SegmentationBinaryAUROC(Metric):
         literature (e.g., MUAD) and behaves better than computing AUROC over the
         flattened set of all pixels when image sizes or OOD prevalences vary.
 
+        Images without both positive and negative pixels are excluded because their
+        AUROC is undefined. The metric returns ``nan`` if no valid image was observed.
+        A one-dimensional input is treated as one image; otherwise, the first dimension
+        is the image batch dimension.
+
         Args:
             max_fpr: If set, computes the partial AUROC up to this FPR value
                 (passed to :class:`~torchmetrics.classification.BinaryAUROC`).
@@ -50,23 +57,31 @@ class SegmentationBinaryAUROC(Metric):
                 <https://torchmetrics.readthedocs.io/en/stable/pages/overview.html#metric-kwargs>`_.
         """
         super().__init__(**kwargs)
-        self.auroc_metric = BinaryAUROC(
-            max_fpr=max_fpr,
-            thresholds=thresholds,
-            ignore_index=ignore_index,
-            validate_args=validate_args,
-            **kwargs,
-        )
+        self.max_fpr = max_fpr
+        self.thresholds = thresholds
+        self.ignore_index = ignore_index
+        self.validate_args = validate_args
         self.add_state("binary_auroc", default=torch.tensor(0.0), dist_reduce_fx="sum")
         self.add_state("total", default=torch.tensor(0.0), dist_reduce_fx="sum")
 
     def update(self, preds: Tensor, target: Tensor) -> None:  # pyrefly: ignore[bad-override]
-        batch_size = preds.size(0)
-        auroc = self.auroc_metric(preds, target)
-        self.binary_auroc += auroc * batch_size
-        self.total += batch_size
+        for image_preds, image_target in binary_images(preds, target):
+            if not binary_target_has_classes(image_target, ignore_index=self.ignore_index):
+                continue
+            thresholds = self.thresholds
+            if isinstance(thresholds, Tensor):
+                thresholds = thresholds.to(image_preds.device)
+            self.binary_auroc += binary_auroc(
+                image_preds,
+                image_target,
+                max_fpr=self.max_fpr,
+                thresholds=thresholds,
+                ignore_index=self.ignore_index,
+                validate_args=self.validate_args,
+            )
+            self.total += 1
 
     def compute(self) -> Tensor:
         if self.total == 0:
-            return torch.tensor(0.0, device=self.binary_auroc.device)
+            return torch.tensor(torch.nan, device=self.binary_auroc.device)
         return self.binary_auroc / self.total
