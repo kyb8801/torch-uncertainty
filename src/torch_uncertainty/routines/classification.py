@@ -456,16 +456,13 @@ class ClassificationRoutine(LightningModule):
         logits = self.forward(inputs, save_feats=self.eval_grouping_loss)
         logits = rearrange(logits, "(m b) c -> b m c", b=targets.size(0))
 
-        if self.binary_cls:
-            probs_per_est = torch.sigmoid(logits).squeeze(-1)
-        else:
-            probs_per_est = F.softmax(logits, dim=-1)
-
+        probs_per_est = torch.sigmoid(logits) if self.binary_cls else F.softmax(logits, dim=-1)
         probs = probs_per_est.mean(dim=1)
-        self.val_cls_metrics.update(probs, targets)
+        task_probs = probs.squeeze(-1) if self.binary_cls else probs
+        self.val_cls_metrics.update(task_probs, targets)
 
         if self.eval_grouping_loss:
-            self.val_grouping_loss.update(probs, targets, self.features)
+            self.val_grouping_loss.update(task_probs, targets, self.features)
 
     def test_step(
         self,
@@ -498,6 +495,13 @@ class ClassificationRoutine(LightningModule):
         logits = rearrange(logits, "(m b) c -> b m c", b=targets.size(0))
         probs_per_est = torch.sigmoid(logits) if self.binary_cls else F.softmax(logits, dim=-1)
         probs = probs_per_est.mean(dim=1)
+        task_probs = probs.squeeze(-1) if self.binary_cls else probs
+        categorical_probs_per_est = (
+            torch.cat((1 - probs_per_est, probs_per_est), dim=-1)
+            if self.binary_cls
+            else probs_per_est
+        )
+        categorical_probs = categorical_probs_per_est.mean(dim=1)
 
         pp_probs: Tensor | None = None
         pp_epistemic: Tensor | None = None
@@ -516,9 +520,9 @@ class ClassificationRoutine(LightningModule):
         if self.ood_criterion.input_type == OODCriterionInputType.LOGIT:
             ood_scores = self.ood_criterion(logits)
         elif self.ood_criterion.input_type == OODCriterionInputType.PROB:
-            ood_scores = self.ood_criterion(probs)
+            ood_scores = self.ood_criterion(categorical_probs)
         elif self.ood_criterion.input_type == OODCriterionInputType.ESTIMATOR_PROB:
-            ood_scores = self.ood_criterion(probs_per_est)
+            ood_scores = self.ood_criterion(categorical_probs_per_est)
         elif self.ood_criterion.input_type == OODCriterionInputType.POST_PROCESSING:
             if isinstance(self.post_processing, DEUP):
                 ood_scores = self.ood_criterion(pp_epistemic)
@@ -526,26 +530,19 @@ class ClassificationRoutine(LightningModule):
                 ood_scores = self.ood_criterion(pp_probs)
 
         if dataloader_idx == 0:
-            # squeeze if binary classification only for binary metrics
-            self.test_cls_metrics.update(
-                probs.squeeze(-1) if self.binary_cls else probs,
-                targets,
-            )
-            self.test_id_entropy.update(probs)
+            self.test_cls_metrics.update(task_probs, targets)
+            self.test_id_entropy.update(categorical_probs)
 
             if self.eval_grouping_loss:
-                self.test_grouping_loss.update(probs, targets, self.features)
+                self.test_grouping_loss.update(task_probs, targets, self.features)
 
             if self.is_ensemble:
-                self.test_id_ens_metrics.update(probs_per_est)
+                self.test_id_ens_metrics.update(categorical_probs_per_est)
 
             if self.eval_ood:
                 self.test_ood_metrics.update(ood_scores, torch.zeros_like(targets))
 
-                if self.binary_cls:
-                    id_preds = (probs.squeeze(-1) >= 0.5).long()
-                else:
-                    id_preds = probs.argmax(dim=-1)
+                id_preds = (task_probs >= 0.5).long() if self.binary_cls else probs.argmax(dim=-1)
 
                 classification_errors = id_preds.ne(targets)
                 self.test_scod_metrics.update(
@@ -561,7 +558,7 @@ class ClassificationRoutine(LightningModule):
                 self.post_cls_metrics.update(pp_probs, targets)
 
         if self.eval_ood and dataloader_idx == 1:
-            self.test_ood_entropy.update(probs)
+            self.test_ood_entropy.update(categorical_probs)
             self.test_ood_metrics.update(ood_scores, torch.ones_like(targets))
 
             is_ood = torch.ones_like(targets, dtype=torch.bool)
@@ -572,17 +569,17 @@ class ClassificationRoutine(LightningModule):
             )
 
             if self.is_ensemble:
-                self.test_ood_ens_metrics.update(probs_per_est)
+                self.test_ood_ens_metrics.update(categorical_probs_per_est)
 
             if self.ood_score_storage is not None:
                 self.ood_score_storage.append(ood_scores.detach().cpu())
 
         if self.eval_shift and dataloader_idx == (2 if self.eval_ood else 1):
-            self.test_shift_entropy.update(probs)
-            self.test_shift_metrics.update(probs, targets)
+            self.test_shift_entropy.update(categorical_probs)
+            self.test_shift_metrics.update(task_probs, targets)
 
             if self.is_ensemble:
-                self.test_shift_ens_metrics.update(probs_per_est)
+                self.test_shift_ens_metrics.update(categorical_probs_per_est)
 
     def on_validation_epoch_end(self) -> None:
         """Compute and log the values of the collected metrics in `validation_step`."""
