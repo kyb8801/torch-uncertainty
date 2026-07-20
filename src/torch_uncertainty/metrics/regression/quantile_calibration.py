@@ -1,31 +1,29 @@
 import warnings
-from typing import Literal, cast
+from typing import Literal
 
+import matplotlib.pyplot as plt
 import torch
 from torch import Tensor
 from torch.distributions import Distribution, Independent
-from torchmetrics.classification import BinaryCalibrationError
-from torchmetrics.functional.classification.calibration_error import (
-    _binning_bucketize,
-)
-from torchmetrics.utilities.data import dim_zero_cat
+from torchmetrics import Metric
 from torchmetrics.utilities.plot import _PLOT_OUT_TYPE
 
-from torch_uncertainty.metrics.classification.calibration.calibration_error import reliability_chart
 
+class QuantileCalibrationError(Metric):
+    is_differentiable = False
+    higher_is_better = False
+    full_state_update = False
 
-class QuantileCalibrationError(BinaryCalibrationError):
-    is_differentiable: bool = False
-    higher_is_better: bool = False
-    full_state_update: bool = False
-    not_implemented_error: bool = False
+    covered: Tensor
+    total: Tensor
+    unsupported: Tensor
 
     def __init__(
         self,
         num_bins: int = 15,
         norm: Literal["l1", "l2", "max"] = "l1",
-        ignore_index=None,
-        validate_args=True,
+        ignore_index: int | None = None,
+        validate_args: bool = True,
         **kwargs,
     ) -> None:
         r"""Quantile Calibration Error for regression tasks.
@@ -40,24 +38,54 @@ class QuantileCalibrationError(BinaryCalibrationError):
             \mathbf{1}\!\left[ y_i \in
             \left[ F^{-1}_{\theta, x_i}\!\left(\tfrac{1 - \alpha}{2}\right),
                    F^{-1}_{\theta, x_i}\!\left(\tfrac{1 + \alpha}{2}\right) \right]
-            \right],
+            \right].
 
-        where :math:`F^{-1}_{\theta, x_i}` is the predictive inverse CDF (computed via
-        the distribution's ``icdf`` method). The Quantile Calibration Error then
-        aggregates the gap :math:`|\hat{c}(\alpha) - \alpha|` over a regular grid of
-        :attr:`num_bins` confidence levels using the chosen :attr:`norm` — the regression
-        counterpart of the :class:`~torch_uncertainty.metrics.classification.CalibrationError`.
+        The metric evaluates this coverage on :attr:`num_bins` confidence levels
+        :math:`\alpha_k` regularly spaced between ``0.05`` and ``0.95``. It returns
+
+        .. math::
+            \operatorname{QCE}_{L_1}
+            = \frac{1}{K}\sum_{k=1}^{K}
+            \left|\hat{c}(\alpha_k)-\alpha_k\right|,
+
+        with analogous root-mean-square and maximum variants for ``norm="l2"``
+        and ``norm="max"``.
+
+        For :class:`~torch.distributions.Independent` distributions, calibration is
+        evaluated marginally: every scalar event component contributes one coverage
+        observation.
 
         Args:
-            num_bins: Number of bins to use for calibration. Defaults to ``15``.
-            norm: Norm to use for calibration error computation. Defaults to ``"l1"``.
-            ignore_index: Index to ignore during calibration. Defaults to ``None``.
-            validate_args: Whether to validate the input arguments. Defaults to ``True``.
+            num_bins: Number of confidence levels. Defaults to ``15``.
+            norm: Norm used to aggregate the calibration gaps. One of ``"l1"``,
+                ``"l2"``, or ``"max"``. Defaults to ``"l1"``.
+            ignore_index: Optional target value to ignore. Defaults to ``None``.
+            validate_args: Whether to validate input shapes. Defaults to ``True``.
             kwargs: Additional keyword arguments, see `Advanced metric settings
-              <https://torchmetrics.readthedocs.io/en/stable/pages/overview.html#metric-kwargs>`_.
+                <https://torchmetrics.readthedocs.io/en/stable/pages/overview.html#metric-kwargs>`_.
         """
-        super().__init__(num_bins, norm, ignore_index, validate_args, **kwargs)
-        self.conf_intervals = torch.linspace(0.05, 0.95, self.n_bins + 1)
+        super().__init__(**kwargs)
+        if num_bins < 1:
+            raise ValueError(f"Expected `num_bins` to be at least 1, but got {num_bins}.")
+        if norm not in ("l1", "l2", "max"):
+            raise ValueError(f"Expected `norm` to be one of ('l1', 'l2', 'max'), but got {norm}.")
+
+        self.n_bins = num_bins
+        self.norm = norm
+        self.ignore_index = ignore_index
+        self.validate_args = validate_args
+        self.register_buffer("conf_intervals", torch.linspace(0.05, 0.95, num_bins))
+        self.add_state(
+            "covered",
+            default=torch.zeros(num_bins, dtype=torch.long),
+            dist_reduce_fx="sum",
+        )
+        self.add_state("total", default=torch.tensor(0, dtype=torch.long), dist_reduce_fx="sum")
+        self.add_state(
+            "unsupported",
+            default=torch.tensor(0, dtype=torch.long),
+            dist_reduce_fx="sum",
+        )
 
     def update(  # pyrefly: ignore[bad-override]
         self,
@@ -65,107 +93,96 @@ class QuantileCalibrationError(BinaryCalibrationError):
         target: Tensor,
         ignore_mask: Tensor | None = None,
     ) -> None:
-        """Update the metric with new predictions and targets.
+        """Update the metric with predictive distributions and targets.
 
         Args:
-            dist: The predicted distribution.
-            target: The ground truth values.
-            ignore_mask: A mask to ignore certain values. Defaults to ``None``.
+            dist: Predicted distribution. It must implement ``icdf``.
+            target: Ground-truth values, with one value per predictive distribution.
+            ignore_mask: Boolean mask of targets to ignore. A mask over only the batch
+                dimensions is expanded over trailing event dimensions. Defaults to ``None``.
         """
-        reduce_event_dims = False
-        if isinstance(dist, Independent):
-            iid_dist = dist.base_dist
-            reduce_event_dims = True
-        else:
-            iid_dist = dist
+        expected_shape = dist.batch_shape + dist.event_shape
+        if self.validate_args and target.shape != expected_shape:
+            raise ValueError(
+                "Expected `target` to have shape equal to the distribution batch and "
+                f"event shapes ({expected_shape}), but got {target.shape}."
+            )
+
+        marginal_dist = dist.base_dist if isinstance(dist, Independent) else dist
+        levels = self.conf_intervals.to(target.device)
 
         try:
-            iid_dist.icdf((1 - self.conf_intervals[0]) / 2)
-
+            intervals = [
+                (
+                    marginal_dist.icdf((1 - level) / 2),
+                    marginal_dist.icdf((1 + level) / 2),
+                )
+                for level in levels
+            ]
         except NotImplementedError:
             warnings.warn(
                 "The distribution does not support the `icdf()` method. "
-                "This metric will therefore return `nan` values. "
-                "Please use a distribution that implements `icdf()`.",
+                "This metric will therefore return `nan`. Please use a "
+                "distribution that implements `icdf()`.",
                 UserWarning,
                 stacklevel=2,
             )
-            self.not_implemented_error = True
+            self.unsupported += 1
             return
 
-        confidences = self.conf_intervals.expand(*dist.batch_shape, -1)
-        correct_mask = torch.empty_like(confidences)
-
-        for i, conf in enumerate(self.conf_intervals):
-            b_min = iid_dist.icdf((1 - conf) / 2)
-            bound_log_prob = iid_dist.log_prob(b_min)
-            target_log_prob = dist.log_prob(target)
-            if reduce_event_dims:
-                indep_dist = cast("Independent", dist)
-                bound_log_prob = bound_log_prob.sum(
-                    dim=list(range(-indep_dist.reinterpreted_batch_ndims, 0))
-                )
-
-            correct_mask[..., i] = (bound_log_prob <= target_log_prob).float()
-
+        valid = torch.ones_like(target, dtype=torch.bool)
+        if self.ignore_index is not None:
+            valid &= target != self.ignore_index
         if ignore_mask is not None:
-            confidences = confidences[~ignore_mask]
-            correct_mask = correct_mask[~ignore_mask]
+            ignore_mask = ignore_mask.bool()
+            while ignore_mask.ndim < target.ndim:
+                ignore_mask = ignore_mask.unsqueeze(-1)
+            try:
+                ignore_mask = torch.broadcast_to(ignore_mask, target.shape)
+            except RuntimeError as err:
+                raise ValueError(
+                    f"Expected `ignore_mask` to be broadcastable to {target.shape}, "
+                    f"but got {ignore_mask.shape}."
+                ) from err
+            valid &= ~ignore_mask
 
-        super().update(confidences.flatten(), correct_mask.flatten())
+        inside = torch.stack(
+            [(target >= lower) & (target <= upper) & valid for lower, upper in intervals]
+        )
+        self.covered += inside.reshape(self.n_bins, -1).sum(dim=1)
+        self.total += valid.sum()
 
     def compute(self) -> Tensor:
-        """Compute the quantile calibration error.
+        """Compute the Quantile Calibration Error."""
+        if self.unsupported > 0 or self.total == 0:
+            return torch.tensor(torch.nan, device=self.covered.device)
 
-        Returns:
-            Tensor: The quantile calibration error.
-
-        Warning:
-            If the distribution does not support ``icdf()``, this returns ``nan`` values.
-        """
-        if self.not_implemented_error:
-            return torch.tensor(float("nan"))
-        return super().compute()
+        empirical_coverage = self.covered / self.total
+        calibration_gap = (empirical_coverage - self.conf_intervals).abs()
+        if self.norm == "l1":
+            return calibration_gap.mean()
+        if self.norm == "l2":
+            return calibration_gap.square().mean().sqrt()
+        return calibration_gap.max()
 
     def plot(self) -> _PLOT_OUT_TYPE:  # pyrefly: ignore[bad-override]
-        """Plot the quantile calibration reliability diagram.
-
-        Raises:
-            NotImplementedError: If the distribution does not support ``icdf()``.
-        """
-        if self.not_implemented_error:
+        """Plot empirical coverage against nominal coverage."""
+        if self.unsupported > 0:
             raise NotImplementedError(
                 "The distribution does not support the `icdf()` method. "
-                "This metric will therefore return `nan` values. "
                 "Please use a distribution that implements `icdf()`."
             )
+        if self.total == 0:
+            raise RuntimeError("QuantileCalibrationError requires at least one valid target.")
 
-        confidences = dim_zero_cat(self.confidences)
-        accuracies = dim_zero_cat(self.accuracies)
-
-        bin_boundaries = torch.linspace(
-            0,
-            1,
-            self.n_bins + 1,
-            dtype=torch.float,
-            device=confidences.device,
-        )
-
-        with torch.no_grad():
-            acc_bin, conf_bin, prop_bin = _binning_bucketize(
-                confidences, accuracies, bin_boundaries
-            )
-
-        np_acc_bin = acc_bin.cpu().numpy()
-        np_conf_bin = conf_bin.cpu().numpy()
-        np_prop_bin = prop_bin.cpu().numpy()
-        np_bin_boundaries = bin_boundaries.cpu().numpy()
-
-        return reliability_chart(
-            accuracies=accuracies.cpu().numpy(),
-            confidences=confidences.cpu().numpy(),
-            bin_accuracies=np_acc_bin,
-            bin_confidences=np_conf_bin,
-            bin_sizes=np_prop_bin,
-            bins=np_bin_boundaries,
-        )
+        nominal = self.conf_intervals.detach().cpu() * 100
+        empirical = (self.covered / self.total).detach().cpu() * 100
+        fig, ax = plt.subplots()
+        ax.plot(nominal, empirical, marker="o", label="Model")
+        ax.plot([0, 100], [0, 100], linestyle="--", color="black", label="Ideal")
+        ax.set_xlabel("Nominal Coverage (%)")
+        ax.set_ylabel("Empirical Coverage (%)")
+        ax.set_xlim(0, 100)
+        ax.set_ylim(0, 100)
+        ax.legend()
+        return fig, ax
