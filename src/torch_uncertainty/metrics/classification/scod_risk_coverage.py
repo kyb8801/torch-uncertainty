@@ -39,12 +39,23 @@ class _SCODRiskCoverageMixin:
                 "the same number of elements."
             )
 
-        classification_errors = classification_errors.to(dtype=ood_scores.dtype)
-        is_ood = is_ood.bool()
+        if ood_scores.is_floating_point() and not torch.isfinite(ood_scores).all():
+            raise ValueError("ood_scores must contain only finite values.")
+
+        # SCOD losses are fractional even when the ranking scores are integral.
+        # Promote half precision as well, since the parent risk-coverage metrics
+        # perform cumulative sums over the losses.
+        dtype = torch.promote_types(ood_scores.dtype, torch.float32)
+        ood_scores = ood_scores.to(dtype=dtype)
+        classification_errors = classification_errors.to(
+            device=ood_scores.device,
+            dtype=dtype,
+        )
+        is_ood = is_ood.to(device=ood_scores.device, dtype=torch.bool)
 
         scod_losses = torch.where(
             is_ood,
-            torch.full_like(classification_errors, self.ood_cost),
+            torch.full_like(classification_errors, self.ood_cost, dtype=dtype),
             classification_errors * (1 - self.ood_cost),
         )
 

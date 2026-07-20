@@ -155,6 +155,40 @@ class TestBrierScore:
         metric.update(vec3d, vec3d_target)
         assert metric.compute() == 1
 
+    def test_mixed_2d_and_3d_updates(self) -> None:
+        metric = BrierScore(num_classes=2, reduction="mean")
+        metric.update(torch.tensor([[0.0, 1.0]]), torch.tensor([1]))
+        metric.update(
+            torch.tensor([[[1.0, 0.0], [1.0, 0.0]]]),
+            torch.tensor([1]),
+        )
+
+        # The first sample has score 0 and the second has estimator-mean score 2.
+        torch.testing.assert_close(metric.compute(), torch.tensor(1.0))
+
+    def test_none_reduction_averages_estimators_per_sample(self) -> None:
+        probs = torch.tensor(
+            [
+                [[0.0, 1.0], [1.0, 0.0]],
+                [[0.5, 0.5], [0.5, 0.5]],
+            ]
+        )
+        metric = BrierScore(num_classes=2, reduction="none")
+        metric.update(probs, torch.tensor([1, 0]))
+
+        assert metric.compute().shape == (2,)
+        torch.testing.assert_close(metric.compute(), torch.tensor([1.0, 0.5]))
+
+    def test_binary_brier_and_top_class(self) -> None:
+        probs = torch.tensor([0.1, 0.8])
+        target = torch.tensor([0, 1])
+
+        metric = BrierScore(num_classes=1)
+        top_metric = BrierScore(num_classes=1, top_class=True)
+
+        torch.testing.assert_close(metric(probs, target), torch.tensor(0.025))
+        torch.testing.assert_close(top_metric(probs, target), torch.tensor(0.025))
+
     def test_compute_3d_sum(self, vec3d: torch.Tensor, vec3d_target: torch.Tensor) -> None:
         metric = BrierScore(num_classes=2, reduction="sum")
         metric.update(vec3d, vec3d_target)

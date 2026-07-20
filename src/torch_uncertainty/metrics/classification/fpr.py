@@ -26,7 +26,7 @@ class FPRx(Metric):
         equals the target recall level :math:`x`:
 
         .. math::
-            \tau_x = \inf \left\{ \tau \;\middle|\;
+            \tau_x = \sup \left\{ \tau \;\middle|\;
             \frac{|\{i : s_i \geq \tau,\, y_i = 1\}|}{|\{i : y_i = 1\}|} \geq x \right\},
 
         where :math:`s_i` is the confidence score assigned to sample :math:`i` and
@@ -96,53 +96,53 @@ class FPRx(Metric):
             Tensor: The value of the FPRx.
         """
         confidences = dim_zero_cat(self.confidences)
-        targets = dim_zero_cat(self.targets) == self.pos_label
-
-        # map examples and labels to OOD first
-        indx = torch.argsort(targets, descending=True)
-        examples = confidences[indx]
-        labels = torch.zeros_like(targets, dtype=torch.bool, device=self.device)
-        labels[: torch.count_nonzero(targets)] = True
-
-        # sort examples and labels by decreasing confidence
-        desc_scores_indx = torch.argsort(examples, descending=True)
-        examples = examples[desc_scores_indx]
-        labels = labels[desc_scores_indx]
-
-        # Get the indices of the distinct values
-        distinct_value_indices = torch.where(torch.diff(examples))[0]
-        threshold_idxs = torch.cat(
-            [
-                distinct_value_indices,
-                torch.tensor([labels.shape[0] - 1], dtype=torch.long, device=self.device),
-            ]
+        targets = dim_zero_cat(self.targets)
+        return _fprx_compute(
+            confidences,
+            targets,
+            recall_level=self.recall_level,
+            pos_label=self.pos_label,
         )
 
-        # accumulate the true positives with decreasing threshold
-        true_pos = torch.cumsum(labels, dim=0)[threshold_idxs]
-        false_pos = 1 + threshold_idxs - true_pos  # add one because of zero-based indexing
 
-        # check that there is at least one OOD example
-        if true_pos[-1] == 0:
-            return torch.tensor([torch.nan], device=self.device)
+def _fprx_compute(
+    confidences: Tensor,
+    target: Tensor,
+    recall_level: float,
+    pos_label: int,
+) -> Tensor:
+    """Compute a tie-aware FPR at a minimum requested recall."""
+    confidences = confidences.flatten()
+    labels = target.flatten() == pos_label
+    if confidences.shape != labels.shape:
+        raise ValueError("Expected `confidences` and `target` to have the same shape.")
 
-        recall = true_pos / true_pos[-1]
+    num_positive = labels.sum()
+    num_negative = (~labels).sum()
+    if num_positive == 0 or num_negative == 0:
+        dtype = confidences.dtype if confidences.is_floating_point() else torch.float32
+        return torch.tensor(torch.nan, device=confidences.device, dtype=dtype)
+    if recall_level == 0:
+        return confidences.new_tensor(0.0, dtype=torch.float32)
 
-        last_ind = torch.searchsorted(true_pos, true_pos[-1])
-        recall = torch.cat(
-            [
-                recall[: last_ind + 1].flip(0),
-                torch.tensor([1.0], device=self.device),
-            ]
+    order = confidences.argsort(descending=True)
+    sorted_scores = confidences[order]
+    sorted_labels = labels[order]
+
+    # Evaluate thresholds only after complete groups of tied scores. Splitting a
+    # tie could claim a recall/FPR pair that no score threshold can achieve.
+    threshold_idxs = torch.cat(
+        (
+            torch.where(sorted_scores[1:] != sorted_scores[:-1])[0],
+            torch.tensor([labels.numel() - 1], device=labels.device),
         )
-        false_pos = torch.cat(
-            [
-                false_pos[: last_ind + 1].flip(0),
-                torch.tensor([0.0], device=self.device),
-            ]
-        )
-        cutoff = torch.argmin(torch.abs(recall - self.recall_level))
-        return false_pos[cutoff] / (~labels).sum()
+    )
+    true_positive = sorted_labels.cumsum(dim=0)[threshold_idxs]
+    false_positive = threshold_idxs + 1 - true_positive
+    recall = true_positive / num_positive
+
+    cutoff = torch.where(recall >= recall_level)[0][0]
+    return false_positive[cutoff] / num_negative
 
 
 class FPR95(FPRx):

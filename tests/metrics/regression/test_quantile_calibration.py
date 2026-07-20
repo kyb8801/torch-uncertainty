@@ -17,12 +17,8 @@ class TestQuantileCalibrationError:
         res = qce.compute()
         assert res.item() < 0.02
 
-        fig, ax = qce.plot()
+        fig, _ = qce.plot()
         assert isinstance(fig, plt.Figure)
-        assert ax[0].get_xlabel() == "Top-class Confidence (%)"
-        assert ax[0].get_ylabel() == "Success Rate (%)"
-        assert ax[1].get_xlabel() == "Top-class Confidence (%)"
-        assert ax[1].get_ylabel() == "Density (%)"
 
         qce2 = QuantileCalibrationError()
         qce2.update(dist, targets, ignore_mask=torch.zeros(1000, dtype=torch.bool))

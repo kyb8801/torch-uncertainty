@@ -25,7 +25,19 @@ class TestSegmentationBinaryAUROC:
     def test_compute_zero_total(self) -> None:
         metric = SegmentationBinaryAUROC()
         result = metric.compute()
-        assert result == 0.0
+        assert torch.isnan(result)
+
+    def test_image_average_and_batch_partition_invariance(self) -> None:
+        preds, target = _image_averaging_example()
+
+        batched = SegmentationBinaryAUROC()
+        batched.update(preds, target)
+        split = SegmentationBinaryAUROC()
+        split.update(preds[0:1], target[0:1])
+        split.update(preds[1:2], target[1:2])
+
+        torch.testing.assert_close(batched.compute(), torch.tensor(0.5))
+        torch.testing.assert_close(split.compute(), batched.compute())
 
     def test_multiple_batches(self) -> None:
         metric = SegmentationBinaryAUROC()
@@ -49,7 +61,19 @@ class TestSegmentationBinaryAveragePrecision:
     def test_compute_zero_total(self) -> None:
         metric = SegmentationBinaryAveragePrecision()
         result = metric.compute()
-        assert result == 0.0
+        assert torch.isnan(result)
+
+    def test_image_average_and_batch_partition_invariance(self) -> None:
+        preds, target = _image_averaging_example()
+
+        batched = SegmentationBinaryAveragePrecision()
+        batched.update(preds, target)
+        split = SegmentationBinaryAveragePrecision()
+        split.update(preds[0:1], target[0:1])
+        split.update(preds[1:2], target[1:2])
+
+        torch.testing.assert_close(batched.compute(), torch.tensor(0.625))
+        torch.testing.assert_close(split.compute(), batched.compute())
 
     def test_multiple_batches(self) -> None:
         metric = SegmentationBinaryAveragePrecision()
@@ -84,6 +108,35 @@ class TestSegmentationFPR95:
             metric.update(preds, target)
         result = metric.compute()
         assert result.ndim == 0
+
+    def test_image_average_and_batch_partition_invariance(self) -> None:
+        preds, target = _image_averaging_example()
+
+        batched = SegmentationFPR95(pos_label=1)
+        batched.update(preds, target)
+        split = SegmentationFPR95(pos_label=1)
+        split.update(preds[0:1], target[0:1])
+        split.update(preds[1:2], target[1:2])
+
+        torch.testing.assert_close(batched.compute(), torch.tensor(0.5))
+        torch.testing.assert_close(split.compute(), batched.compute())
+
+
+def _image_averaging_example() -> tuple[torch.Tensor, torch.Tensor]:
+    """Two images whose pooled pixel metric differs from their image average."""
+    preds = torch.tensor(
+        [
+            [[0.0, 1.0], [0.9, 0.8]],
+            [[0.7, 0.6], [0.5, 0.4]],
+        ]
+    )
+    target = torch.tensor(
+        [
+            [[0, 1], [1, 1]],
+            [[0, 0], [0, 1]],
+        ]
+    )
+    return preds, target
 
 
 class TestPAvPU:
