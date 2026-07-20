@@ -279,7 +279,7 @@ class ClassificationRoutine(LightningModule):
                 compute_groups=[
                     ["SCOD_AURC", "SCOD_AUGRC", "SCOD_Cov_5Risk", "SCOD_Risk_80Cov"],
                 ],
-            ).clone(prefix="ood/SCOD_")
+            ).clone(prefix="ood/")
 
             self.test_ood_entropy = Entropy()
 
