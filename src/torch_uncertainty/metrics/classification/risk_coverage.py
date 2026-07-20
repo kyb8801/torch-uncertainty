@@ -398,14 +398,15 @@ class CovAtxRisk(Metric):
         if num_samples < 1:
             return torch.tensor([float("nan")], device=self.device)
         error_rates = _aurc_rejection_rate_compute(scores, errors)
-        admissible_risks = (error_rates > self.risk_threshold) * 1
-        max_cov_at_risk = admissible_risks.flip(0).argmin()
+        admissible = torch.nonzero(
+            error_rates <= self.risk_threshold,
+            as_tuple=False,
+        ).flatten()
 
-        # check if max_cov_at_risk is really admissible, if not return nan
-        risk = admissible_risks[max_cov_at_risk]
-        if risk > self.risk_threshold:
+        if admissible.numel() == 0:
             return torch.tensor([float("nan")], device=self.device)
-        return 1 - max_cov_at_risk / num_samples
+
+        return (admissible[-1] + 1) / num_samples
 
 
 class CovAt5Risk(CovAtxRisk):

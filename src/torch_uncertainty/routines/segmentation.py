@@ -20,8 +20,6 @@ from torch_uncertainty.methods import (
 from torch_uncertainty.metrics import (
     AUGRC,
     AURC,
-    SCODAUGRC,
-    SCODAURC,
     BrierScore,
     CalibrationError,
     CategoricalNLL,
@@ -29,8 +27,6 @@ from torch_uncertainty.metrics import (
     MeanIntersectionOverUnion,
     PAvPU,
     RiskAt80Cov,
-    SCODCovAt5Risk,
-    SCODRiskAt80Cov,
     SegmentationBinaryAUROC,
     SegmentationBinaryAveragePrecision,
     SegmentationFPR95,
@@ -228,10 +224,6 @@ class SegmentationRoutine(LightningModule):
                     "AUROC": SegmentationBinaryAUROC(),
                     "AUPR": SegmentationBinaryAveragePrecision(),
                     "FPR95": SegmentationFPR95(pos_label=1),
-                    "SCOD_AURC": SCODAURC(),
-                    "SCOD_AUGRC": SCODAUGRC(),
-                    "SCOD_Cov_5Risk": SCODCovAt5Risk(),
-                    "SCOD_Risk_80Cov": SCODRiskAt80Cov(),
                 }
             )
             self.test_ood_metrics = ood_metrics.clone(prefix="ood/")
