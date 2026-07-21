@@ -240,6 +240,34 @@ class TestSCODRiskAtxCov:
 
 
 class TestSCODRiskCoverageValidation:
+    @pytest.mark.parametrize("score_dtype", [torch.int64, torch.uint8, torch.float16])
+    def test_fractional_losses_do_not_follow_score_dtype(
+        self,
+        score_dtype: torch.dtype,
+    ) -> None:
+        metric = SCODAURC(ood_cost=0.5)
+
+        metric.update(
+            ood_scores=torch.tensor([0, 1], dtype=score_dtype),
+            classification_errors=torch.zeros(2, dtype=torch.bool),
+            is_ood=torch.ones(2, dtype=torch.bool),
+        )
+
+        assert metric.errors[0].dtype == torch.float32
+        torch.testing.assert_close(metric.errors[0], torch.tensor([0.5, 0.5]))
+        torch.testing.assert_close(metric.partial_compute(), torch.tensor([0.5, 0.5]))
+
+    def test_float64_scores_preserve_precision(self) -> None:
+        metric = SCODAURC(ood_cost=0.25)
+        metric.update(
+            ood_scores=torch.tensor([0.0, 1.0], dtype=torch.float64),
+            classification_errors=torch.zeros(2, dtype=torch.bool),
+            is_ood=torch.ones(2, dtype=torch.bool),
+        )
+
+        assert metric.errors[0].dtype == torch.float64
+        assert metric.scores[0].dtype == torch.float64
+
     @pytest.mark.parametrize("metric_cls", [SCODAURC, SCODAUGRC])
     def test_invalid_ood_cost_type(self, metric_cls: type) -> None:
         with pytest.raises(TypeError, match=r"Expected ood_cost to be of type float"):
