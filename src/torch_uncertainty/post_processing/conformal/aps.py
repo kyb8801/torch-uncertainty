@@ -1,6 +1,7 @@
 from typing import Literal
 
 import torch
+import torch.nn.functional as F
 from torch import Tensor, nn
 from torch.utils.data import DataLoader
 
@@ -126,7 +127,25 @@ class ConformalClsAPS(Conformal):
 
     @torch.no_grad()
     def conformal(self, inputs: Tensor) -> Tensor:
-        """Compute the prediction set for each input."""
+        """Compute the prediction set for each input.
+
+        Returns:
+            A probability vector for each sample. Its support is the conformal
+            prediction set, with equal probability assigned to every included class.
+            If thresholding produces an empty prediction set, the class with the
+            lowest non-conformity score is included before normalization. Consequently,
+            every returned row is finite and sums to one.
+        """
         probs = self.model_forward(inputs)
-        pred_set = self._calculate_all_labels(probs) <= self.quantile
-        return pred_set.float() / pred_set.sum(dim=1, keepdim=True)
+        scores = self._calculate_all_labels(probs)
+        pred_set = scores <= self.quantile
+
+        empty = ~pred_set.any(dim=-1)
+        fallback = F.one_hot(
+            scores.argmin(dim=-1),
+            num_classes=scores.shape[-1],
+        ).bool()
+        pred_set = pred_set | (empty.unsqueeze(-1) & fallback)
+
+        pred_set = pred_set.to(dtype=probs.dtype)
+        return pred_set / pred_set.sum(dim=-1, keepdim=True)
