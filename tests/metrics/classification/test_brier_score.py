@@ -155,6 +155,40 @@ class TestBrierScore:
         metric.update(vec3d, vec3d_target)
         assert metric.compute() == 1
 
+    def test_mixed_2d_and_3d_updates(self) -> None:
+        metric = BrierScore(num_classes=2, reduction="mean")
+        metric.update(torch.tensor([[0.0, 1.0]]), torch.tensor([1]))
+        metric.update(
+            torch.tensor([[[1.0, 0.0], [1.0, 0.0]]]),
+            torch.tensor([1]),
+        )
+
+        # The first sample has score 0 and the second has estimator-mean score 2.
+        torch.testing.assert_close(metric.compute(), torch.tensor(1.0))
+
+    def test_none_reduction_averages_estimators_per_sample(self) -> None:
+        probs = torch.tensor(
+            [
+                [[0.0, 1.0], [1.0, 0.0]],
+                [[0.5, 0.5], [0.5, 0.5]],
+            ]
+        )
+        metric = BrierScore(num_classes=2, reduction="none")
+        metric.update(probs, torch.tensor([1, 0]))
+
+        assert metric.compute().shape == (2,)
+        torch.testing.assert_close(metric.compute(), torch.tensor([1.0, 0.5]))
+
+    def test_binary_brier_and_top_class(self) -> None:
+        probs = torch.tensor([0.1, 0.8])
+        target = torch.tensor([0, 1])
+
+        metric = BrierScore(num_classes=1)
+        top_metric = BrierScore(num_classes=1, top_class=True)
+
+        torch.testing.assert_close(metric(probs, target), torch.tensor(0.025))
+        torch.testing.assert_close(top_metric(probs, target), torch.tensor(0.025))
+
     def test_compute_3d_sum(self, vec3d: torch.Tensor, vec3d_target: torch.Tensor) -> None:
         metric = BrierScore(num_classes=2, reduction="sum")
         metric.update(vec3d, vec3d_target)
@@ -177,6 +211,33 @@ class TestBrierScore:
         metric = BrierScore(num_classes=2, reduction="none")
         with pytest.raises(ValueError):
             metric.update(torch.ones(2, 2, 2, 2), torch.ones(2, 2, 2, 2))
+
+    @pytest.mark.parametrize(
+        ("probs", "target", "match"),
+        [
+            (torch.ones(2), torch.zeros(2, dtype=torch.long), "One-dimensional"),
+            (torch.ones(2, 3), torch.zeros(2, dtype=torch.long), "Expected 2 classes"),
+            (torch.ones(2, 2), torch.zeros(2, 2, 2), "Expected `target`"),
+            (torch.ones(2, 2), torch.zeros(3, dtype=torch.long), "same batch size"),
+        ],
+    )
+    def test_invalid_input_shapes(
+        self,
+        probs: torch.Tensor,
+        target: torch.Tensor,
+        match: str,
+    ) -> None:
+        with pytest.raises(ValueError, match=match):
+            BrierScore(num_classes=2).update(probs, target)
+
+    def test_binary_column_target_and_ensemble_top_class(self) -> None:
+        probs = torch.tensor([[[0.1], [0.3]], [[0.8], [0.6]]])
+        target = torch.tensor([[0], [1]])
+
+        metric = BrierScore(num_classes=1, top_class=True, reduction="none")
+        metric.update(probs, target)
+
+        torch.testing.assert_close(metric.compute(), torch.tensor([0.05, 0.10]))
 
     def test_bad_argument(self) -> None:
         with pytest.raises(ValueError, match=r"Expected argument `reduction` to be one of"):

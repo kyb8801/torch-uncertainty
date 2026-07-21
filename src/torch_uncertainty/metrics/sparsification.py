@@ -6,7 +6,6 @@ from matplotlib.axes import Axes
 from matplotlib.figure import Figure
 from torch import Tensor
 from torchmetrics.metric import Metric
-from torchmetrics.utilities.compute import _auc_compute
 from torchmetrics.utilities.data import dim_zero_cat
 from torchmetrics.utilities.plot import _AX_TYPE
 
@@ -55,6 +54,18 @@ class AUSE(Metric):
             scores: uncertainty scores of shape :math:`(B,)`
             errors: errors of shape :math:`(B,)`
         """
+        if scores.ndim != 1 or errors.ndim != 1:
+            raise ValueError("Expected `scores` and `errors` to be one-dimensional tensors.")
+        if scores.shape != errors.shape:
+            raise ValueError(
+                "Expected `scores` and `errors` to have the same shape, but got "
+                f"{scores.shape} and {errors.shape}."
+            )
+        if errors.is_floating_point() and not torch.isfinite(errors).all():
+            raise ValueError("Expected `errors` to contain only finite values.")
+        if torch.any(errors < 0):
+            raise ValueError("Expected `errors` to contain only non-negative values.")
+
         self.scores.append(scores)
         self.errors.append(errors)
 
@@ -62,11 +73,11 @@ class AUSE(Metric):
         scores = dim_zero_cat(self.scores)
         errors = dim_zero_cat(self.errors)
         if scores.shape[0] < 2:
-            nan = torch.tensor([float("nan")], device=self.device)
+            nan = torch.tensor(float("nan"), device=self.device)
             return nan, nan
         error_rates = _ause_rejection_rate_compute(scores, errors)
         optimal_error_rates = _ause_rejection_rate_compute(errors, errors)
-        return error_rates.cpu(), optimal_error_rates.cpu()
+        return error_rates, optimal_error_rates
 
     def compute(self) -> Tensor:
         """Compute the Area Under the Sparsification Error curve (AUSE) based
@@ -76,12 +87,13 @@ class AUSE(Metric):
             Tensor: The AUSE.
         """
         error_rates, optimal_error_rates = self.partial_compute()
-        if torch.isnan(error_rates[0]).item():
-            return torch.tensor([float("nan")], device=self.device)
+        if error_rates.ndim == 0:
+            return error_rates
         num_samples = error_rates.size(0)
-        x = torch.arange(0, num_samples, device=self.device) / num_samples
+        x = torch.arange(num_samples, device=error_rates.device, dtype=error_rates.dtype)
+        x /= num_samples
         y = error_rates - optimal_error_rates
-        return torch.tensor([_auc_compute(x, y)])
+        return torch.trapezoid(y, x)
 
     def plot(  # pyrefly: ignore[bad-override]
         self,
@@ -106,23 +118,26 @@ class AUSE(Metric):
 
         # Computation of AUSEC
         error_rates, optimal_error_rates = self.partial_compute()
+        if error_rates.ndim == 0:
+            raise RuntimeError("AUSE requires at least two samples before plotting.")
         num_samples = error_rates.size(0)
-        x = torch.arange(num_samples) / num_samples
+        x = torch.arange(num_samples, device=error_rates.device, dtype=error_rates.dtype)
+        x /= num_samples
         y = error_rates - optimal_error_rates
 
-        ausec = _auc_compute(x, y).cpu().item()
+        ausec = torch.trapezoid(y, x).item()
 
-        rejection_rates = torch.arange(num_samples) / num_samples * 100
+        rejection_rates = x.cpu() * 100
 
         ax.plot(
             rejection_rates,
-            error_rates * 100,
+            error_rates.cpu() * 100,
             label="Model",
         )
         if plot_oracle:
             ax.plot(
                 rejection_rates,
-                optimal_error_rates * 100,
+                optimal_error_rates.cpu() * 100,
                 label="Oracle",
             )
 
@@ -158,10 +173,23 @@ def _ause_rejection_rate_compute(
     """
     num_samples = errors.size(0)
 
-    order = scores.argsort()
-    errors = errors[order]
+    dtype = errors.dtype if errors.is_floating_point() else torch.get_default_dtype()
+    ordered_errors = errors[scores.argsort()].to(dtype)
 
-    error_rates = torch.zeros(num_samples + 1)
-    error_rates[0] = errors.sum()
-    error_rates[1:] = errors.cumsum(dim=-1).flip(0)
-    return error_rates / error_rates[0]
+    # At rejection step k, the k samples with the highest uncertainty have
+    # been discarded. Since scores are sorted increasingly, the retained
+    # samples form the prefix ending at N-k.
+    remaining_sum = ordered_errors.cumsum(dim=0).flip(0)
+    remaining_count = torch.arange(
+        num_samples,
+        0,
+        -1,
+        device=errors.device,
+        dtype=dtype,
+    )
+    error_rates = remaining_sum / remaining_count
+
+    initial_error = ordered_errors.mean()
+    if initial_error == 0:
+        return torch.zeros_like(error_rates)
+    return error_rates / initial_error

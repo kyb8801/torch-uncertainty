@@ -73,6 +73,7 @@ class ClassificationRoutine(LightningModule):
         eval_grouping_loss: bool = False,
         ood_criterion: TUOODCriterion | str = "msp",
         post_processing: PostProcessing | None = None,
+        scod_ood_cost: float = 0.5,
         num_bins_calibration_error: int = 15,
         log_plots: bool = False,
         save_to_csv: bool = False,
@@ -103,6 +104,10 @@ class ClassificationRoutine(LightningModule):
                 Probability score.
             post_processing: Post-processing method to train on the calibration set. No post-processing if None.
                 Defaults to ``None``.
+            scod_ood_cost: Relative cost of accepting an out-of-distribution sample
+                when computing SCOD metrics. The cost of accepting a misclassified
+                in-distribution sample is ``1 - scod_ood_cost``. Must be between
+                ``0`` and ``1``. Defaults to ``0.5``.
             num_bins_calibration_error: Number of bins to compute calibration error metrics.
                 Defaults to ``15``.
             log_plots: Indicates whether to log plots from metrics. Defaults to ``False``.
@@ -143,6 +148,7 @@ class ClassificationRoutine(LightningModule):
             num_bins_calibration_error=num_bins_calibration_error,
             mixup_params=mixup_params,
             post_processing=post_processing,
+            scod_ood_cost=scod_ood_cost,
             format_batch_fn=format_batch_fn,
         )
 
@@ -172,6 +178,7 @@ class ClassificationRoutine(LightningModule):
         if self.post_processing is not None:
             self.post_processing.set_model(self.model)
 
+        self.scod_ood_cost = scod_ood_cost
         self._init_metrics()
         self.mixup = self._init_mixup(mixup_params)
 
@@ -250,23 +257,30 @@ class ClassificationRoutine(LightningModule):
         self.test_id_entropy = Entropy()
 
         if self.eval_ood:
-            ood_metrics = MetricCollection(
+            self.test_ood_metrics = MetricCollection(
                 {
                     "AUROC": BinaryAUROC(),
                     "AUPR": BinaryAveragePrecision(),
                     "FPR95": FPR95(pos_label=1),
-                    "SCOD_AURC": SCODAURC(),
-                    "SCOD_AUGRC": SCODAUGRC(),
-                    "SCOD_Cov_5Risk": SCODCovAt5Risk(),
-                    "SCOD_Risk_80Cov": SCODRiskAt80Cov(),
                 },
                 compute_groups=[
                     ["AUROC", "AUPR"],
                     ["FPR95"],
+                ],
+            ).clone(prefix="ood/")
+
+            self.test_scod_metrics = MetricCollection(
+                {
+                    "SCOD_AURC": SCODAURC(ood_cost=self.scod_ood_cost),
+                    "SCOD_AUGRC": SCODAUGRC(ood_cost=self.scod_ood_cost),
+                    "SCOD_Cov_5Risk": SCODCovAt5Risk(ood_cost=self.scod_ood_cost),
+                    "SCOD_Risk_80Cov": SCODRiskAt80Cov(ood_cost=self.scod_ood_cost),
+                },
+                compute_groups=[
                     ["SCOD_AURC", "SCOD_AUGRC", "SCOD_Cov_5Risk", "SCOD_Risk_80Cov"],
                 ],
-            )
-            self.test_ood_metrics = ood_metrics.clone(prefix="ood/")
+            ).clone(prefix="ood/")
+
             self.test_ood_entropy = Entropy()
 
         if self.eval_shift:
@@ -442,16 +456,13 @@ class ClassificationRoutine(LightningModule):
         logits = self.forward(inputs, save_feats=self.eval_grouping_loss)
         logits = rearrange(logits, "(m b) c -> b m c", b=targets.size(0))
 
-        if self.binary_cls:
-            probs_per_est = torch.sigmoid(logits).squeeze(-1)
-        else:
-            probs_per_est = F.softmax(logits, dim=-1)
-
+        probs_per_est = torch.sigmoid(logits) if self.binary_cls else F.softmax(logits, dim=-1)
         probs = probs_per_est.mean(dim=1)
-        self.val_cls_metrics.update(probs, targets)
+        task_probs = probs.squeeze(-1) if self.binary_cls else probs
+        self.val_cls_metrics.update(task_probs, targets)
 
         if self.eval_grouping_loss:
-            self.val_grouping_loss.update(probs, targets, self.features)
+            self.val_grouping_loss.update(task_probs, targets, self.features)
 
     def test_step(
         self,
@@ -484,6 +495,13 @@ class ClassificationRoutine(LightningModule):
         logits = rearrange(logits, "(m b) c -> b m c", b=targets.size(0))
         probs_per_est = torch.sigmoid(logits) if self.binary_cls else F.softmax(logits, dim=-1)
         probs = probs_per_est.mean(dim=1)
+        task_probs = probs.squeeze(-1) if self.binary_cls else probs
+        categorical_probs_per_est = (
+            torch.cat((1 - probs_per_est, probs_per_est), dim=-1)
+            if self.binary_cls
+            else probs_per_est
+        )
+        categorical_probs = categorical_probs_per_est.mean(dim=1)
 
         pp_probs: Tensor | None = None
         pp_epistemic: Tensor | None = None
@@ -502,9 +520,9 @@ class ClassificationRoutine(LightningModule):
         if self.ood_criterion.input_type == OODCriterionInputType.LOGIT:
             ood_scores = self.ood_criterion(logits)
         elif self.ood_criterion.input_type == OODCriterionInputType.PROB:
-            ood_scores = self.ood_criterion(probs)
+            ood_scores = self.ood_criterion(categorical_probs)
         elif self.ood_criterion.input_type == OODCriterionInputType.ESTIMATOR_PROB:
-            ood_scores = self.ood_criterion(probs_per_est)
+            ood_scores = self.ood_criterion(categorical_probs_per_est)
         elif self.ood_criterion.input_type == OODCriterionInputType.POST_PROCESSING:
             if isinstance(self.post_processing, DEUP):
                 ood_scores = self.ood_criterion(pp_epistemic)
@@ -512,21 +530,26 @@ class ClassificationRoutine(LightningModule):
                 ood_scores = self.ood_criterion(pp_probs)
 
         if dataloader_idx == 0:
-            # squeeze if binary classification only for binary metrics
-            self.test_cls_metrics.update(
-                probs.squeeze(-1) if self.binary_cls else probs,
-                targets,
-            )
-            self.test_id_entropy.update(probs)
+            self.test_cls_metrics.update(task_probs, targets)
+            self.test_id_entropy.update(categorical_probs)
 
             if self.eval_grouping_loss:
-                self.test_grouping_loss.update(probs, targets, self.features)
+                self.test_grouping_loss.update(task_probs, targets, self.features)
 
             if self.is_ensemble:
-                self.test_id_ens_metrics.update(probs_per_est)
+                self.test_id_ens_metrics.update(categorical_probs_per_est)
 
             if self.eval_ood:
                 self.test_ood_metrics.update(ood_scores, torch.zeros_like(targets))
+
+                id_preds = (task_probs >= 0.5).long() if self.binary_cls else probs.argmax(dim=-1)
+
+                classification_errors = id_preds.ne(targets)
+                self.test_scod_metrics.update(
+                    ood_scores,
+                    classification_errors=classification_errors,
+                    is_ood=torch.zeros_like(classification_errors),
+                )
 
             if self.id_score_storage is not None:
                 self.id_score_storage.append(ood_scores.detach().cpu())
@@ -535,21 +558,28 @@ class ClassificationRoutine(LightningModule):
                 self.post_cls_metrics.update(pp_probs, targets)
 
         if self.eval_ood and dataloader_idx == 1:
-            self.test_ood_entropy.update(probs)
+            self.test_ood_entropy.update(categorical_probs)
             self.test_ood_metrics.update(ood_scores, torch.ones_like(targets))
 
+            is_ood = torch.ones_like(targets, dtype=torch.bool)
+            self.test_scod_metrics.update(
+                ood_scores,
+                classification_errors=torch.zeros_like(is_ood),
+                is_ood=is_ood,
+            )
+
             if self.is_ensemble:
-                self.test_ood_ens_metrics.update(probs_per_est)
+                self.test_ood_ens_metrics.update(categorical_probs_per_est)
 
             if self.ood_score_storage is not None:
                 self.ood_score_storage.append(ood_scores.detach().cpu())
 
         if self.eval_shift and dataloader_idx == (2 if self.eval_ood else 1):
-            self.test_shift_entropy.update(probs)
-            self.test_shift_metrics.update(probs, targets)
+            self.test_shift_entropy.update(categorical_probs)
+            self.test_shift_metrics.update(task_probs, targets)
 
             if self.is_ensemble:
-                self.test_shift_ens_metrics.update(probs_per_est)
+                self.test_shift_ens_metrics.update(categorical_probs_per_est)
 
     def on_validation_epoch_end(self) -> None:
         """Compute and log the values of the collected metrics in `validation_step`."""
@@ -587,9 +617,11 @@ class ClassificationRoutine(LightningModule):
             result_dict |= self.test_id_ens_metrics.compute()
 
         if self.eval_ood:
-            result_dict |= self.test_ood_metrics.compute() | {
-                "ood/Entropy": self.test_ood_entropy.compute()
-            }
+            result_dict |= (
+                self.test_ood_metrics.compute()
+                | self.test_scod_metrics.compute()
+                | {"ood/Entropy": self.test_ood_entropy.compute()}
+            )
             if self.is_ensemble:
                 result_dict |= self.test_ood_ens_metrics.compute()
 
@@ -618,6 +650,7 @@ class ClassificationRoutine(LightningModule):
             self.test_id_ens_metrics.reset()
         if self.eval_ood:
             self.test_ood_metrics.reset()
+            self.test_scod_metrics.reset()
             self.test_ood_entropy.reset()
             if self.is_ensemble:
                 self.test_ood_ens_metrics.reset()
@@ -671,6 +704,7 @@ def _classification_routine_checks(
     num_bins_calibration_error: int,
     mixup_params: dict | None,
     post_processing: PostProcessing | None,
+    scod_ood_cost: float,
     format_batch_fn: nn.Module | None,
 ) -> None:
     """Check the domains of the arguments of the classification routine.
@@ -684,6 +718,8 @@ def _classification_routine_checks(
         num_bins_calibration_error: the number of bins for the evaluation of the calibration.
         mixup_params: the dictionary to setup the mixup augmentation.
         post_processing: the post-processing module.
+        scod_ood_cost: Cost of accepting an OOD sample in SCOD metrics.
+            Misclassified ID samples cost ``1 - scod_ood_cost``.
         format_batch_fn: the function for formatting the batch for ensembles.
     """
     ood_criterion = get_ood_criterion(ood_criterion)
@@ -709,7 +745,7 @@ def _classification_routine_checks(
 
     if num_classes < 1:
         raise ValueError(
-            f"The number of classes must be a positive integer >= 1. Got {num_classes}."
+            f"The number of classes must be a positive integer >= 1. Got {num_classes=}."
         )
 
     if eval_grouping_loss and not hasattr(model, "feats_forward"):
@@ -727,7 +763,7 @@ def _classification_routine_checks(
 
     if num_bins_calibration_error < 2:
         raise ValueError(
-            f"num_bins_calibration_error must be at least 2, got {num_bins_calibration_error}."
+            f"num_bins_calibration_error must be at least 2, got {num_bins_calibration_error=}."
         )
 
     if mixup_params is not None and isinstance(format_batch_fn, RepeatTarget):
@@ -739,3 +775,10 @@ def _classification_routine_checks(
         raise ValueError(
             "Ensembles and post-processing methods cannot be used together. Raise an issue if needed."
         )
+
+    if not isinstance(scod_ood_cost, float):
+        raise TypeError(
+            f"Expected scod_ood_cost to be of type float, but got {type(scod_ood_cost)=}"
+        )
+    if not 0 <= scod_ood_cost <= 1:
+        raise ValueError(f"scod_ood_cost should be in the range [0, 1], but got {scod_ood_cost=}.")

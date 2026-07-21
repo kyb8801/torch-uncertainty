@@ -465,14 +465,28 @@ class TestClassification:
             eval_ood=True,
         )
         assert routine.test_ood_metrics.prefix == "ood/"
-        assert "SCOD_AURC" in routine.test_ood_metrics
-        assert "SCOD_AUGRC" in routine.test_ood_metrics
-        assert "SCOD_Cov_5Risk" in routine.test_ood_metrics
-        assert "SCOD_Risk_80Cov" in routine.test_ood_metrics
+        assert "SCOD_AURC" in routine.test_scod_metrics
+        assert "SCOD_AUGRC" in routine.test_scod_metrics
+        assert "SCOD_Cov_5Risk" in routine.test_scod_metrics
+        assert "SCOD_Risk_80Cov" in routine.test_scod_metrics
 
         # num_classes
         with pytest.raises(ValueError):
             ClassificationRoutine(num_classes=0, model=nn.Module(), loss=None)
+        with pytest.raises(TypeError, match="scod_ood_cost"):
+            ClassificationRoutine(
+                num_classes=2,
+                model=nn.Identity(),
+                loss=None,
+                scod_ood_cost=1,
+            )
+        with pytest.raises(ValueError, match="scod_ood_cost"):
+            ClassificationRoutine(
+                num_classes=2,
+                model=nn.Identity(),
+                loss=None,
+                scod_ood_cost=1.1,
+            )
         # single & MI
         with pytest.raises(ValueError):
             ClassificationRoutine(
@@ -584,3 +598,69 @@ class TestClassification:
                 model=nn.Module(),
                 loss=None,
             ).training_step((torch.tensor(float("nan")), torch.tensor(float("nan"))))
+
+    def test_binary_ensemble_uses_categorical_probs_for_uncertainty_metrics(self) -> None:
+        positive_probs = torch.tensor(
+            [
+                [[0.9], [0.1]],
+                [[0.2], [0.8]],
+            ]
+        )
+        # ClassificationRoutine expects estimator-major model outputs: (M * B, C).
+        logits = torch.logit(positive_probs).transpose(0, 1).reshape(-1, 1)
+        targets = torch.tensor([0, 1])
+        routine = ClassificationRoutine(
+            model=nn.Identity(),
+            num_classes=1,
+            loss=None,
+            is_ensemble=True,
+            ood_criterion=EntropyCriterion(),
+        )
+        routine.test_num_flops = 0
+        criterion_inputs = []
+        hook = routine.ood_criterion.register_forward_pre_hook(
+            lambda _, args: criterion_inputs.append(args[0])
+        )
+
+        routine.test_step((logits, targets), batch_idx=0)
+        hook.remove()
+
+        categorical_probs = torch.cat((1 - positive_probs, positive_probs), dim=-1)
+        mean_probs = categorical_probs.mean(dim=1)
+        predictive_entropy = torch.special.entr(mean_probs).sum(dim=-1)
+        expected_entropy = torch.special.entr(categorical_probs).sum(dim=-1).mean()
+        expected_mi = (
+            predictive_entropy - torch.special.entr(categorical_probs).sum(dim=-1).mean(dim=1)
+        ).mean()
+        ensemble_metrics = routine.test_id_ens_metrics.compute()
+
+        assert criterion_inputs[0].shape == (2, 2, 2)
+        torch.testing.assert_close(criterion_inputs[0].sum(dim=-1), torch.ones(2, 2))
+        torch.testing.assert_close(routine.test_id_entropy.compute(), predictive_entropy.mean())
+        torch.testing.assert_close(ensemble_metrics["test/ens_Entropy"], expected_entropy)
+        torch.testing.assert_close(ensemble_metrics["test/ens_MI"], expected_mi)
+        torch.testing.assert_close(ensemble_metrics["test/ens_Disagreement"], torch.tensor(1.0))
+
+    def test_binary_scod_metrics_receive_id_errors_and_ood_indicators(self) -> None:
+        routine = ClassificationRoutine(
+            model=nn.Identity(),
+            num_classes=1,
+            loss=None,
+            eval_ood=True,
+            ood_criterion=EntropyCriterion(),
+        )
+        routine.test_num_flops = 0
+
+        routine.test_step(
+            (torch.tensor([[-2.0], [2.0]]), torch.tensor([1, 1])),
+            batch_idx=0,
+            dataloader_idx=0,
+        )
+        routine.test_step(
+            (torch.tensor([[0.0], [1.0]]), torch.tensor([0, 0])),
+            batch_idx=0,
+            dataloader_idx=1,
+        )
+
+        errors = torch.cat(routine.test_scod_metrics["SCOD_AURC"].errors)
+        torch.testing.assert_close(errors, torch.tensor([0.5, 0.0, 0.5, 0.5]))

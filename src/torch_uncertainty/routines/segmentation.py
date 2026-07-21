@@ -20,8 +20,6 @@ from torch_uncertainty.methods import (
 from torch_uncertainty.metrics import (
     AUGRC,
     AURC,
-    SCODAUGRC,
-    SCODAURC,
     BrierScore,
     CalibrationError,
     CategoricalNLL,
@@ -29,8 +27,6 @@ from torch_uncertainty.metrics import (
     MeanIntersectionOverUnion,
     PAvPU,
     RiskAt80Cov,
-    SCODCovAt5Risk,
-    SCODRiskAt80Cov,
     SegmentationBinaryAUROC,
     SegmentationBinaryAveragePrecision,
     SegmentationFPR95,
@@ -225,13 +221,9 @@ class SegmentationRoutine(LightningModule):
         if self.eval_ood:
             ood_metrics = MetricCollection(
                 {
-                    "AUROC": SegmentationBinaryAUROC(),
-                    "AUPR": SegmentationBinaryAveragePrecision(),
-                    "FPR95": SegmentationFPR95(pos_label=1),
-                    "SCOD_AURC": SCODAURC(),
-                    "SCOD_AUGRC": SCODAUGRC(),
-                    "SCOD_Cov_5Risk": SCODCovAt5Risk(),
-                    "SCOD_Risk_80Cov": SCODRiskAt80Cov(),
+                    "AUROC": SegmentationBinaryAUROC(ignore_index=255),
+                    "AUPR": SegmentationBinaryAveragePrecision(ignore_index=255),
+                    "FPR95": SegmentationFPR95(pos_label=1, ignore_index=255),
                 }
             )
             self.test_ood_metrics = ood_metrics.clone(prefix="ood/")
@@ -386,13 +378,11 @@ class SegmentationRoutine(LightningModule):
 
         if self.eval_ood and dataloader_idx == 1:
             if self.ood_criterion.input_type == OODCriterionInputType.PROB:
-                ood_scores = self.ood_criterion(
-                    rearrange(probs, "b c h w -> b h w c")[~ignore_mask]
-                )
+                flat_probs = rearrange(probs, "b c h w -> (b h w) c")
+                ood_scores = self.ood_criterion(flat_probs).reshape_as(targets)
             elif self.ood_criterion.input_type == OODCriterionInputType.ESTIMATOR_PROB:
-                ood_scores = self.ood_criterion(
-                    rearrange(probs_per_est, "b m c h w -> b h w m c")[~ignore_mask]
-                )
+                flat_probs_per_est = rearrange(probs_per_est, "b m c h w -> (b h w) m c")
+                ood_scores = self.ood_criterion(flat_probs_per_est).reshape_as(targets)
             else:
                 raise ValueError(
                     f"Unsupported input type for OOD criterion: {self.ood_criterion.input_type}"
@@ -401,8 +391,9 @@ class SegmentationRoutine(LightningModule):
             labels = torch.zeros_like(targets)
             labels[id_mask] = 0  # ID examples
             labels[ood_mask] = 1  # OOD examples
+            labels[ignore_mask] = 255
 
-            self.test_ood_metrics.update(ood_scores, labels[~ignore_mask])
+            self.test_ood_metrics.update(ood_scores, labels)
 
     def on_validation_epoch_end(self) -> None:
         """Compute and log the values of the collected metrics in `validation_step`."""
