@@ -1,3 +1,4 @@
+import math
 from typing import Literal
 
 import torch
@@ -56,6 +57,11 @@ class ConformalClsRAPS(ConformalClsAPS):
             This implementation only works in the multiclass setting. Raise an issue
             if binary support is needed.
 
+        Note:
+            Outputs are uniform probability vectors over the selected classes. Empty
+            thresholded sets are replaced by the lowest-score singleton before
+            normalization.
+
         Reference:
             - `Angelopoulos, A. N., Bates, S., Jordan, M., & Malik, J. (2021).
               Uncertainty Sets for Image Classifiers using Conformal Prediction. ICLR 2021
@@ -73,15 +79,21 @@ class ConformalClsRAPS(ConformalClsAPS):
             enable_ts=enable_ts,
             device=device,
         )
+        if not isinstance(penalty, float | int):
+            raise TypeError(f"penalty should be a float or integer. Got {type(penalty)=}.")
+        if not math.isfinite(penalty):
+            raise ValueError(f"penalty should be finite. Got {penalty=}.")
         if penalty < 0:
-            raise ValueError(f"penalty should be non-negative. Got {penalty}.")
+            raise ValueError(f"penalty should be non-negative. Got {penalty=}.")
 
         if not isinstance(regularization_rank, int):
-            raise TypeError(f"regularization_rank should be an integer. Got {regularization_rank}.")
+            raise TypeError(
+                f"regularization_rank should be an integer. Got {regularization_rank=}."
+            )
 
-        if regularization_rank < 0:
+        if regularization_rank < 1:
             raise ValueError(
-                f"regularization_rank should be non-negative. Got {regularization_rank}."
+                f"regularization_rank should be strictly positive. Got {regularization_rank=}."
             )
 
         self.penalty = penalty
