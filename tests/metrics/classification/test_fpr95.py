@@ -45,3 +45,21 @@ class TestFPR95:
         # Reaching 95% recall requires accepting the complete score-0.1 tie,
         # which also accepts the only negative example.
         torch.testing.assert_close(FPR95(pos_label=1)(scores, target), torch.tensor(1.0))
+
+    def test_zero_recall(self) -> None:
+        metric = FPRx(recall_level=0, pos_label=1)
+        result = metric(torch.tensor([0.2, 0.8]), torch.tensor([0, 1]))
+        torch.testing.assert_close(result, torch.tensor(0.0))
+
+    def test_mismatched_number_of_values(self) -> None:
+        metric = FPR95(pos_label=1)
+        metric.update(torch.tensor([0.1, 0.9]), torch.tensor([1]))
+        with pytest.raises(ValueError, match="same shape"):
+            metric.compute()
+
+    @pytest.mark.parametrize("target", [torch.tensor([0, 0]), torch.tensor([1, 1])])
+    def test_degenerate_integer_scores_return_float_nan(self, target: torch.Tensor) -> None:
+        metric = FPR95(pos_label=1)
+        result = metric(torch.tensor([0, 1]), target)
+        assert result.dtype == torch.float32
+        assert torch.isnan(result)

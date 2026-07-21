@@ -212,6 +212,33 @@ class TestBrierScore:
         with pytest.raises(ValueError):
             metric.update(torch.ones(2, 2, 2, 2), torch.ones(2, 2, 2, 2))
 
+    @pytest.mark.parametrize(
+        ("probs", "target", "match"),
+        [
+            (torch.ones(2), torch.zeros(2, dtype=torch.long), "One-dimensional"),
+            (torch.ones(2, 3), torch.zeros(2, dtype=torch.long), "Expected 2 classes"),
+            (torch.ones(2, 2), torch.zeros(2, 2, 2), "Expected `target`"),
+            (torch.ones(2, 2), torch.zeros(3, dtype=torch.long), "same batch size"),
+        ],
+    )
+    def test_invalid_input_shapes(
+        self,
+        probs: torch.Tensor,
+        target: torch.Tensor,
+        match: str,
+    ) -> None:
+        with pytest.raises(ValueError, match=match):
+            BrierScore(num_classes=2).update(probs, target)
+
+    def test_binary_column_target_and_ensemble_top_class(self) -> None:
+        probs = torch.tensor([[[0.1], [0.3]], [[0.8], [0.6]]])
+        target = torch.tensor([[0], [1]])
+
+        metric = BrierScore(num_classes=1, top_class=True, reduction="none")
+        metric.update(probs, target)
+
+        torch.testing.assert_close(metric.compute(), torch.tensor([0.05, 0.10]))
+
     def test_bad_argument(self) -> None:
         with pytest.raises(ValueError, match=r"Expected argument `reduction` to be one of"):
             _ = BrierScore(num_classes=2, reduction="geometric_mean")

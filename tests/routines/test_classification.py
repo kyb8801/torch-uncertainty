@@ -473,6 +473,20 @@ class TestClassification:
         # num_classes
         with pytest.raises(ValueError):
             ClassificationRoutine(num_classes=0, model=nn.Module(), loss=None)
+        with pytest.raises(TypeError, match="scod_ood_cost"):
+            ClassificationRoutine(
+                num_classes=2,
+                model=nn.Identity(),
+                loss=None,
+                scod_ood_cost=1,
+            )
+        with pytest.raises(ValueError, match="scod_ood_cost"):
+            ClassificationRoutine(
+                num_classes=2,
+                model=nn.Identity(),
+                loss=None,
+                scod_ood_cost=1.1,
+            )
         # single & MI
         with pytest.raises(ValueError):
             ClassificationRoutine(
@@ -626,3 +640,27 @@ class TestClassification:
         torch.testing.assert_close(ensemble_metrics["test/ens_Entropy"], expected_entropy)
         torch.testing.assert_close(ensemble_metrics["test/ens_MI"], expected_mi)
         torch.testing.assert_close(ensemble_metrics["test/ens_Disagreement"], torch.tensor(1.0))
+
+    def test_binary_scod_metrics_receive_id_errors_and_ood_indicators(self) -> None:
+        routine = ClassificationRoutine(
+            model=nn.Identity(),
+            num_classes=1,
+            loss=None,
+            eval_ood=True,
+            ood_criterion=EntropyCriterion(),
+        )
+        routine.test_num_flops = 0
+
+        routine.test_step(
+            (torch.tensor([[-2.0], [2.0]]), torch.tensor([1, 1])),
+            batch_idx=0,
+            dataloader_idx=0,
+        )
+        routine.test_step(
+            (torch.tensor([[0.0], [1.0]]), torch.tensor([0, 0])),
+            batch_idx=0,
+            dataloader_idx=1,
+        )
+
+        errors = torch.cat(routine.test_scod_metrics["SCOD_AURC"].errors)
+        torch.testing.assert_close(errors, torch.tensor([0.5, 0.0, 0.5, 0.5]))

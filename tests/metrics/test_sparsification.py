@@ -50,6 +50,12 @@ class TestAUSE:
         assert ax.get_ylabel() == "Error Rate (%)"
         plt.close(fig)
 
+        external_fig, external_ax = plt.subplots()
+        returned_fig, returned_ax = metric.plot(ax=external_ax)
+        assert returned_fig is None
+        assert returned_ax is external_ax
+        plt.close(external_fig)
+
         metric = AUSE()
         metric.update(scores, values)
         fig, ax = metric.plot(plot_oracle=False, plot_value=False)
@@ -73,3 +79,15 @@ class TestAUSE:
             metric.update(torch.ones(2), torch.ones(3))
         with pytest.raises(ValueError, match="non-negative"):
             metric.update(torch.ones(2), torch.tensor([1.0, -1.0]))
+        with pytest.raises(ValueError, match="finite"):
+            metric.update(torch.ones(2), torch.tensor([1.0, float("nan")]))
+
+    def test_integer_errors_and_too_few_samples_for_plot(self) -> None:
+        metric = AUSE()
+        metric.update(torch.tensor([0.2, 0.1]), torch.tensor([2, 1]))
+        assert metric.compute().dtype == torch.get_default_dtype()
+
+        metric = AUSE()
+        metric.update(torch.tensor([0.2]), torch.tensor([1.0]))
+        with pytest.raises(RuntimeError, match="at least two samples"):
+            metric.plot()

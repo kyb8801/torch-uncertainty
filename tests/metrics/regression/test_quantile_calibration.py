@@ -104,3 +104,36 @@ class TestQuantileCalibrationError:
         qce = QuantileCalibrationError()
         with pytest.raises(ValueError, match="target"):
             qce.update(Normal(torch.zeros(2), torch.ones(2)), torch.zeros(3))
+
+    def test_ignore_index(self) -> None:
+        dist = Normal(torch.zeros(3), torch.ones(3))
+        qce = QuantileCalibrationError(ignore_index=-1)
+        qce.update(dist, torch.tensor([0.0, -1.0, 0.0]))
+
+        assert qce.total == 2
+        assert torch.isfinite(qce.compute())
+
+    def test_shape_validation_can_be_disabled(self) -> None:
+        dist = Normal(torch.zeros(2), torch.ones(2))
+        qce = QuantileCalibrationError(validate_args=False)
+        qce.update(dist, torch.zeros(2))
+        assert torch.isfinite(qce.compute())
+
+    def test_invalid_ignore_mask_shape(self) -> None:
+        dist = Normal(torch.zeros(2, 3), torch.ones(2, 3))
+        qce = QuantileCalibrationError()
+
+        with pytest.raises(ValueError, match="broadcastable"):
+            qce.update(dist, torch.zeros(2, 3), ignore_mask=torch.zeros(4))
+
+    def test_plot_requires_supported_distribution_and_valid_targets(self) -> None:
+        empty = QuantileCalibrationError()
+        with pytest.raises(RuntimeError, match="at least one valid target"):
+            empty.plot()
+
+        unsupported = QuantileCalibrationError()
+        dist = Distribution(batch_shape=torch.Size([2]), validate_args=False)
+        with pytest.warns(UserWarning, match="does not support"):
+            unsupported.update(dist, torch.zeros(2))
+        with pytest.raises(NotImplementedError, match="does not support"):
+            unsupported.plot()

@@ -295,3 +295,14 @@ class TestSCODRiskCoverageValidation:
                 classification_errors=torch.tensor([False]),
                 is_ood=torch.tensor([False, True]),
             )
+
+    @pytest.mark.parametrize("value", [float("nan"), float("inf"), float("-inf")])
+    def test_non_finite_ood_scores(self, value: float) -> None:
+        metric = SCODAURC()
+
+        with pytest.raises(ValueError, match="only finite values"):
+            metric.update(
+                ood_scores=torch.tensor([0.0, value]),
+                classification_errors=torch.tensor([False, False]),
+                is_ood=torch.tensor([False, True]),
+            )
